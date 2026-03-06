@@ -4,12 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
-  { label: 'Overview', href: '/dashboard' },
   { label: 'Links', href: '/dashboard/links' },
-  { label: 'Info & Content', href: '/dashboard/info' },
-  { label: 'Chat Settings', href: '/dashboard/chat' },
   { label: 'Appearance', href: '/dashboard/appearance' },
-  { label: 'Settings', href: '/dashboard/settings' },
+  { label: 'Chatbot Memory', href: '/dashboard/memory' },
+  { label: 'Analytics', href: '/dashboard/analytics' },
+  { label: 'Chats', href: '/dashboard/chats' },
 ];
 
 export function Sidebar() {
@@ -25,10 +24,7 @@ export function Sidebar() {
 
       <nav className="flex-1 space-y-1 px-3">
         {navItems.map((item) => {
-          const isActive =
-            item.href === '/dashboard'
-              ? pathname === '/dashboard'
-              : pathname.startsWith(item.href);
+          const isActive = pathname.startsWith(item.href);
 
           return (
             <Link

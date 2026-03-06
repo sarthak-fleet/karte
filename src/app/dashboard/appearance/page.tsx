@@ -5,7 +5,7 @@ import { pages } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { PageSettings } from '@/components/dashboard/page-settings';
 
-export default async function SettingsPage() {
+export default async function AppearancePage() {
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
 

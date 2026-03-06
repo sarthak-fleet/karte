@@ -80,7 +80,7 @@ export function PageSettings({ page }: PageSettingsProps) {
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-6 text-2xl font-bold text-white">
-        {isEditing ? 'Page Settings' : 'Create Your Page'}
+        {isEditing ? 'Appearance' : 'Create Your Page'}
       </h1>
 
       <div className="space-y-6 rounded-2xl border border-white/20 bg-white/5 p-6 backdrop-blur-xl">
