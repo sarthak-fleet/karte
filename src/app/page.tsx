@@ -22,12 +22,6 @@ export default function Home() {
           >
             Get Started
           </Link>
-          <Link
-            href="/demo"
-            className="rounded-xl border border-white/20 bg-white/5 px-8 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-          >
-            See Demo
-          </Link>
         </div>
       </div>
     </div>
