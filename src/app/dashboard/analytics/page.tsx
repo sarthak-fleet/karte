@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { db, ensureProjectsTable } from '@/db';
-import { pageEvents, pages, users } from '@/db/schema';
+import { pageEvents, pages } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
 type NativeAnalyticsEvent = {
@@ -52,11 +52,6 @@ function MetricCard({
 export default async function AnalyticsPage() {
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
-
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, session.user.id));
 
   const page = await db.query.pages.findFirst({
     where: eq(pages.userId, session.user.id),
@@ -170,7 +165,12 @@ export default async function AnalyticsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="mb-1 text-2xl font-bold text-white">Analytics</h1>
+      <div className="mb-1 flex items-center gap-3">
+        <h1 className="text-2xl font-bold text-white">Analytics</h1>
+        <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-200">
+          Beta
+        </span>
+      </div>
       <p className="text-sm text-gray-400">
         Native views, outbound clicks, and recent visitor activity.
       </p>
@@ -301,27 +301,6 @@ export default async function AnalyticsPage() {
               )}
             </div>
           </div>
-
-          {user?.smProjectId && (
-            <div className="rounded-2xl border border-white/20 bg-white/5 p-6 backdrop-blur-xl">
-              <h2 className="mb-2 text-lg font-semibold text-white">SaaS Maker Analytics</h2>
-              <p className="mb-4 text-sm text-gray-400">
-                Your external analytics project ID is{' '}
-                <code className="rounded bg-white/10 px-2 py-0.5 text-xs text-white/80">
-                  {user.smProjectId}
-                </code>
-              </p>
-              <a
-                href={`https://saas-maker.io/projects/${user.smProjectId}/analytics`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
-              >
-                View in SaaS Maker
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          )}
         </>
       )}
     </div>

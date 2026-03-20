@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { eq, and, asc } from 'drizzle-orm';
 import { db, ensureProjectsTable } from '@/db';
@@ -252,7 +253,9 @@ export default async function PublicPage({ params }: Props) {
         {/* Footer */}
         <p className="mt-auto pt-12 text-center text-xs text-white/30">
           Powered by{' '}
-          <span className="font-medium text-white/50">LinkChat</span>
+          <Link href="/" className="font-medium text-white/50 transition-colors hover:text-white">
+            LinkChat
+          </Link>
         </p>
       </div>
 
