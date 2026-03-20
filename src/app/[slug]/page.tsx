@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { eq, and, asc } from 'drizzle-orm';
 import { db, ensureProjectsTable } from '@/db';
@@ -125,9 +126,12 @@ export default async function PublicPage({ params }: Props) {
           <GlassCard className="w-full p-8 text-center sm:p-10">
             <div className="mx-auto max-w-2xl">
               {page.avatarUrl && (
-                <img
+                <Image
                   src={page.avatarUrl}
                   alt={page.displayName}
+                  width={96}
+                  height={96}
+                  sizes="96px"
                   className="mx-auto mb-5 h-24 w-24 rounded-full border-2 border-white/20 object-cover shadow-lg shadow-black/30"
                 />
               )}
