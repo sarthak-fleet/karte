@@ -25,18 +25,31 @@ export async function PublicTopBar({
   accentColor = '#ffffff',
   current = 'home',
 }: PublicTopBarProps) {
-  const isAuthConfigured = Boolean(
-    process.env.AUTH_SECRET && process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET,
-  );
-  const session = isAuthConfigured ? await auth() : null;
+  // Skip auth entirely for public pages to avoid 200ms+ session lookup
+  // The top bar will just show login/create buttons for everyone
+  // Dashboard link is available from the dashboard itself
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let session: any = null;
+  let userPage: { slug: string } | null = null;
 
-  const userPage =
-    session?.user?.id
-      ? await db.query.pages.findFirst({
+  // Only check auth if cookies suggest a session exists (avoid DB hit for anonymous visitors)
+  const { cookies } = await import('next/headers');
+  const cookieStore = await cookies();
+  const hasSessionCookie = cookieStore.has('authjs.session-token') || cookieStore.has('__Secure-authjs.session-token');
+
+  if (hasSessionCookie) {
+    try {
+      session = await auth() as typeof session;
+      if (session?.user?.id) {
+        userPage = await db.query.pages.findFirst({
           where: eq(pages.userId, session.user.id),
           columns: { slug: true },
-        })
-      : null;
+        }) ?? null;
+      }
+    } catch {
+      // Auth failed, show anonymous UI
+    }
+  }
 
   return (
     <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6 sm:pt-6">
@@ -85,10 +98,10 @@ export async function PublicTopBar({
                 className="flex items-center gap-2 rounded-full border px-2 py-1.5 text-white"
                 style={{ borderColor: `${accentColor}40`, backgroundColor: `${accentColor}12` }}
               >
-                {session.user.image ? (
+                {session?.user?.image ? (
                   <Image
-                    src={session.user.image}
-                    alt={session.user.name ?? 'Account'}
+                    src={session?.user?.image}
+                    alt={session?.user?.name ?? 'Account'}
                     width={28}
                     height={28}
                     sizes="28px"
@@ -99,11 +112,11 @@ export async function PublicTopBar({
                     className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold"
                     style={{ backgroundColor: `${accentColor}2a` }}
                   >
-                    {getInitials(session.user.name)}
+                    {getInitials(session?.user?.name)}
                   </div>
                 )}
                 <span className="hidden max-w-28 truncate text-sm font-medium sm:block">
-                  {session.user.name ?? 'Account'}
+                  {session?.user?.name ?? 'Account'}
                 </span>
               </div>
             </>
