@@ -2,8 +2,6 @@ import { notFound } from 'next/navigation';
 import { getFullPageData } from './_lib/get-page-data';
 import type { Metadata } from 'next';
 
-export const runtime = 'edge';
-
 type Props = { params: Promise<{ slug: string }>; children: React.ReactNode };
 
 export async function generateMetadata({
