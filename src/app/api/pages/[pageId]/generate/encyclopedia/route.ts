@@ -6,6 +6,7 @@ import { generateCompletion, parseAIResponse } from '@/lib/saasmaker';
 import { ENCYCLOPEDIA_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
 import type { EncyclopediaContent } from '@/lib/generated-page-types';
+import { getScrapedContext } from '@/lib/scrape-page-content';
 
 export async function POST(req: Request, { params }: { params: Promise<{ pageId: string }> }) {
   const { pageId } = await params;
@@ -26,10 +27,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
     return new Response(JSON.stringify({ error: 'AI not configured' }), { status: 503 });
   }
 
-  // Collect all context
-  const blocks = await db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId));
-  const pageLinks = await db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder));
-  const pageProjects = await db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder));
+  // Fetch all context + scraped content in parallel
+  const [blocks, pageLinks, pageProjects, scrapedContext] = await Promise.all([
+    db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)),
+    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
+    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
+    getScrapedContext(pageId, page),
+  ]);
 
   // Read page settings for encyclopedia customization
   const settings = (page.pageSettings as PageSettings | null)?.encyclopedia;
@@ -41,6 +45,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
     `Projects: ${pageProjects.map((p) => `${p.title}: ${p.description}`).join('\n') || 'None'}`,
     ...blocks.map((b) => `${b.title || b.type}: ${b.content}`),
     ...(settings?.context ? [`Additional context from the person: ${settings.context}`] : []),
+    ...(scrapedContext ? [scrapedContext] : []),
   ].join('\n\n');
 
   // Build system prompt with style preference

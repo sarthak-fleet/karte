@@ -1,11 +1,12 @@
 import { db, ensureProjectsTable } from '@/db';
-import { pages, users, infoBlocks, generatedPages } from '@/db/schema';
+import { pages, users, infoBlocks, links, projects, generatedPages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, asc } from 'drizzle-orm';
 import { generateCompletion, parseAIResponse } from '@/lib/saasmaker';
 import { ROAST_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
 import type { RoastContent } from '@/lib/generated-page-types';
+import { getScrapedContext } from '@/lib/scrape-page-content';
 
 export async function POST(
   req: Request,
@@ -53,15 +54,17 @@ export async function POST(
     return Response.json(existing[0].content);
   }
 
-  // Get body data
-  const body = await req.json().catch(() => ({}));
-  const { linkTitles = [], projectTitles = [] } = body;
+  // Fetch links and projects from DB
+  const [pageLinks, pageProjects] = await Promise.all([
+    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
+    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
+  ]);
 
-  // Collect all info blocks
-  const blocks = await db
-    .select()
-    .from(infoBlocks)
-    .where(eq(infoBlocks.pageId, pageId));
+  // Collect all info blocks + scrape URLs in parallel
+  const [blocks, scrapedContext] = await Promise.all([
+    db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)),
+    getScrapedContext(pageId, page),
+  ]);
 
   // Read page settings for roast customization
   const settings = (page.pageSettings as PageSettings | null)?.roast;
@@ -69,10 +72,11 @@ export async function POST(
   const context = [
     `Name: ${page.displayName}`,
     `Bio: ${page.bio || 'No bio provided'}`,
-    `Links: ${linkTitles.join(', ') || 'None'}`,
-    `Projects: ${projectTitles.join(', ') || 'None'}`,
+    `Links: ${pageLinks.map((l) => `${l.title} (${l.url})`).join(', ') || 'None'}`,
+    `Projects: ${pageProjects.map((p) => `${p.title}: ${p.description}`).join('\n') || 'None'}`,
     ...blocks.map((b) => `${b.title || b.type}: ${b.content}`),
     ...(settings?.context ? [`Additional context from the person: ${settings.context}`] : []),
+    ...(scrapedContext ? [scrapedContext] : []),
   ].join('\n\n');
 
   // Build system prompt with tone preference

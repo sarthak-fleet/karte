@@ -128,6 +128,10 @@ export async function ensureProjectsTable() {
       if (!pageColNames.has('pageSettings')) {
         await client.execute('ALTER TABLE pages ADD COLUMN pageSettings TEXT');
       }
+
+      if (!pageColNames.has('scrapedContent')) {
+        await client.execute('ALTER TABLE pages ADD COLUMN scrapedContent TEXT');
+      }
     })().catch((error) => {
       featureTablesReady = null;
       throw error;

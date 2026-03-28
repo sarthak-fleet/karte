@@ -1,5 +1,6 @@
 import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
 import type { ThemeConfig } from '@/lib/themes';
+import type { ScrapedCache } from '@/lib/scraper';
 
 // ── Page Settings Type ──────────────────────────────────────────────
 export type PageSettings = {
@@ -87,6 +88,7 @@ export const pages = sqliteTable('pages', {
   roastEnabled: integer('roastEnabled', { mode: 'boolean' }).default(false),
   newspaperEnabled: integer('newspaperEnabled', { mode: 'boolean' }).default(false),
   pageSettings: text('pageSettings', { mode: 'json' }).$type<PageSettings>(),
+  scrapedContent: text('scrapedContent', { mode: 'json' }).$type<ScrapedCache>(),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),
