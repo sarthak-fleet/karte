@@ -31,6 +31,7 @@ export default async function DashboardPagesPage() {
       initialEncyclopedia={page.encyclopediaEnabled ?? false}
       initialRoast={page.roastEnabled ?? false}
       initialNewspaper={page.newspaperEnabled ?? false}
+      initialPageSettings={page.pageSettings ?? {}}
     />
   );
 }

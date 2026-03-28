@@ -124,6 +124,10 @@ export async function ensureProjectsTable() {
           await client.execute(`ALTER TABLE pages ADD COLUMN ${col} INTEGER DEFAULT 0`);
         }
       }
+
+      if (!pageColNames.has('pageSettings')) {
+        await client.execute('ALTER TABLE pages ADD COLUMN pageSettings TEXT');
+      }
     })().catch((error) => {
       featureTablesReady = null;
       throw error;

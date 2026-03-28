@@ -1,6 +1,13 @@
 import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
 import type { ThemeConfig } from '@/lib/themes';
 
+// ── Page Settings Type ──────────────────────────────────────────────
+export type PageSettings = {
+  roast?: { tone?: string; context?: string };
+  newspaper?: { name?: string; tone?: string; context?: string };
+  encyclopedia?: { style?: string; context?: string };
+};
+
 // ── Users (extends NextAuth default) ──────────────────────────────────
 export const users = sqliteTable('users', {
   id: text('id')
@@ -79,6 +86,7 @@ export const pages = sqliteTable('pages', {
   encyclopediaEnabled: integer('encyclopediaEnabled', { mode: 'boolean' }).default(false),
   roastEnabled: integer('roastEnabled', { mode: 'boolean' }).default(false),
   newspaperEnabled: integer('newspaperEnabled', { mode: 'boolean' }).default(false),
+  pageSettings: text('pageSettings', { mode: 'json' }).$type<PageSettings>(),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),
