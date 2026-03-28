@@ -4,6 +4,7 @@ import { db, ensureProjectsTable } from '@/db';
 import { pages, links, projects, pageSections, users, infoBlocks, generatedPages } from '@/db/schema';
 
 export const getPageBySlug = cache(async (slug: string) => {
+  await ensureProjectsTable();
   const result = await db
     .select()
     .from(pages)

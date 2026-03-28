@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Sidebar } from '@/components/dashboard/sidebar';
-import { db } from '@/db';
+import { db, ensureProjectsTable } from '@/db';
 import { pages } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
@@ -12,6 +12,8 @@ export default async function DashboardLayout({
 }) {
   const session = await auth();
   if (!session?.user) redirect('/login');
+
+  await ensureProjectsTable();
 
   const page = await db.query.pages.findFirst({
     where: eq(pages.userId, session.user.id!),

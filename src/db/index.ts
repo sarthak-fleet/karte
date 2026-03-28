@@ -132,3 +132,6 @@ export async function ensureProjectsTable() {
 
   await featureTablesReady;
 }
+
+// Eagerly start migration on module load so columns exist before any query
+ensureProjectsTable().catch(() => {});
