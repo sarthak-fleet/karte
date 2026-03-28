@@ -4,7 +4,7 @@ import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 
-if (!process.env.AUTH_SECRET) {
+if (!process.env.AUTH_SECRET && process.env.NEXT_PHASE !== 'phase-production-build') {
   throw new Error('AUTH_SECRET environment variable is required');
 }
 
