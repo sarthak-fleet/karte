@@ -18,22 +18,42 @@ function sectionId(heading: string): string {
 
 export function WikiArticle({ content, displayName, avatarUrl, accentColor }: WikiArticleProps) {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-      <article className="border border-white/10 bg-white/5 rounded-2xl backdrop-blur-xl p-6 sm:p-10">
+    <div
+      className="mx-auto max-w-4xl px-4 py-6 sm:py-10"
+      style={{
+        fontFamily: 'Georgia, "Times New Roman", serif',
+        color: '#202122',
+        backgroundColor: '#ffffff',
+      }}
+    >
+      <article>
         {/* Article title */}
-        <header className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-serif text-white font-normal tracking-tight">
+        <header className="mb-4 border-b border-[#a7d7f9] pb-2">
+          <h1
+            className="text-[28px] font-normal leading-tight sm:text-[32px]"
+            style={{
+              fontFamily: 'Linux Libertine, Georgia, "Times New Roman", serif',
+              color: '#000000',
+            }}
+          >
             {displayName}
           </h1>
-          <div
-            className="mt-2 h-[2px] w-24"
-            style={{ backgroundColor: accentColor }}
-          />
         </header>
 
-        {/* Lead paragraph - above the infobox */}
-        <p className="text-lg font-serif text-white/80 leading-relaxed mb-8">
-          {content.leadParagraph}
+        {/* Tagline */}
+        <p
+          className="mb-5 text-xs italic"
+          style={{ fontFamily: 'sans-serif', color: '#54595d' }}
+        >
+          From LinkChat Encyclopedia, the free profile
+        </p>
+
+        {/* Lead paragraph - slightly larger */}
+        <p
+          className="mb-5 text-[15px] leading-relaxed sm:text-base"
+          style={{ color: '#202122' }}
+        >
+          <b>{displayName}</b> {content.leadParagraph}
         </p>
 
         {/* Infobox floated right (on desktop) */}
@@ -50,19 +70,31 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
         {/* Article sections */}
         <div className="clear-none">
           {content.sections.map((section, i) => (
-            <section key={i} id={sectionId(section.heading)} className="mb-8">
-              <div className="flex items-baseline gap-3 border-b border-white/10 pb-2 mb-4">
-                <h2 className="text-xl sm:text-2xl font-semibold text-white">
+            <section key={i} id={sectionId(section.heading)} className="mb-6">
+              <div className="mb-2 flex items-baseline gap-3 border-b border-[#a2a9b1] pb-1">
+                <h2
+                  className="text-[22px] font-normal leading-snug"
+                  style={{
+                    fontFamily: 'Linux Libertine, Georgia, "Times New Roman", serif',
+                    color: '#000000',
+                  }}
+                >
                   {section.heading}
                 </h2>
                 <span
-                  className="text-xs font-sans cursor-default select-none"
-                  style={{ color: accentColor }}
+                  className="cursor-default select-none text-xs"
+                  style={{ fontFamily: 'sans-serif', color: '#3366cc' }}
                 >
                   [edit]
                 </span>
               </div>
-              <div className="font-serif text-white/70 leading-relaxed whitespace-pre-line">
+              <div
+                className="whitespace-pre-line text-sm leading-relaxed"
+                style={{
+                  color: '#202122',
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                }}
+              >
                 {section.content}
               </div>
             </section>
@@ -71,17 +103,24 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
 
         {/* Categories */}
         {content.categories.length > 0 && (
-          <footer className="mt-10 pt-6 border-t border-white/10">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-white/40 font-semibold uppercase tracking-wider mr-1">
+          <footer className="mt-8 border border-dotted border-[#a2a9b1] px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className="mr-1 text-xs font-semibold"
+                style={{ fontFamily: 'sans-serif', color: '#54595d' }}
+              >
                 Categories:
               </span>
               {content.categories.map((cat, i) => (
                 <span
                   key={i}
-                  className="border border-white/10 bg-white/5 px-2 py-1 rounded text-xs text-white/50"
+                  className="text-xs"
+                  style={{ fontFamily: 'sans-serif', color: '#3366cc' }}
                 >
                   {cat}
+                  {i < content.categories.length - 1 && (
+                    <span className="ml-2 text-[#a2a9b1]">|</span>
+                  )}
                 </span>
               ))}
             </div>

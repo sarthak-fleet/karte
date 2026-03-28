@@ -16,6 +16,7 @@ function sectionId(heading: string): string {
 
 export function WikiToc({ sections, accentColor }: WikiTocProps) {
   const [activeId, setActiveId] = useState<string>('');
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     const ids = sections.map((s) => sectionId(s.heading));
@@ -25,7 +26,6 @@ export function WikiToc({ sections, accentColor }: WikiTocProps) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Find the first visible section
         const visible = entries.filter((e) => e.isIntersecting);
         if (visible.length > 0) {
           setActiveId(visible[0].target.id);
@@ -46,30 +46,47 @@ export function WikiToc({ sections, accentColor }: WikiTocProps) {
   }
 
   return (
-    <nav className="border border-white/10 bg-white/5 rounded-xl p-4 mb-6 md:w-fit">
-      <p className="font-bold text-white text-sm mb-2">Contents</p>
-      <ol className="list-none space-y-1">
-        {sections.map((section, i) => {
-          const id = sectionId(section.heading);
-          const isActive = activeId === id;
+    <nav
+      className="mb-6 w-fit border border-[#a2a9b1] bg-[#f8f9fa] px-4 py-3"
+      style={{ fontFamily: 'sans-serif', fontSize: '14px' }}
+    >
+      <div className="mb-2 flex items-center justify-between gap-4">
+        <p className="text-sm font-bold text-[#202122]">Contents</p>
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="cursor-pointer border-none bg-transparent p-0 text-xs text-[#3366cc] hover:underline"
+        >
+          [{collapsed ? 'show' : 'hide'}]
+        </button>
+      </div>
 
-          return (
-            <li key={id}>
-              <button
-                onClick={() => scrollTo(id)}
-                className="text-left text-sm transition-colors duration-150 cursor-pointer bg-transparent border-none p-0"
-                style={{
-                  color: isActive ? accentColor : 'rgba(255,255,255,0.6)',
-                  fontWeight: isActive ? 600 : 400,
-                }}
-              >
-                <span className="mr-2 tabular-nums text-white/40">{i + 1}.</span>
-                {section.heading}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      {!collapsed && (
+        <ol className="m-0 list-none space-y-0.5 pl-0">
+          {sections.map((section, i) => {
+            const id = sectionId(section.heading);
+            const isActive = activeId === id;
+
+            return (
+              <li key={id} className="leading-relaxed">
+                <button
+                  onClick={() => scrollTo(id)}
+                  className="cursor-pointer border-none bg-transparent p-0 text-left text-sm transition-colors duration-100"
+                  style={{
+                    color: isActive ? '#202122' : '#3366cc',
+                    fontWeight: isActive ? 700 : 400,
+                    fontFamily: 'sans-serif',
+                  }}
+                >
+                  <span className="mr-1.5 tabular-nums text-[#202122]">{i + 1}</span>
+                  <span className={isActive ? '' : 'hover:underline'}>
+                    {section.heading}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </nav>
   );
 }

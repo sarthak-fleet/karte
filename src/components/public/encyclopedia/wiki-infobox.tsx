@@ -9,47 +9,66 @@ export function WikiInfobox({ infobox, displayName, avatarUrl, accentColor }: Wi
   const entries = Object.entries(infobox);
 
   return (
-    <div className="w-full md:w-64 md:float-right md:ml-6 mb-6 border border-white/15 bg-white/[0.08] rounded-xl overflow-hidden">
+    <table
+      className="mb-4 w-full border border-collapse border-[#a2a9b1] md:float-right md:ml-5 md:w-[280px]"
+      style={{ fontSize: '14px' }}
+    >
       {/* Header */}
-      <div
-        className="px-4 py-3 text-center font-semibold text-white"
-        style={{ backgroundColor: `${accentColor}1a` }}
+      <caption
+        className="border border-[#a2a9b1] bg-[#cee0f2] px-3 py-2 text-center text-base font-bold"
+        style={{ fontFamily: 'sans-serif', captionSide: 'top' }}
       >
         {displayName}
-      </div>
+      </caption>
 
-      {/* Avatar */}
-      {avatarUrl && (
-        <div className="flex justify-center p-4 pb-2">
-          <img
-            src={avatarUrl}
-            alt={displayName}
-            width={160}
-            height={160}
-            className="rounded-lg w-40 h-40 object-cover"
-          />
-        </div>
-      )}
+      <tbody>
+        {/* Avatar */}
+        {avatarUrl && (
+          <tr>
+            <td colSpan={2} className="border border-[#a2a9b1] p-2 text-center">
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                width={200}
+                height={200}
+                className="mx-auto h-[200px] w-[200px] object-cover"
+              />
+              <p
+                className="mt-1 text-xs text-[#54595d]"
+                style={{ fontFamily: 'sans-serif' }}
+              >
+                {displayName}
+              </p>
+            </td>
+          </tr>
+        )}
 
-      {/* Key-value rows */}
-      <div className="divide-y divide-white/5">
+        {/* Key-value rows */}
         {entries.map(([label, value], i) => (
-          <div
-            key={label}
-            className="px-4 py-2.5"
-            style={{
-              backgroundColor: i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'transparent',
-            }}
-          >
-            <div className="text-xs font-bold text-white/50 uppercase tracking-wider mb-0.5">
+          <tr key={label}>
+            <th
+              className="border border-[#a2a9b1] px-3 py-1.5 text-left align-top text-sm font-semibold whitespace-nowrap"
+              style={{
+                fontFamily: 'sans-serif',
+                color: '#202122',
+                backgroundColor: i % 2 === 0 ? '#f8f9fa' : '#ffffff',
+              }}
+            >
               {label}
-            </div>
-            <div className="text-sm text-white/80">
+            </th>
+            <td
+              className="border border-[#a2a9b1] px-3 py-1.5 text-sm"
+              style={{
+                fontFamily: 'sans-serif',
+                color: '#202122',
+                backgroundColor: i % 2 === 0 ? '#f8f9fa' : '#ffffff',
+              }}
+            >
               {value}
-            </div>
-          </div>
+            </td>
+          </tr>
         ))}
-      </div>
-    </div>
+      </tbody>
+    </table>
   );
 }
