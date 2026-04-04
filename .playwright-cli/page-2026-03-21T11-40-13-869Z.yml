@@ -1,0 +1,238 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e9]:
+      - link "LC LinkChat" [ref=e249] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e11]:
+          - generic [ref=e12]: LC
+          - generic [ref=e14]: LinkChat
+      - generic [ref=e16]:
+        - link "Start Profile" [ref=e17] [cursor=pointer]:
+          - /url: /create
+        - link "Log In" [ref=e18] [cursor=pointer]:
+          - /url: /login
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - paragraph [ref=e22]: Preview before login
+        - heading "Turn your link in bio into a profile people can actually use." [level=1] [ref=e23]
+        - paragraph [ref=e24]: LinkChat combines links, projects, modular sections, lead capture, analytics, and an AI chat assistant in one page. Start in draft mode, then claim the username only when the page feels ready.
+        - generic [ref=e25]:
+          - link "Start Your Profile" [ref=e26] [cursor=pointer]:
+            - /url: /create
+          - link "See What Ships Today" [ref=e27] [cursor=pointer]:
+            - /url: "#features"
+        - paragraph [ref=e28]: Draft first. Sign in only when you want to save and claim the name.
+        - generic [ref=e29]:
+          - generic [ref=e30]: Projects
+          - generic [ref=e31]: AI chat
+          - generic [ref=e32]: Themes
+          - generic [ref=e33]: Sections
+          - generic [ref=e34]: Analytics beta
+          - generic [ref=e35]: Lead capture
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: 4 theme presets
+            - paragraph [ref=e39]: with custom accents and image-backed pages
+          - generic [ref=e40]:
+            - paragraph [ref=e41]: 5 section types
+            - paragraph [ref=e42]: for proof, CTA, contact, testimonials, and socials
+          - generic [ref=e43]:
+            - paragraph [ref=e44]: 1 unified dashboard
+            - paragraph [ref=e45]: for editing, leads, analytics, and AI memory
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - paragraph [ref=e54]: Live Draft
+              - paragraph [ref=e55]: Public profile preview
+            - generic [ref=e56]: Claim later
+          - generic [ref=e57]:
+            - generic [ref=e58]: SA
+            - generic [ref=e59]:
+              - paragraph [ref=e60]: Founder Profile
+              - heading "Sarthak Agrawal" [level=3] [ref=e61]
+              - paragraph [ref=e62]: Building software, sharing experiments, and turning a link page into a profile that actually closes loops.
+          - generic [ref=e63]:
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - generic [ref=e66]: "01"
+                - generic [ref=e67]: Book an intro call
+              - generic [ref=e68]: Open
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]: "02"
+                - generic [ref=e72]: Read my operating notes
+              - generic [ref=e73]: Open
+            - generic [ref=e74]:
+              - generic [ref=e75]:
+                - generic [ref=e76]: "03"
+                - generic [ref=e77]: Browse AI projects
+              - generic [ref=e78]: Open
+          - generic [ref=e79]:
+            - paragraph [ref=e80]: Featured Project
+            - heading "AI GTM Operating System" [level=4] [ref=e81]
+            - paragraph [ref=e82]: Frameworks, templates, and experiments for founder-led distribution.
+          - generic [ref=e83]:
+            - paragraph [ref=e84]: Chat Preview
+            - paragraph [ref=e85]: Visitor asks
+            - paragraph [ref=e86]: Can I see your best product and AI work?
+            - paragraph [ref=e87]: LinkChat replies
+            - paragraph [ref=e88]: Start with the highlighted project card, then open the social proof and contact sections if you want to keep talking.
+        - generic [ref=e89]:
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - generic [ref=e92]:
+                - paragraph [ref=e93]: Analytics Beta
+                - heading "What the page is doing" [level=4] [ref=e94]
+              - generic [ref=e95]: Last 7 days
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - paragraph [ref=e98]: Page views
+                - paragraph [ref=e99]: "412"
+              - generic [ref=e100]:
+                - paragraph [ref=e101]: Project clicks
+                - paragraph [ref=e102]: "38"
+              - generic [ref=e103]:
+                - paragraph [ref=e104]: Leads captured
+                - paragraph [ref=e105]: "7"
+            - generic [ref=e106]:
+              - paragraph [ref=e107]: Signal
+              - paragraph [ref=e108]: The portfolio card and contact CTA are earning the most intent right now.
+          - generic [ref=e109]:
+            - paragraph [ref=e110]: Lead Inbox
+            - heading "Follow up while interest is hot" [level=4] [ref=e111]
+            - generic [ref=e112]:
+              - generic [ref=e113]:
+                - paragraph [ref=e114]: Aarav from Stripe
+                - paragraph [ref=e115]: Loved the AI project section. Open to a product ops call next week?
+              - generic [ref=e116]:
+                - paragraph [ref=e117]: Maya from Figma
+                - paragraph [ref=e118]: Can you share a deeper walkthrough of the portfolio case study?
+          - generic [ref=e119]:
+            - generic [ref=e120]:
+              - paragraph [ref=e121]: Theme Stack
+              - paragraph [ref=e127]: Presets, custom accents, and a page that already feels branded before you publish it.
+            - generic [ref=e128]:
+              - paragraph [ref=e129]: Upload Flow
+              - generic [ref=e130]:
+                - paragraph [ref=e131]: Avatar and project images
+                - paragraph [ref=e132]: Stored in R2 and ready for live previews.
+              - paragraph [ref=e133]: Keep the media local to the product instead of juggling third-party image links.
+    - generic [ref=e134]:
+      - generic [ref=e135]:
+        - paragraph [ref=e136]: Why it lands
+        - heading "Not another dead-end profile page." [level=2] [ref=e137]
+        - paragraph [ref=e138]: The best link pages do more than route traffic. They give visitors enough proof, context, and ways to act that the next step feels obvious.
+      - generic [ref=e139]:
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - paragraph [ref=e142]: Show the work
+            - generic [ref=e143]: "01"
+          - heading "Put projects next to your links instead of hiding them three clicks away." [level=3] [ref=e144]
+          - paragraph [ref=e145]: Use link stacks for quick actions, then pull real portfolio pieces, social proof, and richer sections into the same page.
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - paragraph [ref=e148]: Answer faster
+            - generic [ref=e149]: "02"
+          - heading "Let visitors ask the obvious questions without waiting for you to reply." [level=3] [ref=e150]
+          - paragraph [ref=e151]: LinkChat turns your memory blocks into a bottom-anchored assistant that handles the repeat questions while you stay focused.
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - paragraph [ref=e154]: See what landed
+            - generic [ref=e155]: "03"
+          - heading "Track attention from the same dashboard you use to update the page." [level=3] [ref=e156]
+          - paragraph [ref=e157]: Views, destination clicks, section impressions, and incoming leads are already wired into the product with no extra setup.
+    - generic [ref=e158]:
+      - generic [ref=e159]:
+        - paragraph [ref=e160]: Product Stack
+        - heading "Everything that ships with a serious profile page." [level=2] [ref=e161]
+        - paragraph [ref=e162]: The app now covers the core pieces people keep stitching together with separate tools. The point is momentum, not more setup.
+      - generic [ref=e163]:
+        - generic [ref=e164]:
+          - paragraph [ref=e165]: Included
+          - heading "Projects and links together" [level=3] [ref=e166]
+          - paragraph [ref=e167]: Profiles are not limited to a dead list of buttons. Add portfolio cards with titles, descriptions, URLs, and images.
+        - generic [ref=e168]:
+          - paragraph [ref=e169]: Included
+          - heading "Themes that feel deliberate" [level=3] [ref=e170]
+          - paragraph [ref=e171]: Start from curated presets, custom accents, and avatar styling so each page feels branded instead of template-flat.
+        - generic [ref=e172]:
+          - paragraph [ref=e173]: Included
+          - heading "Modular sections" [level=3] [ref=e174]
+          - paragraph [ref=e175]: Drop in text, testimonial, CTA, contact, and social sections, then reorder everything without touching code.
+        - generic [ref=e176]:
+          - paragraph [ref=e177]: Included
+          - heading "Contact capture built in" [level=3] [ref=e178]
+          - paragraph [ref=e179]: Turn profile visits into leads with contact forms that land directly in your dashboard inbox.
+        - generic [ref=e180]:
+          - paragraph [ref=e181]: Included
+          - heading "Native analytics" [level=3] [ref=e182]
+          - paragraph [ref=e183]: See page views, top destinations, and section performance from the same product that powers the page.
+        - generic [ref=e184]:
+          - paragraph [ref=e185]: Included
+          - heading "Uploads and AI memory" [level=3] [ref=e186]
+          - paragraph [ref=e187]: Upload avatars and project images to R2, then train the chat assistant with memory blocks that reflect your actual work.
+    - generic [ref=e189]:
+      - generic [ref=e190]:
+        - paragraph [ref=e191]: Workflow
+        - heading "Draft, claim, publish, improve." [level=2] [ref=e192]
+        - paragraph [ref=e193]: The onboarding is deliberately lighter than a traditional page builder. You can shape the page first and commit only when it looks right.
+      - generic [ref=e194]:
+        - generic [ref=e196]:
+          - generic [ref=e197]:
+            - generic [ref=e198]: "01"
+            - generic [ref=e199]:
+              - heading "Start in preview mode" [level=3] [ref=e200]
+              - paragraph [ref=e201]: Draft the page visually before signup. Shape the bio, theme, username idea, and page direction with zero friction.
+          - generic [ref=e202]: LinkChat flow
+        - generic [ref=e204]:
+          - generic [ref=e205]:
+            - generic [ref=e206]: "02"
+            - generic [ref=e207]:
+              - heading "Claim the identity" [level=3] [ref=e208]
+              - paragraph [ref=e209]: When the draft feels right, log in, claim the username, and publish the page as your public profile.
+          - generic [ref=e210]: LinkChat flow
+        - generic [ref=e212]:
+          - generic [ref=e213]:
+            - generic [ref=e214]: "03"
+            - generic [ref=e215]:
+              - heading "Keep learning from traffic" [level=3] [ref=e216]
+              - paragraph [ref=e217]: Add projects, update sections, review leads, and let analytics show what is actually earning attention.
+          - generic [ref=e218]: LinkChat flow
+    - generic [ref=e220]:
+      - generic [ref=e221]:
+        - generic [ref=e222]:
+          - paragraph [ref=e223]: Social Proof
+          - heading "People should feel the product has momentum." [level=2] [ref=e224]
+          - paragraph [ref=e225]: Testimonials work better when they sit inside the same polished surface as the rest of the page instead of floating below the fold.
+        - generic [ref=e252]: No testimonials yet.
+      - generic [ref=e226]:
+        - generic [ref=e227]:
+          - paragraph [ref=e228]: Shipping Rhythm
+          - heading "Show that the product is alive." [level=2] [ref=e229]
+          - paragraph [ref=e230]: A changelog is not just a status feed. It reassures visitors that the product is actively improving.
+        - generic [ref=e255]: No changelog entries yet.
+    - generic [ref=e232]:
+      - generic [ref=e233]:
+        - paragraph [ref=e234]: Ready to build
+        - heading "Build the page people keep asking you for." [level=2] [ref=e235]
+        - paragraph [ref=e236]: Start with a live draft, publish when the page feels sharp, and give visitors more than a static pile of links.
+      - generic [ref=e237]:
+        - link "Start Drafting" [ref=e238] [cursor=pointer]:
+          - /url: /create
+        - link "Log In" [ref=e239] [cursor=pointer]:
+          - /url: /login
+  - generic [ref=e244] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e245]:
+      - img [ref=e246]
+    - generic [ref=e256]:
+      - button "Open issues overlay" [ref=e257]:
+        - generic [ref=e258]:
+          - generic [ref=e259]: "1"
+          - generic [ref=e260]: "2"
+        - generic [ref=e261]:
+          - text: Issue
+          - generic [ref=e262]: s
+      - button "Collapse issues badge" [ref=e263]:
+        - img [ref=e264]
+  - alert [ref=e266]

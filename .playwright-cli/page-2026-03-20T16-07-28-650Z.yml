@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - button "Feedback" [ref=e2] [cursor=pointer]:
+    - img [ref=e3]
+    - generic [ref=e6]: Feedback
+  - generic [ref=e7]:
+    - generic [ref=e10]:
+      - heading "Your links. Your story. Your AI." [level=1] [ref=e11]:
+        - text: Your links.
+        - text: Your story.
+        - text: Your AI.
+      - paragraph [ref=e12]: Create a beautiful personal page with all your links — and let visitors chat with an AI that knows everything about you.
+      - generic [ref=e13]:
+        - link "Start Your Profile" [ref=e14] [cursor=pointer]:
+          - /url: /create
+        - link "Log In" [ref=e15] [cursor=pointer]:
+          - /url: /login
+      - paragraph [ref=e16]: Draft first. Login only when you want to claim your username and save.
+    - heading "What people are saying" [level=2] [ref=e18]
+    - heading "Changelog" [level=2] [ref=e20]
+  - button "Open Next.js Dev Tools" [ref=e26] [cursor=pointer]:
+    - img [ref=e27]
+  - alert [ref=e30]

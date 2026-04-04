@@ -1,0 +1,24 @@
+- generic [active] [ref=e1]:
+  - button "Feedback" [ref=e2] [cursor=pointer]:
+    - img [ref=e3]
+    - generic [ref=e6]: Feedback
+  - generic [ref=e81] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e82]:
+      - img [ref=e83]
+    - generic [ref=e86]:
+      - button "Open issues overlay" [ref=e87]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: "1"
+          - generic [ref=e90]: "2"
+        - generic [ref=e91]:
+          - text: Issue
+          - generic [ref=e92]: s
+      - button "Collapse issues badge" [ref=e93]:
+        - img [ref=e94]
+  - alert [ref=e96]
+  - generic [ref=e98]:
+    - heading "Welcome to LinkChat" [level=1] [ref=e99]
+    - paragraph [ref=e100]: Sign in to manage your page
+    - button "Continue with Google" [ref=e103]:
+      - img [ref=e104]
+      - text: Continue with Google
