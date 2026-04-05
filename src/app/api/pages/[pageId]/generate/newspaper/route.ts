@@ -5,7 +5,7 @@ import { eq, and, asc } from 'drizzle-orm';
 import { generateCompletion, parseAIResponse } from '@/lib/saasmaker';
 import { NEWSPAPER_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
-import type { NewspaperContent } from '@/lib/generated-page-types';
+import { asGeneratedPageContent, type NewspaperContent } from '@/lib/generated-page-types';
 import { getScrapedContext } from '@/lib/scrape-page-content';
 
 export async function POST(
@@ -110,7 +110,7 @@ export async function POST(
       await db
         .update(generatedPages)
         .set({
-          content: newspaper as any,
+          content: asGeneratedPageContent(newspaper),
           status: 'ready',
           updatedAt: new Date(),
         })
@@ -119,7 +119,7 @@ export async function POST(
       await db.insert(generatedPages).values({
         pageId,
         type: 'newspaper',
-        content: newspaper as any,
+        content: asGeneratedPageContent(newspaper),
         status: 'ready',
       });
     }

@@ -5,7 +5,7 @@ import { eq, and, asc } from 'drizzle-orm';
 import { generateCompletion, parseAIResponse } from '@/lib/saasmaker';
 import { ROAST_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
-import type { RoastContent } from '@/lib/generated-page-types';
+import { asGeneratedPageContent, type RoastContent } from '@/lib/generated-page-types';
 import { getScrapedContext } from '@/lib/scrape-page-content';
 
 export async function POST(
@@ -106,7 +106,7 @@ export async function POST(
       await db
         .update(generatedPages)
         .set({
-          content: roast as any,
+          content: asGeneratedPageContent(roast),
           status: 'ready',
           updatedAt: new Date(),
         })
@@ -115,13 +115,13 @@ export async function POST(
       await db.insert(generatedPages).values({
         pageId,
         type: 'roast',
-        content: roast as any,
+        content: asGeneratedPageContent(roast),
         status: 'ready',
       });
     }
 
     return Response.json(roast);
-  } catch (e) {
+  } catch {
     return new Response(JSON.stringify({ error: 'Failed to generate roast' }), {
       status: 500,
     });

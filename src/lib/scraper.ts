@@ -15,7 +15,7 @@ function isBlockedUrl(urlStr: string): boolean {
     // Check if hostname is an IP address
     const ipv4 = lower.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
     if (ipv4) {
-      const [, a, b, c, d] = ipv4.map(Number);
+      const [, a, b] = ipv4.map(Number);
       if (a === 127) return true;                          // 127.0.0.0/8
       if (a === 10) return true;                           // 10.0.0.0/8
       if (a === 172 && b >= 16 && b <= 31) return true;   // 172.16.0.0/12

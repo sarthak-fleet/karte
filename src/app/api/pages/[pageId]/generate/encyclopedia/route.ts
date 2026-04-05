@@ -5,7 +5,7 @@ import { eq, and, asc } from 'drizzle-orm';
 import { generateCompletion, parseAIResponse } from '@/lib/saasmaker';
 import { ENCYCLOPEDIA_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
-import type { EncyclopediaContent } from '@/lib/generated-page-types';
+import { asGeneratedPageContent, type EncyclopediaContent } from '@/lib/generated-page-types';
 import { getScrapedContext } from '@/lib/scrape-page-content';
 
 export async function POST(req: Request, { params }: { params: Promise<{ pageId: string }> }) {
@@ -80,13 +80,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
     if (existing[0]) {
       await db
         .update(generatedPages)
-        .set({ content: encyclopedia as any, status: 'ready', updatedAt: new Date() })
+        .set({ content: asGeneratedPageContent(encyclopedia), status: 'ready', updatedAt: new Date() })
         .where(eq(generatedPages.id, existing[0].id));
     } else {
       await db.insert(generatedPages).values({
         pageId,
         type: 'encyclopedia',
-        content: encyclopedia as any,
+        content: asGeneratedPageContent(encyclopedia),
         status: 'ready',
       });
     }

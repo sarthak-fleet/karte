@@ -34,3 +34,7 @@ export interface NewspaperContent {
   sidebar: { facts: string[]; mood: string };
   fakeAds: string[];
 }
+
+export function asGeneratedPageContent(value: object): Record<string, unknown> {
+  return value as Record<string, unknown>;
+}
