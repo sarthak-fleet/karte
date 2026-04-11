@@ -35,6 +35,9 @@ importers:
       '@opennextjs/cloudflare':
         specifier: ^1.18.0
         version: 1.18.0(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(wrangler@4.78.0)
+      '@saas-maker/ai':
+        specifier: file:/Users/sarthakagrawal/Desktop/saas-maker/packages/ai
+        version: file:../saas-maker/packages/ai(@ai-sdk/openai-compatible@2.0.41(zod@4.3.6))(ai@6.0.158(zod@4.3.6))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@saas-maker/changelog-widget':
         specifier: 0.2.0
         version: 0.2.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -1857,6 +1860,19 @@ packages:
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
+
+  '@saas-maker/ai@file:../saas-maker/packages/ai':
+    resolution: {directory: ../saas-maker/packages/ai, type: directory}
+    peerDependencies:
+      '@ai-sdk/openai-compatible': '>=1.0.0'
+      ai: '>=4.0.0'
+      react: '>=18'
+      react-dom: '>=18'
+    peerDependenciesMeta:
+      '@ai-sdk/openai-compatible':
+        optional: true
+      ai:
+        optional: true
 
   '@saas-maker/changelog-widget@0.2.0':
     resolution: {integrity: sha512-D0pNamHMfW8f+WyRckwZSSKTI25M3Jponf4tPgINsrky+ZENcDDuhcuaj5KUwkhOdUQ9KPZsNIuCnfVOWRXAiw==}
@@ -7154,6 +7170,14 @@ snapshots:
   '@remirror/core-constants@3.0.0': {}
 
   '@rtsao/scc@1.1.0': {}
+
+  '@saas-maker/ai@file:../saas-maker/packages/ai(@ai-sdk/openai-compatible@2.0.41(zod@4.3.6))(ai@6.0.158(zod@4.3.6))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+    optionalDependencies:
+      '@ai-sdk/openai-compatible': 2.0.41(zod@4.3.6)
+      ai: 6.0.158(zod@4.3.6)
 
   '@saas-maker/changelog-widget@0.2.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:

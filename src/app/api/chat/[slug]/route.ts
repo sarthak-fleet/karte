@@ -2,7 +2,8 @@ import { db } from '@/db';
 import { pages, users } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { search } from '@/lib/saasmaker';
-import { streamResponse, type AiConfig } from '@/lib/ai-client';
+import { createAIModel, type AIConfig } from '@saas-maker/ai/server';
+import { streamText } from 'ai';
 import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
@@ -40,7 +41,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     return new Response(JSON.stringify({ error: 'Chat not configured — AI endpoint missing' }), { status: 503 });
   }
 
-  const aiConfig: AiConfig = {
+  const aiConfig: AIConfig = {
     endpointUrl: user.aiEndpointUrl,
     apiKey: user.aiApiKey,
     model: user.aiModel,
@@ -62,10 +63,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       : baseSystemPrompt;
 
     // Step 3: Stream LLM response via custom AI endpoint
-    return streamResponse(aiConfig, {
+    const result = streamText({
+      model: createAIModel(aiConfig),
       system: systemPrompt,
       prompt: query,
     });
+    return result.toTextStreamResponse();
   } catch {
     return new Response(JSON.stringify({ error: 'Chat service unavailable' }), { status: 502 });
   }

@@ -2,7 +2,8 @@ import { db, ensureProjectsTable } from '@/db';
 import { pages, users, infoBlocks, links, projects, generatedPages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
-import { generate, type AiConfig } from '@/lib/ai-client';
+import { createAIModel, type AIConfig } from '@saas-maker/ai/server';
+import { generateText } from 'ai';
 import { parseAIResponse } from '@/lib/saasmaker';
 import { ENCYCLOPEDIA_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
@@ -28,7 +29,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
     return new Response(JSON.stringify({ error: 'AI not configured' }), { status: 503 });
   }
 
-  const aiConfig: AiConfig = {
+  const aiConfig: AIConfig = {
     endpointUrl: user.aiEndpointUrl,
     apiKey: user.aiApiKey,
     model: user.aiModel,
@@ -68,7 +69,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
   }
 
   try {
-    const raw = await generate(aiConfig, {
+    const { text: raw } = await generateText({
+      model: createAIModel(aiConfig),
       system: systemPrompt,
       prompt: `Write a Wikipedia-style encyclopedia article about this person:\n\n${context}`,
     });

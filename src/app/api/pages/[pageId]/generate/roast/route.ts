@@ -2,7 +2,8 @@ import { db, ensureProjectsTable } from '@/db';
 import { pages, users, infoBlocks, links, projects, generatedPages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
-import { generate, type AiConfig } from '@/lib/ai-client';
+import { createAIModel, type AIConfig } from '@saas-maker/ai/server';
+import { generateText } from 'ai';
 import { parseAIResponse } from '@/lib/saasmaker';
 import { ROAST_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
@@ -42,7 +43,7 @@ export async function POST(
     });
   }
 
-  const aiConfig: AiConfig = {
+  const aiConfig: AIConfig = {
     endpointUrl: user.aiEndpointUrl,
     apiKey: user.aiApiKey,
     model: user.aiModel,
@@ -99,7 +100,8 @@ export async function POST(
   }
 
   try {
-    const raw = await generate(aiConfig, {
+    const { text: raw } = await generateText({
+      model: createAIModel(aiConfig),
       system: systemPrompt,
       prompt: `Roast this person based on their profile:\n\n${context}`,
     });
