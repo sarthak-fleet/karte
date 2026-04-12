@@ -26,7 +26,12 @@ export default async function MemoryPage() {
     );
   }
 
-  const [user] = await db.select({ smApiKey: users.smApiKey }).from(users).where(eq(users.id, session.user.id));
+  const [user] = await db.select({
+    smApiKey: users.smApiKey,
+    aiEndpointUrl: users.aiEndpointUrl,
+    aiApiKey: users.aiApiKey,
+    aiModel: users.aiModel,
+  }).from(users).where(eq(users.id, session.user.id));
 
   const blocks = await db.query.infoBlocks.findMany({
     where: eq(infoBlocks.pageId, page.id),
@@ -45,7 +50,12 @@ export default async function MemoryPage() {
 
       <hr className="border-white/10" />
 
-      <AiKeySettings hasKey={!!user?.smApiKey} />
+      <AiKeySettings
+        hasKey={!!user?.smApiKey}
+        hasAiConfig={!!(user?.aiEndpointUrl && user?.aiApiKey && user?.aiModel)}
+        aiEndpointUrl={user?.aiEndpointUrl || ''}
+        aiModel={user?.aiModel || ''}
+      />
 
       <hr className="border-white/10" />
 

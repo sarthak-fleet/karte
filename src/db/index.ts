@@ -132,6 +132,16 @@ export async function ensureProjectsTable() {
       if (!pageColNames.has('scrapedContent')) {
         await client.execute('ALTER TABLE pages ADD COLUMN scrapedContent TEXT');
       }
+
+      // Add AI endpoint columns to users if missing
+      const userColumns = await client.execute('PRAGMA table_info(users)');
+      const userColNames = new Set(userColumns.rows.map((r) => (r as { name?: string }).name));
+
+      for (const col of ['aiEndpointUrl', 'aiApiKey', 'aiModel']) {
+        if (!userColNames.has(col)) {
+          await client.execute(`ALTER TABLE users ADD COLUMN ${col} TEXT`);
+        }
+      }
     })().catch((error) => {
       featureTablesReady = null;
       throw error;

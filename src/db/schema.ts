@@ -21,6 +21,9 @@ export const users = sqliteTable('users', {
   smProjectId: text('smProjectId'),
   smApiKey: text('smApiKey'),
   smIndexId: text('smIndexId'),
+  aiEndpointUrl: text('aiEndpointUrl'),
+  aiApiKey: text('aiApiKey'),
+  aiModel: text('aiModel'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),

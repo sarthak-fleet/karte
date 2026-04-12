@@ -139,43 +139,25 @@ export function ChatWidget({
       setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
 
       const decoder = new TextDecoder();
-      let buffer = '';
       let fullResponse = '';
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith('data: ')) continue;
-          const data = trimmed.slice(6);
-          if (data === '[DONE]') continue;
-
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.type === 'chunk' && parsed.content) {
-              fullResponse += parsed.content;
-              setMessages((prev) => {
-                const updated = [...prev];
-                const last = updated[updated.length - 1];
-                if (last?.role === 'assistant') {
-                  updated[updated.length - 1] = {
-                    ...last,
-                    content: last.content + parsed.content,
-                  };
-                }
-                return updated;
-              });
-            }
-          } catch {
-            // skip malformed event lines
+        const chunk = decoder.decode(value, { stream: true });
+        fullResponse += chunk;
+        setMessages((prev) => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last?.role === 'assistant') {
+            updated[updated.length - 1] = {
+              ...last,
+              content: last.content + chunk,
+            };
           }
-        }
+          return updated;
+        });
       }
 
       if (fullResponse) {

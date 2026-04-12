@@ -2,7 +2,9 @@ import { db, ensureProjectsTable } from '@/db';
 import { pages, users, infoBlocks, links, projects, generatedPages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
-import { generateCompletion, parseAIResponse } from '@/lib/saasmaker';
+import { createAIModel, type AIConfig } from '@saas-maker/ai/server';
+import { generateText } from 'ai';
+import { parseAIResponse } from '@/lib/saasmaker';
 import { NEWSPAPER_SYSTEM_PROMPT } from '@/lib/ai-prompts';
 import { rateLimit } from '@/lib/rate-limit';
 import { asGeneratedPageContent, type NewspaperContent } from '@/lib/generated-page-types';
@@ -35,12 +37,18 @@ export async function POST(
   }
 
   const [user] = await db.select().from(users).where(eq(users.id, page.userId));
-  if (!user?.smApiKey || !user?.smIndexId) {
+  if (!user?.aiEndpointUrl || !user?.aiApiKey || !user?.aiModel) {
     return new Response(
       JSON.stringify({ error: 'AI not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }
     );
   }
+
+  const aiConfig: AIConfig = {
+    endpointUrl: user.aiEndpointUrl,
+    apiKey: user.aiApiKey,
+    model: user.aiModel,
+  };
 
   // Fetch links, projects, info blocks, and scraped content in parallel
   const [pageLinks, pageProjects, blocks, scrapedContext] = await Promise.all([
@@ -85,12 +93,11 @@ export async function POST(
   }
 
   try {
-    const raw = await generateCompletion(
-      user.smApiKey,
-      user.smIndexId,
-      `Write a newspaper front page about this person:\n\n${context}`,
-      systemPrompt
-    );
+    const { text: raw } = await generateText({
+      model: createAIModel(aiConfig),
+      system: systemPrompt,
+      prompt: `Write a newspaper front page about this person:\n\n${context}`,
+    });
 
     const newspaper = parseAIResponse<NewspaperContent>(raw);
 
