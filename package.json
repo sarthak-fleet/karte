@@ -9,7 +9,8 @@
     "lint": "eslint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "upload:cf": "opennextjs-cloudflare build && opennextjs-cloudflare upload"
+    "upload:cf": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "prepare": "husky"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",
@@ -42,6 +43,7 @@
     "drizzle-kit": "^0.31.9",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "husky": "^9.1.7",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.78.0"
