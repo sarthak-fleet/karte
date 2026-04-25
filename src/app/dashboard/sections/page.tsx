@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
 import { eq, asc } from 'drizzle-orm';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db, ensureProjectsTable } from '@/db';
 import { pages, pageSections } from '@/db/schema';
 import { SectionEditor } from '@/components/dashboard/section-editor';
 
 export default async function SectionsPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   await ensureProjectsTable();

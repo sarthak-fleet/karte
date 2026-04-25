@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db } from '@/db';
 import { pages, links } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
@@ -9,7 +9,7 @@ export async function DELETE(
   { params }: { params: Promise<{ pageId: string; linkId: string }> },
 ) {
   const { pageId, linkId } = await params;
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

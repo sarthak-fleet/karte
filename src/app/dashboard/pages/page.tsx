@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db, ensureProjectsTable } from '@/db';
 import { pages } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { PageToggles } from '@/components/dashboard/page-toggles';
 
 export default async function DashboardPagesPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   await ensureProjectsTable();

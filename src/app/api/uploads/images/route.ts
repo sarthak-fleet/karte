@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db } from '@/db';
 import { pages } from '@/db/schema';
 import {
@@ -35,7 +35,7 @@ function isUploadKind(value: string): value is UploadKind {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

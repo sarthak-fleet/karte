@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db, ensureProjectsTable } from '@/db';
 import { pages, generatedPages } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
@@ -7,7 +7,7 @@ import { EncyclopediaEditor } from '@/components/dashboard/encyclopedia-editor';
 import { normalizeEncyclopediaContent } from '@/lib/encyclopedia-compat';
 
 export default async function DashboardEncyclopediaPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   await ensureProjectsTable();

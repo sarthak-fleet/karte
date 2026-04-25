@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db } from '@/db';
 import { pages, infoBlocks, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -8,7 +8,7 @@ import { ChatSettings } from '@/components/dashboard/chat-settings';
 import { AiKeySettings } from '@/components/dashboard/ai-key-settings';
 
 export default async function MemoryPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   const page = await db.query.pages.findFirst({

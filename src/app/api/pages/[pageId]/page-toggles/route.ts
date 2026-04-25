@@ -1,11 +1,11 @@
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db, ensureProjectsTable } from '@/db';
 import { pages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ pageId: string }> }) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }

@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { redirect } from 'next/navigation';
 import { db, ensureProjectsTable } from '@/db';
 import { pageEvents, pages } from '@/db/schema';
@@ -50,7 +50,7 @@ function MetricCard({
 }
 
 export default async function AnalyticsPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   const page = await db.query.pages.findFirst({

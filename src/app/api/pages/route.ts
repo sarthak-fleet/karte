@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db } from '@/db';
 import { pages } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -12,7 +12,7 @@ import {
 import { isThemePresetId, resolveThemeConfig } from '@/lib/themes';
 
 export async function GET() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -25,7 +25,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

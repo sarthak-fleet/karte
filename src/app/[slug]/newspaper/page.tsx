@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPageBySlug, getGeneratedPage } from '../_lib/get-page-data';
 import { resolveThemeConfig } from '@/lib/themes';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import type { NewspaperContent } from '@/lib/generated-page-types';
 import { NewspaperFrontPage } from '@/components/public/newspaper/newspaper-front-page';
 import { GenerateNewspaper } from '@/components/public/newspaper/generate-newspaper';
@@ -72,7 +72,7 @@ export default async function NewspaperPage({
   }
 
   // Only show generate UI to the page owner
-  const session = await auth().catch(() => null);
+  const session = await getSession().catch(() => null);
   const isOwner = session?.user?.id === page.userId;
   if (!isOwner) notFound();
 

@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { PageSettings } from '@/components/dashboard/page-settings';
 import { PublicTopBar } from '@/components/public/public-top-bar';
 
 export default async function CreatePage() {
-  const session = await auth();
+  const session = await getSession();
 
   if (session?.user?.id) {
     redirect('/dashboard/appearance');

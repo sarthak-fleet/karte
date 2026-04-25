@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db, ensureProjectsTable } from '@/db';
 import { pages, projects } from '@/db/schema';
 import { ProjectEditor } from '@/components/dashboard/project-editor';
 
 export default async function ProjectsPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   const page = await db.query.pages.findFirst({

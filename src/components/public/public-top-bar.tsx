@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { eq } from 'drizzle-orm';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db } from '@/db';
 import { pages } from '@/db/schema';
 
@@ -31,22 +31,16 @@ export async function PublicTopBar({
   let session: any = null;
   let userPage: { slug: string } | null = null;
 
-  const { cookies } = await import('next/headers');
-  const cookieStore = await cookies();
-  const hasSessionCookie = cookieStore.has('authjs.session-token') || cookieStore.has('__Secure-authjs.session-token');
-
-  if (hasSessionCookie) {
-    try {
-      session = await auth() as typeof session;
-      if (session?.user?.id) {
-        userPage = await db.query.pages.findFirst({
-          where: eq(pages.userId, session.user.id),
-          columns: { slug: true },
-        }) ?? null;
-      }
-    } catch {
-      // Auth failed, show anonymous UI
+  try {
+    session = await getSession() as typeof session;
+    if (session?.user?.id) {
+      userPage = await db.query.pages.findFirst({
+        where: eq(pages.userId, session.user.id),
+        columns: { slug: true },
+      }) ?? null;
     }
+  } catch {
+    // Auth failed — show anonymous UI
   }
 
   if (variant === 'minimal') {

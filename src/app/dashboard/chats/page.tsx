@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
 import { pages } from '@/db/schema';
@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { ChatList } from '@/components/dashboard/chat-list';
 
 export default async function ChatsPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   const userPages = await db

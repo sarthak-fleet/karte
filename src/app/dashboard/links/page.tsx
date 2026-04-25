@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db } from '@/db';
 import { pages, links } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { LinkEditor } from '@/components/dashboard/link-editor';
 
 export default async function LinksPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   const page = await db.query.pages.findFirst({

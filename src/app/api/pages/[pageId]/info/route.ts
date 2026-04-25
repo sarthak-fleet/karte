@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db } from '@/db';
 import { pages, infoBlocks, users } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
@@ -10,7 +10,7 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -37,7 +37,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

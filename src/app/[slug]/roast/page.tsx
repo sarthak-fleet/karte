@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPageBySlug, getGeneratedPage, getPageLinks, getPageProjects } from '../_lib/get-page-data';
 import { resolveThemeConfig } from '@/lib/themes';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import type { RoastContent } from '@/lib/generated-page-types';
 import { RoastPageClient } from '@/components/public/roast/roast-page-client';
 
@@ -31,7 +31,7 @@ export default async function RoastPage({
       : null;
 
   // If no content generated and visitor isn't the owner, 404
-  const session = await auth().catch(() => null);
+  const session = await getSession().catch(() => null);
   const isOwner = session?.user?.id === page.userId;
   if (!existingRoast && !isOwner) notFound();
 

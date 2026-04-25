@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
 import { desc, eq } from 'drizzle-orm';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-server';
 import { db, ensureProjectsTable } from '@/db';
 import { pages, contactSubmissions } from '@/db/schema';
 
 export default async function LeadsPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
   const page = await db.query.pages.findFirst({
