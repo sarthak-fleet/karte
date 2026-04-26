@@ -1,7 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "linkchat",
+  "main": ".open-next/worker.js",
   "compatibility_date": "2024-12-30",
   "compatibility_flags": ["nodejs_compat_v2"],
-  "pages_build_output_dir": ".open-next/assets"
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "linkchat-auth",
+      "database_id": "32b026e9-9870-474e-8323-17b44d8089f6"
+    }
+  ]
 }
