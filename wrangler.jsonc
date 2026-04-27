@@ -28,5 +28,11 @@
       "database_name": "linkchat-auth",
       "database_id": "c1a2aab0-9b0d-418b-a2da-ae627e1da72d"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "IMAGES_BUCKET",
+      "bucket_name": "linkchat-images"
+    }
   ]
 }

@@ -1,39 +1,36 @@
 import 'server-only';
 
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 type ImageUploadKind = 'avatar' | 'project';
 
-let r2Client: S3Client | null = null;
+interface R2HttpMetadata {
+  contentType?: string;
+  cacheControl?: string;
+  contentDisposition?: string;
+}
+interface R2BucketLike {
+  put(
+    key: string,
+    value: ArrayBuffer | ArrayBufferView | Uint8Array | string,
+    options?: { httpMetadata?: R2HttpMetadata },
+  ): Promise<unknown>;
+}
 
 function getEnv(name: string): string | null {
   const value = process.env[name]?.trim();
   return value ? value : null;
 }
 
-function getRequiredEnv(name: string): string {
-  const value = getEnv(name);
-
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
+function getR2Bucket(): R2BucketLike | null {
+  try {
+    const { env } = getCloudflareContext();
+    return (
+      (env as unknown as { IMAGES_BUCKET?: R2BucketLike }).IMAGES_BUCKET ?? null
+    );
+  } catch {
+    return null;
   }
-
-  return value;
-}
-
-function getR2Client(): S3Client {
-  if (!r2Client) {
-    r2Client = new S3Client({
-      region: 'auto',
-      endpoint: `https://${getRequiredEnv('CLOUDFLARE_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: getRequiredEnv('R2_ACCESS_KEY_ID'),
-        secretAccessKey: getRequiredEnv('R2_SECRET_ACCESS_KEY'),
-      },
-    });
-  }
-
-  return r2Client;
 }
 
 function getFileExtension(fileName: string, contentType: string): string {
@@ -67,13 +64,8 @@ function encodeObjectKeyForUrl(objectKey: string): string {
 }
 
 export function isR2Configured(): boolean {
-  return [
-    'CLOUDFLARE_ACCOUNT_ID',
-    'R2_BUCKET_NAME',
-    'R2_PUBLIC_BASE_URL',
-    'R2_ACCESS_KEY_ID',
-    'R2_SECRET_ACCESS_KEY',
-  ].every((name) => Boolean(getEnv(name)));
+  if (!getEnv('R2_PUBLIC_BASE_URL')) return false;
+  return getR2Bucket() !== null;
 }
 
 export function createR2ImageObjectKey(args: {
@@ -88,7 +80,10 @@ export function createR2ImageObjectKey(args: {
 }
 
 export function buildR2PublicUrl(objectKey: string): string {
-  const baseUrl = getRequiredEnv('R2_PUBLIC_BASE_URL').replace(/\/+$/, '');
+  const baseUrl = (getEnv('R2_PUBLIC_BASE_URL') ?? '').replace(/\/+$/, '');
+  if (!baseUrl) {
+    throw new Error('Missing required environment variable: R2_PUBLIC_BASE_URL');
+  }
   return `${baseUrl}/${encodeObjectKeyForUrl(objectKey)}`;
 }
 
@@ -97,15 +92,21 @@ export async function uploadImageToR2(args: {
   body: Buffer;
   contentType: string;
 }) {
-  await getR2Client().send(
-    new PutObjectCommand({
-      Bucket: getRequiredEnv('R2_BUCKET_NAME'),
-      Key: args.objectKey,
-      Body: args.body,
-      ContentType: args.contentType,
-      CacheControl: 'public, max-age=31536000, immutable',
-      ContentDisposition: 'inline',
-    }),
+  const bucket = getR2Bucket();
+  if (!bucket) {
+    throw new Error('R2 binding IMAGES_BUCKET is not configured');
+  }
+
+  await bucket.put(
+    args.objectKey,
+    args.body as unknown as ArrayBuffer,
+    {
+      httpMetadata: {
+        contentType: args.contentType,
+        cacheControl: 'public, max-age=31536000, immutable',
+        contentDisposition: 'inline',
+      },
+    },
   );
 
   return {
