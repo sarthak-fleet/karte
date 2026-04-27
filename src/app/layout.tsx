@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AnalyticsProvider } from "@/components/posthog-provider";
 import { SaasMakerAnalytics } from "@/components/SaasMakerAnalytics";
 import { SaaSMakerFeedback } from "@/components/saasmaker-feedback";
 import { PageAnalyticsTracker } from "@/components/public/page-analytics-tracker";
@@ -30,10 +31,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-950 text-white`}
       >
-        <SaasMakerAnalytics />
-        <SaaSMakerFeedback />
-        <PageAnalyticsTracker />
-        {children}
+        <AnalyticsProvider>
+          <SaasMakerAnalytics />
+          <SaaSMakerFeedback />
+          <PageAnalyticsTracker />
+          {children}
+        </AnalyticsProvider>
       </body>
     </html>
   );
