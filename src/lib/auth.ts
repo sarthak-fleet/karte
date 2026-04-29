@@ -27,6 +27,9 @@ export function createAuth() {
       },
     },
     trustedOrigins: [process.env.BETTER_AUTH_URL || 'http://localhost:3000'],
+    rateLimit: {
+      enabled: false,
+    },
   });
   return _auth as ReturnType<typeof betterAuth>;
 }
