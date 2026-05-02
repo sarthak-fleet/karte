@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import {
-  EditorRoot,
-  EditorContent,
+  createSuggestionItems,
   EditorBubble,
   EditorBubbleItem,
   EditorCommand,
-  EditorCommandList,
-  EditorCommandItem,
   EditorCommandEmpty,
+  EditorCommandItem,
+  EditorCommandList,
+  EditorContent,
+  EditorRoot,
   handleCommandNavigation,
-  createSuggestionItems,
 } from 'novel';
+import { useEffect,useState } from 'react';
 
 // ── Slash command items ─────────────────────────────────────────────────────
 
@@ -103,7 +103,7 @@ export function NovelEditor({ initialContent, onUpdate }: NovelEditorProps) {
 
   // Avoid SSR mismatch -- only render the editor on the client
   useEffect(() => {
-    setHydrated(true);
+    setHydrated(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
   if (!hydrated) {

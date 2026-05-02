@@ -1,9 +1,11 @@
+import { and,eq } from 'drizzle-orm';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth-server';
-import { db, ensureProjectsTable } from '@/db';
-import { pages, generatedPages } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+
 import { EncyclopediaEditor } from '@/components/dashboard/encyclopedia-editor';
+import { db, ensureProjectsTable } from '@/db';
+import { generatedPages,pages } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 import { normalizeEncyclopediaContent } from '@/lib/encyclopedia-compat';
 
 export default async function DashboardEncyclopediaPage() {
@@ -45,9 +47,9 @@ export default async function DashboardEncyclopediaPage() {
         <div className="rounded-2xl border border-white/20 bg-white/5 p-6 backdrop-blur-xl">
           <p className="text-gray-400">
             Generate your encyclopedia first from the{' '}
-            <a href="/dashboard/pages" className="text-white underline underline-offset-2 transition hover:text-gray-300">
+            <Link href="/dashboard/pages" className="text-white underline underline-offset-2 transition hover:text-gray-300">
               Pages tab
-            </a>
+            </Link>
             .
           </p>
         </div>
