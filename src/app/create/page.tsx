@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth-server';
+
 import { PageSettings } from '@/components/dashboard/page-settings';
 import { PublicTopBar } from '@/components/public/public-top-bar';
+import { getSession } from '@/lib/auth-server';
 
 export default async function CreatePage() {
   const session = await getSession();

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-server';
+
 import { listModels } from '@/lib/ai-client';
+import { getSession } from '@/lib/auth-server';
 
 export async function POST(req: Request) {
   const session = await getSession();

@@ -3,7 +3,7 @@ import { and, asc, desc, eq } from 'drizzle-orm';
 import { db, ensureProjectsTable } from '@/db';
 import { infoBlocks, links, pages, projects, users } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
-import { scrapeUrls, type ScrapedPage } from '@/lib/scraper';
+import { type ScrapedPage,scrapeUrls } from '@/lib/scraper';
 
 type LinkRecord = typeof links.$inferSelect;
 type ProjectRecord = typeof projects.$inferSelect;

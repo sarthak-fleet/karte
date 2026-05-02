@@ -1,5 +1,5 @@
-import { GlassCard } from '@/components/public/glass-card';
 import { ContactFormSection } from '@/components/public/contact-form-section';
+import { GlassCard } from '@/components/public/glass-card';
 
 type Section = {
   id: string;
@@ -9,6 +9,21 @@ type Section = {
   buttonLabel: string | null;
   buttonUrl: string | null;
 };
+
+function parseBlogPosts(content: string | null) {
+  return (content ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [title, url, description, date] = line
+        .split('|')
+        .map((part) => part.trim());
+
+      return { title, url, description, date };
+    })
+    .filter((post) => post.title);
+}
 
 export function PageSectionRenderer({
   slug,
@@ -57,6 +72,79 @@ export function PageSectionRenderer({
               {item.label}
             </a>
           ))}
+        </div>
+      </GlassCard>
+    );
+  }
+
+  if (section.type === 'blog') {
+    const posts = parseBlogPosts(section.content);
+
+    return (
+      <GlassCard className="overflow-hidden rounded-3xl p-0">
+        <div className="border-b border-white/10 bg-white/[0.04] p-6 sm:p-8">
+          <p
+            className="text-[11px] font-medium uppercase tracking-[0.28em]"
+            style={{ color: accentColor }}
+          >
+            Blog
+          </p>
+          <h3 className="mt-3 text-2xl font-semibold text-white">
+            {section.title}
+          </h3>
+        </div>
+
+        <div className="divide-y divide-white/10">
+          {posts.map((post, index) => {
+            const isLinked = post.url?.startsWith('http://') || post.url?.startsWith('https://');
+            const className = 'group block p-6 transition hover:bg-white/[0.045] sm:p-8';
+            const body = (
+              <>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-white/35">
+                      Post {String(index + 1).padStart(2, '0')}
+                    </p>
+                    <h4 className="mt-3 text-xl font-semibold leading-tight text-white group-hover:text-white/90">
+                      {post.title}
+                    </h4>
+                  </div>
+                  {post.date && (
+                    <p className="shrink-0 text-sm text-white/40">{post.date}</p>
+                  )}
+                </div>
+                {post.description && (
+                  <p className="mt-4 max-w-2xl text-sm leading-7 text-white/62">
+                    {post.description}
+                  </p>
+                )}
+                {isLinked && (
+                  <p className="mt-5 text-sm font-semibold" style={{ color: accentColor }}>
+                    Read article -&gt;
+                  </p>
+                )}
+              </>
+            );
+
+            return isLinked ? (
+              <a
+                key={`${post.title}-${post.url}`}
+                href={post.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track-type="blog"
+                data-track-id={post.url}
+                data-track-label={post.title}
+                className={className}
+              >
+                {body}
+              </a>
+            ) : (
+              <article key={`${post.title}-${index}`} className={className}>
+                {body}
+              </article>
+            );
+          })}
         </div>
       </GlassCard>
     );

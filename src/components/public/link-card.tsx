@@ -21,10 +21,10 @@ export function LinkCard({
       data-track-type="link"
       data-track-id={id ?? url}
       data-track-label={title}
-      className="group block w-full rounded-xl border border-white/15 bg-white/10 px-6 py-4 text-center backdrop-blur-lg transition-all duration-300 hover:border-white/30 hover:bg-white/20 hover:shadow-lg hover:shadow-white/5 hover:scale-[1.02]"
+      className="group flex min-h-16 w-full items-center justify-center rounded-2xl border border-white/15 bg-white/[0.055] px-6 py-4 text-center backdrop-blur-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-[#f2c879]/35 hover:bg-[#f2c879]/[0.10] hover:shadow-lg hover:shadow-[#f2c879]/10"
       style={accentColor ? { borderColor: `${accentColor}33` } : undefined}
     >
-      <span className="text-sm font-medium text-white group-hover:text-white/90">
+      <span className="text-base font-semibold text-white group-hover:text-white/90">
         {icon && <span className="mr-2">{icon}</span>}
         {title}
       </span>

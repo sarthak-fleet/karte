@@ -83,3 +83,46 @@ pnpm drizzle-kit studio     # Drizzle Studio UI
 - **DB migration warning**: `ensureProjectsTable()` logs `[unenv] https.request is not implemented yet!` on cold start. Non-fatal — error is caught and app continues. Root cause: libsql `@libsql/client/web` uses WebSocket (wss://) for Turso but the initial handshake may touch https internally. Doesn't affect DB reads/writes once connected. Investigate upgrading `@libsql/client` if this causes issues.
 
 ## Active context
+
+
+<claude-mem-context>
+# Memory Context
+
+# [linkchat] recent context, 2026-05-02 1:57pm GMT+5:30
+
+Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
+Format: ID TIME TYPE TITLE
+Fetch details: get_observations([IDs]) | Search: mem-search skill
+
+Stats: 26 obs (7,236t read) | 53,035t work | 86% savings
+
+### May 2, 2026
+451 1:43p 🔵 linkchat CI run 25038129519 failed with empty jobs array
+454 1:44p 🔵 linkchat has two workflows: ci.yml (always failing) vs Deploy to Cloudflare Workers (always succeeding)
+456 " 🔵 linkchat CI failure root cause — missing @saas-maker/eslint-config package
+472 1:49p 🔵 linkchat CI lint failures — 4 errors identified
+474 " 🔵 linkchat novel-editor.tsx lint false positive — standard SSR hydration pattern
+476 " 🔴 linkchat — replaced raw `<a>` tags with Next.js `<Link />` in dashboard pages
+477 1:50p 🔴 linkchat — all 4 lint errors fixed to unblock CI
+480 " 🔵 linkchat — 2 lint errors blocking CI
+482 1:51p 🔵 linkchat lint errors — root causes identified: Date.now in render + setState in effect
+485 " 🔵 linkchat lint error — Date.now violation in src/app/dashboard/layout.tsx line 124
+486 " 🔵 linkchat lint error — setState in effect at src/components/dashboard/novel-editor.tsx line 106
+495 1:53p 🔴 linkchat CI — missing @saas-maker/eslint-config dep + lint errors fixed
+496 " 🔵 linkchat CI still failing after fix — saas-maker upstream CI broken at pnpm build:db
+498 " 🔵 linkchat CI — actual failures are Cloudflare Workers build + deploy job, not lint/ci.yml
+501 1:54p 🔵 linkchat ci.yml run 25247801515 has zero jobs — workflow cancelled or skipped before job creation
+502 " 🔵 linkchat uses saas-maker foundry-ci.yml reusable workflow — runs lint, typecheck, tests via pnpm
+503 " 🔵 linkchat — both ci.yml and Deploy to Cloudflare Workers failing on every push across all recent runs
+507 1:55p 🔵 saas-maker repo is private — npm packages from it require auth token in CI
+509 " 🔵 linkchat ci.yml calls reusable workflow from private saas-maker repo — likely cause of zero-job CI runs
+510 " 🔴 linkchat ci.yml — inlined workflow steps, removed private saas-maker reusable workflow reference
+511 " ✅ linkchat ci.yml inline fix committed and pushed — commit 7d95cbb
+512 1:56p 🔵 linkchat CI run now shows in_progress with jobs — inline fix resolved zero-job failure
+513 " 🔵 linkchat CI run 25247855146 completed/failure — jobs ran but a step failed
+514 " 🔵 linkchat CI build-and-test job failing — need step-level logs to identify failing step
+515 " 🔵 linkchat CI fails at "Run Lint" step — pnpm install succeeds, typecheck/tests skipped
+519 1:57p 🔵 linkchat lint — 0 errors, 11 warnings only
+
+Access 53k tokens of past work via get_observations([IDs]) or mem-search skill.
+</claude-mem-context>

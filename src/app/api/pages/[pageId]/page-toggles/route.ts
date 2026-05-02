@@ -1,8 +1,9 @@
-import { getSession } from '@/lib/auth-server';
+import { and,eq } from 'drizzle-orm';
+
 import { db, ensureProjectsTable } from '@/db';
-import { pages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { pages } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ pageId: string }> }) {
   const session = await getSession();

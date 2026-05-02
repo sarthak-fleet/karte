@@ -1,7 +1,8 @@
+import { and, asc,eq } from 'drizzle-orm';
 import { cache } from 'react';
-import { eq, and, asc } from 'drizzle-orm';
+
 import { db, ensureProjectsTable } from '@/db';
-import { pages, links, projects, pageSections, users, infoBlocks, generatedPages } from '@/db/schema';
+import { generatedPages,infoBlocks, links, pages, pageSections, projects, users } from '@/db/schema';
 
 /**
  * Single query to load everything needed for a public profile page.

@@ -1,13 +1,17 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import type { ThemeConfig } from '@/lib/themes';
+import { integer,sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
 import type { ScrapedCache } from '@/lib/scraper';
+import type { ThemeConfig } from '@/lib/themes';
 
 // ── Page Settings Type ──────────────────────────────────────────────
 export type PageSettings = {
+  visitorIntent?: 'explore' | 'ask' | 'reach' | 'vibe';
   roast?: { tone?: string; context?: string };
   newspaper?: { name?: string; tone?: string; context?: string };
   encyclopedia?: { style?: string; context?: string };
 };
+
+export type DmMode = 'off' | 'anonymous' | 'email';
 
 // ── User (better-auth default + linkchat custom fields) ──────────────
 // Table name `user` (singular) — matches better-auth defaults so its
@@ -94,6 +98,7 @@ export const pages = sqliteTable('pages', {
   published: integer('published', { mode: 'boolean' }).default(false),
   chatEnabled: integer('chatEnabled', { mode: 'boolean' }).default(false),
   chatSystemPrompt: text('chatSystemPrompt'),
+  dmMode: text('dmMode').$type<DmMode>().notNull().default('off'),
   encyclopediaEnabled: integer('encyclopediaEnabled', { mode: 'boolean' }).default(false),
   roastEnabled: integer('roastEnabled', { mode: 'boolean' }).default(false),
   newspaperEnabled: integer('newspaperEnabled', { mode: 'boolean' }).default(false),
@@ -193,6 +198,8 @@ export const contactSubmissions = sqliteTable('contactSubmissions', {
   visitorId: text('visitorId'),
   name: text('name').notNull(),
   email: text('email').notNull(),
+  senderType: text('senderType').$type<'anonymous' | 'email'>().notNull().default('email'),
+  status: text('status').$type<'unread' | 'replied' | 'archived'>().notNull().default('unread'),
   message: text('message').notNull(),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),

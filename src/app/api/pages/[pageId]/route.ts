@@ -1,10 +1,13 @@
+import { and,eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-server';
-import { db } from '@/db';
+
+import { db, ensureProjectsTable } from '@/db';
 import { pages } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
-import { isValidSlug, isValidUrl, MAX_BIO_LENGTH } from '@/lib/validation';
+import { getSession } from '@/lib/auth-server';
 import { isThemePresetId, resolveThemeConfig } from '@/lib/themes';
+import { isValidSlug, isValidUrl, MAX_BIO_LENGTH } from '@/lib/validation';
+
+const DM_MODES = new Set(['off', 'anonymous', 'email']);
 
 export async function PUT(
   req: Request,
@@ -16,6 +19,7 @@ export async function PUT(
   }
 
   const { pageId } = await params;
+  await ensureProjectsTable();
 
   const page = await db.query.pages.findFirst({
     where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
@@ -26,7 +30,7 @@ export async function PUT(
   }
 
   const body = await req.json();
-  const { slug, displayName, bio, avatarUrl, published, themeConfig } = body;
+  const { slug, displayName, bio, avatarUrl, published, themeConfig, dmMode } = body;
 
   if (slug && !isValidSlug(slug)) {
     return NextResponse.json(
@@ -49,6 +53,13 @@ export async function PUT(
         { status: 400 },
       );
     }
+  }
+
+  if (dmMode !== undefined && (typeof dmMode !== 'string' || !DM_MODES.has(dmMode))) {
+    return NextResponse.json(
+      { error: 'DM mode must be off, anonymous, or email' },
+      { status: 400 },
+    );
   }
 
   let normalizedThemeConfig = page.themeConfig ?? resolveThemeConfig();
@@ -101,6 +112,7 @@ export async function PUT(
       avatarUrl: avatarUrl !== undefined ? avatarUrl?.trim() || null : page.avatarUrl,
       themeConfig: normalizedThemeConfig,
       published: published !== undefined ? published : page.published,
+      dmMode: dmMode ?? page.dmMode,
       updatedAt: new Date(),
     })
     .where(eq(pages.id, pageId))

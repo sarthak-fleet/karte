@@ -1,9 +1,10 @@
+import { eq } from 'drizzle-orm';
 import Image from 'next/image';
 import Link from 'next/link';
-import { eq } from 'drizzle-orm';
-import { getSession } from '@/lib/auth-server';
+
 import { db } from '@/db';
 import { pages } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 
 type PublicTopBarProps = {
   accentColor?: string;

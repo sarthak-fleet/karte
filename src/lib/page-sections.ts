@@ -15,6 +15,11 @@ export const PAGE_SECTION_TYPES = [
     description: 'A quote with a person or company name.',
   },
   {
+    value: 'blog',
+    label: 'Blog Posts',
+    description: 'A curated list of essays, updates, or writing.',
+  },
+  {
     value: 'cta',
     label: 'Call To Action',
     description: 'A highlighted block with a button.',

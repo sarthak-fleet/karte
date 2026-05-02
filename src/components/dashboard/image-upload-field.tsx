@@ -1,11 +1,12 @@
 'use client';
 
 import { useId, useRef, useState } from 'react';
+
 import {
   ALLOWED_IMAGE_CONTENT_TYPES,
+  isSupportedImageContentType,
   MAX_IMAGE_UPLOAD_BYTES,
   MAX_IMAGE_UPLOAD_SIZE_MB,
-  isSupportedImageContentType,
 } from '@/lib/validation';
 
 interface ImageUploadFieldProps {

@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCallback,useEffect, useRef, useState } from 'react';
+
 import { ContactFormSection } from '@/components/public/contact-form-section';
+import type { DmMode } from '@/db/schema';
 import { getOrCreateVisitorId } from '@/lib/visitor-id';
 
 interface Message {
@@ -38,14 +40,18 @@ export function ChatWidget({
   displayName,
   accentColor = '#2563eb',
   position = 'bottom-right',
+  chatEnabled = true,
+  dmMode = 'off',
 }: {
   slug: string;
   displayName: string;
   accentColor?: string;
   position?: ChatPosition;
+  chatEnabled?: boolean;
+  dmMode?: DmMode;
 }) {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<'chat' | 'contact'>('chat');
+  const [mode, setMode] = useState<'chat' | 'contact'>(chatEnabled ? 'chat' : 'contact');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -54,6 +60,7 @@ export function ChatWidget({
   const inputRef = useRef<HTMLInputElement>(null);
   const visitorIdRef = useRef<string | null>(null);
   const accentTextColor = getButtonTextColor(accentColor);
+  const dmEnabled = dmMode !== 'off';
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -66,8 +73,34 @@ export function ChatWidget({
   }, [open, mode]);
 
   useEffect(() => {
+    if (!chatEnabled && mode === 'chat') {
+      setMode('contact');
+    }
+  }, [chatEnabled, mode]);
+
+  useEffect(() => {
     visitorIdRef.current = getOrCreateVisitorId();
   }, []);
+
+  useEffect(() => {
+    function handleOpenWidget(event: Event) {
+      const detail = (event as CustomEvent<{ mode?: 'chat' | 'contact' }>).detail;
+      const requestedMode = detail?.mode;
+
+      if (requestedMode === 'contact' && dmEnabled) {
+        setMode('contact');
+      } else if (chatEnabled) {
+        setMode('chat');
+      } else if (dmEnabled) {
+        setMode('contact');
+      }
+
+      setOpen(true);
+    }
+
+    window.addEventListener('linkchat:open-widget', handleOpenWidget);
+    return () => window.removeEventListener('linkchat:open-widget', handleOpenWidget);
+  }, [chatEnabled, dmEnabled]);
 
   const saveMessage = useCallback(
     async (convId: string, role: 'user' | 'assistant', content: string) => {
@@ -179,13 +212,19 @@ export function ChatWidget({
     position === 'bottom-left'
       ? 'left-3 right-3 sm:right-auto sm:left-6 sm:w-[380px]'
       : 'left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px]';
+  const showModeTabs = chatEnabled && dmEnabled;
+  const title = mode === 'chat' ? `Chat with ${displayName}` : `DM ${displayName}`;
+
+  if (!chatEnabled && !dmEnabled) {
+    return null;
+  }
 
   return (
     <>
       <button
         onClick={() => setOpen((current) => !current)}
         className={`fixed bottom-4 ${launcherPositionClass} z-50 flex h-14 w-14 items-center justify-center rounded-full border border-white/20 text-2xl shadow-lg backdrop-blur-xl transition-transform hover:scale-110 active:scale-95 sm:bottom-6`}
-        aria-label={open ? 'Close chat' : 'Open chat'}
+        aria-label={open ? 'Close messenger' : 'Open messenger'}
         style={{
           backgroundColor: `${accentColor}f2`,
           boxShadow: `0 18px 44px -18px ${accentColor}`,
@@ -202,36 +241,38 @@ export function ChatWidget({
           <div className="border-b border-white/10 px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold text-white">
-                {mode === 'chat' ? `Chat with ${displayName}` : `Contact ${displayName}`}
+                {title}
               </h3>
-              <div className="flex rounded-full border border-white/10 bg-white/5 p-1">
-                <button
-                  type="button"
-                  onClick={() => setMode('chat')}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                    mode === 'chat'
-                      ? 'bg-white text-gray-900'
-                      : 'text-white/70 hover:text-white'
-                  }`}
-                >
-                  Chat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('contact')}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                    mode === 'contact'
-                      ? 'bg-white text-gray-900'
-                      : 'text-white/70 hover:text-white'
-                  }`}
-                >
-                  Contact
-                </button>
-              </div>
+              {showModeTabs && (
+                <div className="flex rounded-full border border-white/10 bg-white/5 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setMode('chat')}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                      mode === 'chat'
+                        ? 'bg-white text-gray-900'
+                        : 'text-white/70 hover:text-white'
+                    }`}
+                  >
+                    Chat
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode('contact')}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                      mode === 'contact'
+                        ? 'bg-white text-gray-900'
+                        : 'text-white/70 hover:text-white'
+                    }`}
+                  >
+                    DM
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
-          {mode === 'chat' ? (
+          {mode === 'chat' && chatEnabled ? (
             <>
               <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
                 {messages.length === 0 && (
@@ -277,7 +318,7 @@ export function ChatWidget({
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type a message..."
                   disabled={loading}
-                  className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 outline-none focus:border-blue-500"
+                  className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 outline-none focus:border-[#f2c879]"
                 />
                 <button
                   type="submit"
@@ -294,7 +335,23 @@ export function ChatWidget({
               <p className="mb-4 text-sm text-white/70">
                 Send a direct message to {displayName}.
               </p>
-              <ContactFormSection slug={slug} accentColor={accentColor} compact />
+              {dmMode === 'anonymous' && (
+                <p className="mb-4 text-xs leading-5 text-white/50">
+                  This profile accepts anonymous messages.
+                </p>
+              )}
+              {dmMode === 'email' && (
+                <p className="mb-4 text-xs leading-5 text-white/50">
+                  This profile requires a verified email before sending.
+                </p>
+              )}
+              <ContactFormSection
+                slug={slug}
+                accentColor={accentColor}
+                compact
+                dmMode={dmMode === 'anonymous' ? 'anonymous' : 'email'}
+                requireVerifiedEmail={dmMode === 'email'}
+              />
             </div>
           )}
         </div>

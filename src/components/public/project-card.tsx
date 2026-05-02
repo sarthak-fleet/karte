@@ -1,11 +1,3 @@
-function getHostname(url: string) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
-}
-
 export function ProjectCard({
   id,
   title,
@@ -21,8 +13,6 @@ export function ProjectCard({
   description: string;
   accentColor?: string;
 }) {
-  const hostname = getHostname(url);
-
   return (
     <a
       href={url}
@@ -31,7 +21,7 @@ export function ProjectCard({
       data-track-type="project"
       data-track-id={id ?? url}
       data-track-label={title}
-      className="group flex h-full flex-col rounded-3xl border border-white/15 bg-white/8 p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/12 hover:shadow-2xl hover:shadow-cyan-950/30"
+      className="group flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-white/15 bg-[#141414]/86 p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#f2c879]/35 hover:bg-[#191813] hover:shadow-2xl hover:shadow-black/45"
       style={accentColor ? { borderColor: `${accentColor}33` } : undefined}
     >
       {imageUrl && (
@@ -42,21 +32,28 @@ export function ProjectCard({
       )}
 
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p
-            className="text-[11px] font-medium uppercase tracking-[0.28em]"
-            style={{ color: accentColor ?? '#a5f3fc' }}
-          >
-            {hostname}
-          </p>
-          <h3 className="mt-3 text-xl font-semibold text-white">{title}</h3>
+        <div className="min-w-0">
+          <h3 className="text-xl font-semibold text-white">{title}</h3>
         </div>
 
         <span
-          className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/70 transition"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 transition group-hover:text-white"
           style={accentColor ? { borderColor: `${accentColor}33` } : undefined}
+          aria-label="Visit project"
         >
-          Visit
+          <svg
+            aria-hidden="true"
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+          >
+            <path d="M7 17 17 7" />
+            <path d="M8 7h9v9" />
+          </svg>
         </span>
       </div>
 

@@ -1,8 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
 import { Playfair_Display } from 'next/font/google';
+import { useRef } from 'react';
+
 import type { NewspaperContent } from '@/lib/generated-page-types';
+
 import { ShareControls } from './share-controls';
 
 const playfair = Playfair_Display({
@@ -34,12 +36,12 @@ function deriveCategories(content: NewspaperContent): string[] {
 
 function CategoryNav({ categories }: { categories: string[] }) {
   return (
-    <nav className="border-b-2 border-gray-900 bg-gray-900">
-      <div className="flex items-center gap-0 overflow-x-auto">
+    <nav className="border-y border-stone-900 bg-[#f7f1df]">
+      <div className="flex items-center justify-center gap-0 overflow-x-auto">
         {categories.map((cat, i) => (
           <span
             key={i}
-            className="cursor-default whitespace-nowrap px-4 py-2.5 text-xs font-semibold tracking-wider text-gray-200 uppercase transition-colors hover:bg-gray-800 hover:text-white sm:px-5 sm:text-[13px]"
+            className="cursor-default whitespace-nowrap border-l border-stone-300 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-stone-800 first:border-l-0 sm:px-5"
           >
             {cat}
           </span>
@@ -65,12 +67,11 @@ function StoryCard({
 
   return (
     <article className="group">
-      {/* Category label */}
-      <span className="mb-1.5 inline-block text-[10px] font-bold tracking-widest text-red-600 uppercase">
+      <span className="mb-2 inline-block border-b border-stone-900 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-900">
         {index === 0 ? 'Feature' : index === 1 ? 'Profile' : 'Spotlight'}
       </span>
       <h3
-        className="mb-2 text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-red-700 sm:text-xl"
+        className="mb-2 text-xl font-black leading-[1.02] text-stone-950 transition-colors group-hover:text-stone-700 sm:text-2xl"
         style={playfair.style}
       >
         {headline}
@@ -78,13 +79,13 @@ function StoryCard({
       {paragraphs.map((para, j) => (
         <p
           key={j}
-          className="mt-1 text-[13px] leading-relaxed text-gray-600"
+          className="mt-2 text-[13px] leading-relaxed text-stone-700"
         >
           {para.length > 150 ? para.slice(0, 150) + '...' : para}
         </p>
       ))}
-      <span className="mt-2 inline-block text-xs font-semibold text-red-600 uppercase">
-        Read more &rarr;
+      <span className="mt-3 inline-block text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
+        Continued on profile
       </span>
     </article>
   );
@@ -101,19 +102,18 @@ function TrendingSidebar({
     <aside className="space-y-5">
       {/* Trending / Quick Facts */}
       <div>
-        <div className="mb-3 flex items-center gap-2 border-b-2 border-red-600 pb-2">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-600" />
-          <h4 className="text-xs font-black tracking-widest text-gray-900 uppercase">
-            Trending Now
+        <div className="mb-3 border-y-2 border-stone-900 py-2 text-center">
+          <h4 className="text-xs font-black uppercase tracking-[0.24em] text-stone-950">
+            Index
           </h4>
         </div>
         <ol className="space-y-2.5">
           {facts.map((fact, i) => (
             <li key={i} className="flex items-start gap-2.5">
-              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded bg-gray-900 text-[10px] font-bold text-white">
+              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center bg-stone-900 text-[10px] font-bold text-[#f7f1df]">
                 {i + 1}
               </span>
-              <span className="text-[13px] leading-snug text-gray-700">
+              <span className="text-[13px] leading-snug text-stone-700">
                 {fact}
               </span>
             </li>
@@ -122,24 +122,13 @@ function TrendingSidebar({
       </div>
 
       {/* Mood / Weather widget */}
-      <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50 p-4">
-        <div className="mb-2 flex items-center gap-2">
-          <svg
-            className="h-5 w-5 text-amber-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span className="text-xs font-bold tracking-wider text-gray-800 uppercase">
-            Today&apos;s Forecast
+      <div className="border-2 border-stone-900 bg-[#fffaf0] p-4">
+        <div className="mb-2 border-b border-stone-900 pb-2">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-stone-900">
+            Forecast
           </span>
         </div>
-        <p className="text-[13px] leading-relaxed text-gray-700 italic">
+        <p className="text-[13px] leading-relaxed text-stone-700 italic">
           {mood}
         </p>
       </div>
@@ -162,135 +151,104 @@ export function NewspaperFrontPage({
     .filter((p) => p.trim().length > 0);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-8">
-      {/* Newspaper container */}
+    <div className="mx-auto w-full max-w-6xl px-3 py-8 sm:px-5">
       <div ref={newspaperRef}>
         <div
-          className="overflow-hidden rounded-xl shadow-2xl"
-          style={{ backgroundColor: '#faf9f6' }}
+          className="border border-stone-900 shadow-[0_40px_90px_-70px_rgba(0,0,0,0.9)]"
+          style={{ backgroundColor: '#f7f1df' }}
         >
-          {/* ============================================= */}
-          {/* CATEGORY NAV BAR                              */}
-          {/* ============================================= */}
-          <CategoryNav categories={categories} />
-
-          {/* ============================================= */}
-          {/* MASTHEAD                                      */}
-          {/* ============================================= */}
-          <div className="border-b border-gray-200 px-5 pt-5 pb-4 sm:px-8 sm:pt-6">
-            {/* Thin red line accent at very top */}
-            <div className="mb-4 h-0.5 bg-red-600" />
-
-            {/* Masthead row */}
-            <div className="flex items-end justify-between">
-              <p className="text-[10px] tracking-wider text-gray-400 uppercase sm:text-xs">
-                {content.dateline}
-              </p>
+          <div className="px-4 pt-4 sm:px-8 sm:pt-6">
+            <div className="flex items-center justify-between border-y border-stone-900 py-2 text-[10px] uppercase tracking-[0.18em] text-stone-700 sm:text-xs">
+              <p>{content.dateline}</p>
+              <p>LinkChat Edition</p>
+              <p>Vol. I</p>
+            </div>
+            <div className="py-4 text-center">
               <h1
-                className="text-center text-3xl font-black tracking-tight text-gray-900 sm:text-4xl md:text-5xl"
+                className="text-5xl font-black leading-none tracking-[-0.03em] text-stone-950 sm:text-7xl md:text-8xl"
                 style={playfair.style}
               >
                 {content.mastheadName}
               </h1>
-              <p className="text-[10px] tracking-wider text-gray-400 uppercase sm:text-xs">
-                Vol. I
+              <p className="mx-auto mt-2 max-w-2xl text-xs uppercase tracking-[0.24em] text-stone-600">
+                All the profile that is fit to print
               </p>
             </div>
-
-            {/* Bottom rule */}
-            <div className="mt-3 h-px bg-gray-200" />
-            <div className="mt-0.5 h-[2px] bg-gray-900" />
           </div>
 
-          {/* ============================================= */}
-          {/* HERO LEAD STORY                               */}
-          {/* ============================================= */}
-          <div className="border-b border-gray-200 px-5 py-6 sm:px-8 sm:py-8">
-            {/* Breaking badge */}
-            <div className="mb-3 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded bg-red-600 px-2.5 py-1 text-[10px] font-bold tracking-widest text-white uppercase">
-                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-                Main Story
-              </span>
-            </div>
+          <CategoryNav categories={categories} />
 
-            {/* Hero layout: text + avatar */}
-            <div className="flex flex-col gap-6 md:flex-row md:items-start">
-              {/* Text content */}
+          <div className="border-b-2 border-stone-900 px-4 py-6 sm:px-8 sm:py-8">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
               <div className="flex-1">
+                <span className="mb-3 inline-block border border-stone-900 px-2 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-stone-900">
+                  Main Story
+                </span>
                 <h2
-                  className="mb-2 text-2xl font-black leading-tight tracking-tight text-gray-900 sm:text-3xl md:text-4xl"
+                  className="mb-3 text-4xl font-black leading-[0.95] tracking-[-0.03em] text-stone-950 sm:text-5xl md:text-6xl"
                   style={playfair.style}
                 >
                   {content.leadStory.headline}
                 </h2>
 
                 <p
-                  className="mb-4 text-base leading-snug text-gray-500 italic sm:text-lg"
+                  className="mb-5 border-y border-stone-300 py-3 text-lg leading-snug text-stone-700 italic sm:text-xl"
                   style={playfair.style}
                 >
                   {content.leadStory.subheadline}
                 </p>
 
-                {/* Lead paragraph (larger text) */}
                 {leadParagraphs.length > 0 && (
-                  <p className="mb-3 text-[15px] leading-relaxed text-gray-800 sm:text-base">
+                  <p className="mb-3 text-[16px] leading-relaxed text-stone-900 first-letter:float-left first-letter:mr-2 first-letter:text-6xl first-letter:font-black first-letter:leading-[0.85] sm:text-[17px]">
                     {leadParagraphs[0]}
                   </p>
                 )}
 
-                {/* Remaining paragraphs */}
                 {leadParagraphs.slice(1).map((para, i) => (
                   <p
                     key={i}
-                    className="mt-2.5 text-[13px] leading-relaxed text-gray-600 sm:text-sm"
+                    className="mt-2.5 text-[13px] leading-relaxed text-stone-700 sm:text-sm"
                   >
                     {para}
                   </p>
                 ))}
               </div>
 
-              {/* Avatar as "article image" */}
               {avatarUrl && (
-                <div className="flex-shrink-0 md:w-56 lg:w-64">
-                  <div className="overflow-hidden rounded-lg">
+                <figure className="border border-stone-900 bg-[#fffaf0] p-2">
+                  <div className="overflow-hidden border border-stone-300">
                     <img
                       src={avatarUrl}
                       alt={displayName}
-                      className="h-48 w-full object-cover md:h-56 lg:h-64"
+                      className="h-72 w-full object-cover grayscale"
                     />
                   </div>
-                  <p className="mt-1.5 text-[10px] text-gray-400 italic">
+                  <figcaption className="mt-2 text-[10px] uppercase tracking-[0.12em] text-stone-500">
                     {displayName} | Photo: LinkChat
-                  </p>
-                </div>
+                  </figcaption>
+                </figure>
               )}
             </div>
 
-            {/* Pull quote */}
             {content.leadStory.pullQuote && (
-              <div className="mt-6 border-l-4 border-red-600 bg-gray-50 py-4 pl-5 pr-4">
+              <div className="mt-6 border-y-2 border-stone-900 py-4 text-center">
                 <blockquote
-                  className="text-lg font-bold leading-snug text-gray-800 italic sm:text-xl"
+                  className="mx-auto max-w-3xl text-2xl font-bold leading-snug text-stone-950 italic sm:text-3xl"
                   style={playfair.style}
                 >
-                  &ldquo;{content.leadStory.pullQuote}&rdquo;
+                  “{content.leadStory.pullQuote}”
                 </blockquote>
               </div>
             )}
           </div>
 
-          {/* ============================================= */}
-          {/* 3-COLUMN GRID: Stories + Trending             */}
-          {/* ============================================= */}
-          <div className="px-5 py-6 sm:px-8 sm:py-8">
+          <div className="px-4 py-6 sm:px-8 sm:py-8">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-              {/* LEFT COLUMN: Secondary stories */}
               <div className="space-y-5 md:col-span-4">
                 {content.secondaryStories.slice(0, 2).map((story, i) => (
                   <div key={i}>
                     {i > 0 && (
-                      <hr className="mb-5 border-t border-gray-200" />
+                      <hr className="mb-5 border-t border-stone-300" />
                     )}
                     <StoryCard
                       headline={story.headline}
@@ -301,8 +259,7 @@ export function NewspaperFrontPage({
                 ))}
               </div>
 
-              {/* CENTER COLUMN: Third story or extended lead */}
-              <div className="border-gray-200 md:col-span-4 md:border-x md:px-6">
+              <div className="border-stone-300 md:col-span-4 md:border-x md:px-6">
                 {content.secondaryStories.length > 2 ? (
                   <StoryCard
                     headline={content.secondaryStories[2].headline}
@@ -312,11 +269,11 @@ export function NewspaperFrontPage({
                 ) : content.secondaryStories.length > 1 ? (
                   /* If only 2 secondary stories, show an expanded version of the second */
                   <div>
-                    <span className="mb-1.5 inline-block text-[10px] font-bold tracking-widest text-red-600 uppercase">
+                    <span className="mb-2 inline-block border-b border-stone-900 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-900">
                       In Depth
                     </span>
                     <h3
-                      className="mb-2 text-lg font-bold leading-snug text-gray-900 sm:text-xl"
+                      className="mb-2 text-xl font-black leading-snug text-stone-950 sm:text-2xl"
                       style={playfair.style}
                     >
                       More on {displayName}
@@ -327,7 +284,7 @@ export function NewspaperFrontPage({
                       .map((para, j) => (
                         <p
                           key={j}
-                          className="mt-1.5 text-[13px] leading-relaxed text-gray-600"
+                          className="mt-1.5 text-[13px] leading-relaxed text-stone-700"
                         >
                           {para}
                         </p>
@@ -336,11 +293,11 @@ export function NewspaperFrontPage({
                 ) : (
                   /* Fallback: use lead story continuation */
                   <div>
-                    <span className="mb-1.5 inline-block text-[10px] font-bold tracking-widest text-red-600 uppercase">
+                    <span className="mb-2 inline-block border-b border-stone-900 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-900">
                       Analysis
                     </span>
                     <h3
-                      className="mb-2 text-lg font-bold leading-snug text-gray-900 sm:text-xl"
+                      className="mb-2 text-xl font-black leading-snug text-stone-950 sm:text-2xl"
                       style={playfair.style}
                     >
                       The Full Story
@@ -348,7 +305,7 @@ export function NewspaperFrontPage({
                     {leadParagraphs.slice(1, 4).map((para, j) => (
                       <p
                         key={j}
-                        className="mt-1.5 text-[13px] leading-relaxed text-gray-600"
+                        className="mt-1.5 text-[13px] leading-relaxed text-stone-700"
                       >
                         {para}
                       </p>
@@ -357,7 +314,6 @@ export function NewspaperFrontPage({
                 )}
               </div>
 
-              {/* RIGHT COLUMN: Trending sidebar */}
               <div className="md:col-span-4">
                 <TrendingSidebar
                   facts={content.sidebar.facts}
@@ -367,21 +323,18 @@ export function NewspaperFrontPage({
             </div>
           </div>
 
-          {/* ============================================= */}
-          {/* FAKE ADS                                      */}
-          {/* ============================================= */}
-          <div className="border-t border-gray-200 bg-gray-50 px-5 py-5 sm:px-8 sm:py-6">
+          <div className="border-t-2 border-stone-900 bg-[#efe5c8] px-4 py-5 sm:px-8 sm:py-6">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {content.fakeAds.map((ad, i) => (
                 <div
                   key={i}
-                  className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-center transition-shadow hover:shadow-sm"
+                  className="border border-stone-900 bg-[#f7f1df] px-4 py-3 text-center"
                 >
-                  <p className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
-                    Sponsored
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500">
+                    Advertisement
                   </p>
                   <p
-                    className="mt-1 text-xs font-bold leading-snug text-gray-700 italic"
+                    className="mt-1 text-xs font-bold leading-snug text-stone-800 italic"
                     style={playfair.style}
                   >
                     {ad}
@@ -391,16 +344,13 @@ export function NewspaperFrontPage({
             </div>
           </div>
 
-          {/* ============================================= */}
-          {/* FOOTER                                        */}
-          {/* ============================================= */}
-          <div className="border-t border-gray-900 bg-gray-900 px-5 py-3 sm:px-8">
+          <div className="border-t border-stone-900 bg-stone-950 px-5 py-3 sm:px-8">
             <div className="flex items-center justify-between">
-              <p className="text-[10px] tracking-widest text-gray-500 uppercase">
+              <p className="text-[10px] uppercase tracking-widest text-stone-400">
                 Published by LinkChat
               </p>
               <p
-                className="text-[10px] tracking-wider text-gray-500 italic"
+                className="text-[10px] tracking-wider text-stone-400 italic"
                 style={playfair.style}
               >
                 A Personal Newspaper Experience

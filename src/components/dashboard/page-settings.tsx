@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+
 import { ImageUploadField } from '@/components/dashboard/image-upload-field';
+import type { DmMode } from '@/db/schema';
 import {
   DEFAULT_THEME_PRESET,
-  THEME_PRESETS,
   resolveThemeConfig,
+  THEME_PRESETS,
   type ThemeConfig,
   type ThemePresetId,
 } from '@/lib/themes';
@@ -19,6 +21,7 @@ interface PageData {
   avatarUrl: string | null;
   themeConfig?: ThemeConfig | null;
   published: boolean | null;
+  dmMode: DmMode;
 }
 
 interface PageSettingsProps {
@@ -28,6 +31,27 @@ interface PageSettingsProps {
 }
 
 const PAGE_DRAFT_STORAGE_KEY = 'linkchat:page-draft';
+const DM_MODE_OPTIONS: Array<{
+  value: DmMode;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: 'off',
+    label: 'Off',
+    description: 'Hide the public DM button.',
+  },
+  {
+    value: 'anonymous',
+    label: 'Anonymous',
+    description: 'Visitors can send a message without sharing identity.',
+  },
+  {
+    value: 'email',
+    label: 'Email-verified',
+    description: 'Visitors must be signed in with a verified email.',
+  },
+];
 
 function sanitizeSlug(value: string): string {
   return value
@@ -64,6 +88,7 @@ export function PageSettings({
       ?? DEFAULT_THEME_PRESET.id,
   );
   const [published, setPublished] = useState(page?.published ?? false);
+  const [dmMode, setDmMode] = useState<DmMode>(page?.dmMode ?? 'off');
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [message, setMessage] = useState('');
@@ -168,6 +193,7 @@ export function PageSettings({
         bio,
         avatarUrl,
         themeConfig: { presetId: themePresetId },
+        dmMode,
       };
       if (isEditing) {
         body.published = published;
@@ -312,8 +338,8 @@ export function PageSettings({
                     Next Up
                   </p>
                   <p className="mt-2 text-sm leading-6 text-white/70">
-                    After you claim the username, you can add projects, custom
-                    sections, links, and chat settings.
+                    After you claim the username, you can add projects, blogs,
+                    custom sections, links, and chat settings.
                   </p>
                 </div>
               </div>
@@ -444,29 +470,68 @@ export function PageSettings({
 
         {/* Publish Toggle (edit mode only) */}
         {isEditing && (
-          <div className="flex items-center justify-between">
+          <>
             <div>
-              <h3 className="text-sm font-medium text-white">Published</h3>
-              <p className="text-xs text-gray-400">
-                Make your page visible to visitors
-              </p>
+              <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-white">Personal DMs</h3>
+                  <p className="text-xs text-gray-400">
+                    Choose how visitors can message you from the floating DM button.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                {DM_MODE_OPTIONS.map((option) => {
+                  const isSelected = dmMode === option.value;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setDmMode(option.value)}
+                      className={`rounded-xl border p-4 text-left transition ${
+                        isSelected
+                          ? 'border-white/50 bg-white/10'
+                          : 'border-white/15 bg-white/5 hover:border-white/30 hover:bg-white/[0.08]'
+                      }`}
+                    >
+                      <p className="text-sm font-semibold text-white">
+                        {option.label}
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-gray-400">
+                        {option.description}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={published}
-              onClick={() => setPublished(!published)}
-              className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-gray-950 ${
-                published ? 'bg-blue-500' : 'bg-white/20'
-              }`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-6 w-6 rounded-full bg-white shadow-lg transition-transform duration-200 ${
-                  published ? 'translate-x-5' : 'translate-x-0'
+
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-white">Published</h3>
+                <p className="text-xs text-gray-400">
+                  Make your page visible to visitors
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={published}
+                onClick={() => setPublished(!published)}
+                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-gray-950 ${
+                  published ? 'bg-blue-500' : 'bg-white/20'
                 }`}
-              />
-            </button>
-          </div>
+              >
+                <span
+                  className={`pointer-events-none inline-block h-6 w-6 rounded-full bg-white shadow-lg transition-transform duration-200 ${
+                    published ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          </>
         )}
 
         {/* Save / Create Button */}

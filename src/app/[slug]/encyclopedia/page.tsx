@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPageBySlug, getGeneratedPage } from '../_lib/get-page-data';
-import { resolveThemeConfig } from '@/lib/themes';
-import { getSession } from '@/lib/auth-server';
-import { WikiArticle } from '@/components/public/encyclopedia/wiki-article';
+
 import { GenerateEncyclopedia } from '@/components/public/encyclopedia/generate-encyclopedia';
+import { WikiArticle } from '@/components/public/encyclopedia/wiki-article';
+import { getSession } from '@/lib/auth-server';
 import { normalizeEncyclopediaContent } from '@/lib/encyclopedia-compat';
+import { resolveThemeConfig } from '@/lib/themes';
+
+import { getGeneratedPage,getPageBySlug } from '../_lib/get-page-data';
 
 export default async function EncyclopediaPage({
   params,

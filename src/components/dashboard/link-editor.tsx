@@ -1,26 +1,26 @@
 'use client';
 
-import { useState } from 'react';
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
   DragOverlay,
-  PointerSensor,
+  type DragStartEvent,
   KeyboardSensor,
+  PointerSensor,
   useSensor,
   useSensors,
-  type DragStartEvent,
-  type DragEndEvent,
 } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
+  arrayMove,
   SortableContext,
+  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-  sortableKeyboardCoordinates,
-  arrayMove,
 } from '@dnd-kit/sortable';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
+import { useState } from 'react';
 
 interface Link {
   id: string;
@@ -31,6 +31,11 @@ interface Link {
   sortOrder: number | null;
   enabled: boolean | null;
 }
+
+type ImportedLink = {
+  title: string;
+  url: string;
+};
 
 function DragHandle() {
   return (
@@ -161,6 +166,11 @@ export function LinkEditor({
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [importUrl, setImportUrl] = useState('');
+  const [importedLinks, setImportedLinks] = useState<ImportedLink[]>([]);
+  const [selectedImportUrls, setSelectedImportUrls] = useState<Set<string>>(new Set());
+  const [importLoading, setImportLoading] = useState(false);
+  const [importMessage, setImportMessage] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -268,8 +278,164 @@ export function LinkEditor({
     }
   }
 
+  async function previewImport(e: React.FormEvent) {
+    e.preventDefault();
+    if (!importUrl.trim()) return;
+
+    setImportLoading(true);
+    setImportMessage('');
+    setImportedLinks([]);
+    setSelectedImportUrls(new Set());
+
+    try {
+      const res = await fetch(`/api/pages/${pageId}/links/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'preview', sourceUrl: importUrl }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to preview import');
+      }
+
+      const nextLinks = Array.isArray(data.links) ? data.links as ImportedLink[] : [];
+      setImportedLinks(nextLinks);
+      setSelectedImportUrls(new Set(nextLinks.map((item) => item.url)));
+      setImportMessage(
+        nextLinks.length
+          ? `Found ${nextLinks.length} links. Review before importing.`
+          : 'No importable links found on that page.',
+      );
+    } catch (error) {
+      setImportMessage(error instanceof Error ? error.message : 'Failed to preview import');
+    } finally {
+      setImportLoading(false);
+    }
+  }
+
+  async function importSelectedLinks() {
+    const selected = importedLinks.filter((item) => selectedImportUrls.has(item.url));
+    if (selected.length === 0) {
+      setImportMessage('Select at least one link to import.');
+      return;
+    }
+
+    setImportLoading(true);
+    setImportMessage('');
+
+    try {
+      const res = await fetch(`/api/pages/${pageId}/links/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'import', links: selected }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to import selected links');
+      }
+
+      const inserted = Array.isArray(data.imported) ? data.imported as Link[] : [];
+      setLinks((prev) => normalizeLinks([...prev, ...inserted]));
+      setImportedLinks([]);
+      setSelectedImportUrls(new Set());
+      setImportMessage(`Imported ${inserted.length} links${data.skipped ? `, skipped ${data.skipped} duplicates` : ''}.`);
+    } catch (error) {
+      setImportMessage(error instanceof Error ? error.message : 'Failed to import selected links');
+    } finally {
+      setImportLoading(false);
+    }
+  }
+
+  function toggleImportUrl(url: string) {
+    setSelectedImportUrls((prev) => {
+      const next = new Set(prev);
+      if (next.has(url)) {
+        next.delete(url);
+      } else {
+        next.add(url);
+      }
+      return next;
+    });
+  }
+
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-white/15 bg-white/[0.045] p-5 backdrop-blur-xl">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-cyan-200">
+              Import
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-white">
+              Bring links from Linktree or another profile
+            </h2>
+          </div>
+          <p className="text-xs text-gray-500">
+            Preview first, then choose what to import.
+          </p>
+        </div>
+
+        <form onSubmit={previewImport} className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <input
+            type="url"
+            placeholder="https://linktr.ee/yourname"
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            className="min-w-0 flex-1 rounded-lg border border-white/20 bg-black/20 px-4 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-white/40"
+          />
+          <button
+            type="submit"
+            disabled={importLoading}
+            className="w-full rounded-lg border border-cyan-300/35 bg-cyan-300/10 px-5 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15 disabled:opacity-50 sm:w-auto"
+          >
+            {importLoading ? 'Checking...' : 'Preview Import'}
+          </button>
+        </form>
+
+        {importMessage && (
+          <p className="mt-3 text-sm text-gray-300">{importMessage}</p>
+        )}
+
+        {importedLinks.length > 0 && (
+          <div className="mt-5 space-y-3">
+            <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
+              {importedLinks.map((item) => (
+                <label
+                  key={item.url}
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3 transition hover:bg-white/[0.04]"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedImportUrls.has(item.url)}
+                    onChange={() => toggleImportUrl(item.url)}
+                    className="mt-1 h-4 w-4 accent-cyan-300"
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-white">
+                      {item.title}
+                    </span>
+                    <span className="block truncate text-xs text-gray-500">
+                      {item.url}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={importSelectedLinks}
+              disabled={importLoading || selectedImportUrls.size === 0}
+              className="rounded-lg bg-white px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-gray-100 disabled:opacity-50"
+            >
+              Import {selectedImportUrls.size} Selected
+            </button>
+          </div>
+        )}
+      </section>
+
       <form onSubmit={addLink} className="flex flex-col gap-3 sm:flex-row">
         <input
           type="text"

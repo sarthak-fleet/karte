@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+
 import { getOrCreateVisitorId } from '@/lib/visitor-id';
 
 function postEvent(slug: string, payload: Record<string, unknown>) {

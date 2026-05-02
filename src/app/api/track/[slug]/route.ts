@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
 import { and, eq } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
+
 import { db, ensureProjectsTable } from '@/db';
 import { pageEvents, pages } from '@/db/schema';
 import { isValidSlug } from '@/lib/validation';

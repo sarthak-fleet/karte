@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPageBySlug, getGeneratedPage, getPageLinks, getPageProjects } from '../_lib/get-page-data';
-import { resolveThemeConfig } from '@/lib/themes';
+
+import { RoastPageClient } from '@/components/public/roast/roast-page-client';
 import { getSession } from '@/lib/auth-server';
 import type { RoastContent } from '@/lib/generated-page-types';
-import { RoastPageClient } from '@/components/public/roast/roast-page-client';
+import { resolveThemeConfig } from '@/lib/themes';
+
+import { getGeneratedPage, getPageBySlug, getPageLinks, getPageProjects } from '../_lib/get-page-data';
 
 export default async function RoastPage({
   params,
@@ -39,27 +41,31 @@ export default async function RoastPage({
   const projectTitles = projects.map((p) => p.title);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-950 via-red-950/20 to-gray-950">
-      {/* Ember glow blobs */}
+    <div className="relative min-h-screen overflow-hidden bg-[#12020b] text-white">
       <div
-        className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full opacity-20 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #dc2626 0%, transparent 70%)' }}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-40"
+        style={{
+          backgroundImage:
+            'linear-gradient(45deg, rgba(255,255,255,0.08) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.08) 75%, transparent 75%, transparent)',
+          backgroundSize: '28px 28px',
+        }}
       />
       <div
-        className="pointer-events-none absolute top-1/3 -right-48 h-[500px] w-[500px] rounded-full opacity-15 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #ea580c 0%, transparent 70%)' }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-24 left-1/4 h-80 w-80 rounded-full opacity-10 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #f59e0b 0%, transparent 70%)' }}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 mix-blend-screen"
+        style={{
+          background:
+            'linear-gradient(110deg, rgba(255,0,128,0.34), transparent 38%, rgba(0,255,213,0.2) 66%, rgba(255,242,0,0.2))',
+        }}
       />
 
       {/* Header bar */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-gray-950/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b-4 border-[#f9ff00] bg-[#12020b]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             href={`/${slug}`}
-            className="flex items-center gap-2 text-sm font-medium text-gray-300 transition-colors hover:text-white"
+            className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#f9ff00] transition-colors hover:text-white"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -77,9 +83,8 @@ export default async function RoastPage({
             </svg>
             {page.displayName}
           </Link>
-          <span className="text-xs tracking-wide text-gray-500">
-            Powered by{' '}
-            <span className="font-semibold text-gray-400">LinkChat</span>
+          <span className="rotate-1 border border-[#00ffd5] px-2 py-1 text-xs font-black tracking-wide text-[#00ffd5]">
+            LinkChat Roast Lab
           </span>
         </div>
       </header>

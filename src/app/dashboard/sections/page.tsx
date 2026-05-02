@@ -1,9 +1,10 @@
+import { asc,eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
-import { eq, asc } from 'drizzle-orm';
-import { getSession } from '@/lib/auth-server';
+
+import { SectionEditor } from '@/components/dashboard/section-editor';
 import { db, ensureProjectsTable } from '@/db';
 import { pages, pageSections } from '@/db/schema';
-import { SectionEditor } from '@/components/dashboard/section-editor';
+import { getSession } from '@/lib/auth-server';
 
 export default async function SectionsPage() {
   const session = await getSession();
@@ -18,7 +19,7 @@ export default async function SectionsPage() {
   if (!page) {
     return (
       <div>
-        <h1 className="mb-2 text-2xl font-bold text-white">Sections</h1>
+        <h1 className="mb-2 text-2xl font-bold text-white">Blocks & Blogs</h1>
         <p className="text-sm text-gray-400">
           Create a page first from the Appearance tab.
         </p>
@@ -34,9 +35,9 @@ export default async function SectionsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-bold text-white">Sections</h1>
+      <h1 className="mb-1 text-2xl font-bold text-white">Blocks & Blogs</h1>
       <p className="mb-6 text-sm text-gray-400">
-        Build and reorder structured content blocks for the public page.
+        Build and reorder structured content blocks, including blog posts, for the public page.
       </p>
       <SectionEditor pageId={page.id} initialSections={sections} />
     </div>

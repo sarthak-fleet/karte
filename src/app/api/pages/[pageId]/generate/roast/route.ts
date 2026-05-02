@@ -1,13 +1,14 @@
+import { and,eq } from 'drizzle-orm';
+
 import { db, ensureProjectsTable } from '@/db';
-import { pages, users, infoBlocks, links, projects, generatedPages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
-import { generate, type AiConfig as AIConfig } from '@/lib/ai-client';
-import { parseAIResponse } from '@/lib/saasmaker';
+import { generatedPages,pages, users } from '@/db/schema';
+import { generate, resolveAiConfig } from '@/lib/ai-client';
 import { ROAST_SYSTEM_PROMPT } from '@/lib/ai-prompts';
-import { rateLimit } from '@/lib/rate-limit';
 import { asGeneratedPageContent, type RoastContent } from '@/lib/generated-page-types';
-import { getScrapedContext } from '@/lib/scrape-page-content';
+import { buildProfileMemory } from '@/lib/profile-memory';
+import { rateLimit } from '@/lib/rate-limit';
+import { parseAIResponse } from '@/lib/saasmaker';
 
 export async function POST(
   req: Request,
@@ -36,19 +37,14 @@ export async function POST(
   }
 
   const [user] = await db.select().from(users).where(eq(users.id, page.userId));
-  if (!user?.aiEndpointUrl || !user?.aiApiKey || !user?.aiModel) {
+  const aiConfig = resolveAiConfig(user);
+  if (!aiConfig) {
     return new Response(JSON.stringify({ error: 'AI not configured' }), {
       status: 503,
     });
   }
 
-  const aiConfig: AIConfig = {
-    endpointUrl: user.aiEndpointUrl,
-    apiKey: user.aiApiKey,
-    model: user.aiModel,
-  };
-
-  // Check for existing recent roast (cache for 24h)
+  // Find the existing generated page so this request can replace stale roasts.
   const existing = await db
     .select()
     .from(generatedPages)
@@ -57,34 +53,9 @@ export async function POST(
     )
     .limit(1);
 
-  if (existing[0]?.status === 'ready' && existing[0].content) {
-    return Response.json(existing[0].content);
-  }
-
-  // Fetch links and projects from DB
-  const [pageLinks, pageProjects] = await Promise.all([
-    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
-    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
-  ]);
-
-  // Collect all info blocks + scrape URLs in parallel
-  const [blocks, scrapedContext] = await Promise.all([
-    db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)),
-    getScrapedContext(pageId, page),
-  ]);
-
   // Read page settings for roast customization
   const settings = (page.pageSettings as PageSettings | null)?.roast;
-
-  const context = [
-    `Name: ${page.displayName}`,
-    `Bio: ${page.bio || 'No bio provided'}`,
-    `Links: ${pageLinks.map((l) => `${l.title} (${l.url})`).join(', ') || 'None'}`,
-    `Projects: ${pageProjects.map((p) => `${p.title}: ${p.description}`).join('\n') || 'None'}`,
-    ...blocks.map((b) => `${b.title || b.type}: ${b.content}`),
-    ...(settings?.context ? [`Additional context from the person: ${settings.context}`] : []),
-    ...(scrapedContext ? [scrapedContext] : []),
-  ].join('\n\n');
+  const memory = await buildProfileMemory({ page, mode: 'roast' });
 
   // Build system prompt with tone preference
   let systemPrompt = ROAST_SYSTEM_PROMPT;
@@ -101,7 +72,7 @@ export async function POST(
   try {
     const raw = await generate(aiConfig, {
       system: systemPrompt,
-      prompt: `Roast this person based on their profile:\n\n${context}`,
+      prompt: `Roast this person based on this profile research packet:\n\n${memory.promptContext}`,
     });
 
     const roast = parseAIResponse<RoastContent>(raw);

@@ -1,9 +1,10 @@
-import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth-server';
-import { db } from '@/db';
-import { pages, links } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
+
 import { LinkEditor } from '@/components/dashboard/link-editor';
+import { db } from '@/db';
+import { links,pages } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 
 export default async function LinksPage() {
   const session = await getSession();

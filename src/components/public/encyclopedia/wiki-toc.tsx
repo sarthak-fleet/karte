@@ -85,7 +85,7 @@ export function WikiTocFromHtml({ html, accentColor }: WikiTocFromHtmlProps) {
 
   return (
     <nav
-      className="mb-6 w-fit border border-[#a2a9b1] bg-[#f8f9fa] px-4 py-3"
+      className="mb-6 w-full border border-[#a2a9b1] bg-[#f8f9fa] px-4 py-3 shadow-sm sm:w-fit"
       style={{ fontFamily: 'sans-serif', fontSize: '14px' }}
     >
       <div className="mb-2 flex items-center justify-between gap-4">

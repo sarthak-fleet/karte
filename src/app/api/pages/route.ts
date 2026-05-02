@@ -1,20 +1,23 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-server';
-import { db } from '@/db';
-import { pages } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
+
+import { db, ensureProjectsTable } from '@/db';
+import { pages } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
+import { isThemePresetId, resolveThemeConfig } from '@/lib/themes';
 import {
   isValidSlug,
   isValidUrl,
   MAX_BIO_LENGTH,
   MAX_TITLE_LENGTH,
 } from '@/lib/validation';
-import { isThemePresetId, resolveThemeConfig } from '@/lib/themes';
 
 export async function GET() {
   const session = await getSession();
   if (!session?.user?.id)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  await ensureProjectsTable();
 
   const userPages = await db
     .select()
@@ -28,6 +31,8 @@ export async function POST(req: Request) {
   const session = await getSession();
   if (!session?.user?.id)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  await ensureProjectsTable();
 
   const body = await req.json();
   const { slug, displayName, bio, avatarUrl, themeConfig } = body;

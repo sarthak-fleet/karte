@@ -1,13 +1,14 @@
+import { and,eq } from 'drizzle-orm';
+
 import { db, ensureProjectsTable } from '@/db';
-import { pages, users, infoBlocks, links, projects, generatedPages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
-import { generate, type AiConfig as AIConfig } from '@/lib/ai-client';
-import { parseAIResponse } from '@/lib/saasmaker';
+import { generatedPages,pages, users } from '@/db/schema';
+import { generate, resolveAiConfig } from '@/lib/ai-client';
 import { ENCYCLOPEDIA_SYSTEM_PROMPT } from '@/lib/ai-prompts';
-import { rateLimit } from '@/lib/rate-limit';
 import { asGeneratedPageContent, type EncyclopediaContent } from '@/lib/generated-page-types';
-import { getScrapedContext } from '@/lib/scrape-page-content';
+import { buildProfileMemory } from '@/lib/profile-memory';
+import { rateLimit } from '@/lib/rate-limit';
+import { parseAIResponse } from '@/lib/saasmaker';
 
 export async function POST(req: Request, { params }: { params: Promise<{ pageId: string }> }) {
   const { pageId } = await params;
@@ -24,36 +25,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
   }
 
   const [user] = await db.select().from(users).where(eq(users.id, page.userId));
-  if (!user?.aiEndpointUrl || !user?.aiApiKey || !user?.aiModel) {
+  const aiConfig = resolveAiConfig(user);
+  if (!aiConfig) {
     return new Response(JSON.stringify({ error: 'AI not configured' }), { status: 503 });
   }
 
-  const aiConfig: AIConfig = {
-    endpointUrl: user.aiEndpointUrl,
-    apiKey: user.aiApiKey,
-    model: user.aiModel,
-  };
-
-  // Fetch all context + scraped content in parallel
-  const [blocks, pageLinks, pageProjects, scrapedContext] = await Promise.all([
-    db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)),
-    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
-    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
-    getScrapedContext(pageId, page),
-  ]);
-
   // Read page settings for encyclopedia customization
   const settings = (page.pageSettings as PageSettings | null)?.encyclopedia;
-
-  const context = [
-    `Name: ${page.displayName}`,
-    `Bio: ${page.bio || 'No bio'}`,
-    `Links: ${pageLinks.map((l) => `${l.title} (${l.url})`).join(', ') || 'None'}`,
-    `Projects: ${pageProjects.map((p) => `${p.title}: ${p.description}`).join('\n') || 'None'}`,
-    ...blocks.map((b) => `${b.title || b.type}: ${b.content}`),
-    ...(settings?.context ? [`Additional context from the person: ${settings.context}`] : []),
-    ...(scrapedContext ? [scrapedContext] : []),
-  ].join('\n\n');
+  const memory = await buildProfileMemory({ page, mode: 'encyclopedia' });
 
   // Build system prompt with style preference
   let systemPrompt = ENCYCLOPEDIA_SYSTEM_PROMPT;
@@ -70,7 +49,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
   try {
     const raw = await generate(aiConfig, {
       system: systemPrompt,
-      prompt: `Write a Wikipedia-style encyclopedia article about this person:\n\n${context}`,
+      prompt: `Write a Wikipedia-style encyclopedia article about this person using this source file:\n\n${memory.promptContext}`,
     });
 
     const encyclopedia = parseAIResponse<EncyclopediaContent>(raw);
@@ -97,7 +76,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ pageId:
     }
 
     return Response.json(encyclopedia);
-  } catch {
+  } catch (error) {
+    console.error('Failed to generate encyclopedia', {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : undefined,
+      responseBody: typeof error === 'object' && error && 'responseBody' in error
+        ? (error as { responseBody?: unknown }).responseBody
+        : undefined,
+      cause: error instanceof Error && error.cause instanceof Error
+        ? { name: error.cause.name, message: error.cause.message }
+        : undefined,
+    });
     return new Response(JSON.stringify({ error: 'Failed to generate encyclopedia' }), { status: 500 });
   }
 }

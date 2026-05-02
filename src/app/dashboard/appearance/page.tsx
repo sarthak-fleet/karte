@@ -1,9 +1,10 @@
+import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth-server';
+
+import { PageSettings } from '@/components/dashboard/page-settings';
 import { db } from '@/db';
 import { pages } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-import { PageSettings } from '@/components/dashboard/page-settings';
+import { getSession } from '@/lib/auth-server';
 
 export default async function AppearancePage() {
   const session = await getSession();
@@ -25,6 +26,7 @@ export default async function AppearancePage() {
               avatarUrl: page.avatarUrl,
               themeConfig: page.themeConfig,
               published: page.published,
+              dmMode: page.dmMode,
             }
           : null
       }

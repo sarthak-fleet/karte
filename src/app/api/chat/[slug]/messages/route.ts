@@ -1,7 +1,8 @@
+import { and,eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+
 import { db } from '@/db';
-import { pages, conversations, messages } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { conversations, messages,pages } from '@/db/schema';
 
 export async function POST(
   req: Request,

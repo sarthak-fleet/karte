@@ -1,7 +1,8 @@
-import { getSession } from '@/lib/auth-server';
+import { and,eq } from 'drizzle-orm';
+
 import { db, ensureProjectsTable } from '@/db';
-import { pages, generatedPages } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { generatedPages,pages } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 import type { EncyclopediaContent } from '@/lib/generated-page-types';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ pageId: string }> }) {

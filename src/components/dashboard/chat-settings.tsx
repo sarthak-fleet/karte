@@ -1,10 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  CHAT_POSITIONS,
-  type ChatPosition,
-} from '@/lib/themes';
+
 import {
   Button,
   Card,
@@ -13,6 +10,10 @@ import {
   Textarea,
   Toggle,
 } from '@/components/ui';
+import {
+  CHAT_POSITIONS,
+  type ChatPosition,
+} from '@/lib/themes';
 
 interface ChatSettingsProps {
   pageId: string;

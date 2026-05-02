@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPageBySlug, getGeneratedPage } from '../_lib/get-page-data';
-import { resolveThemeConfig } from '@/lib/themes';
+
+import { GenerateNewspaper } from '@/components/public/newspaper/generate-newspaper';
+import { NewspaperFrontPage } from '@/components/public/newspaper/newspaper-front-page';
 import { getSession } from '@/lib/auth-server';
 import type { NewspaperContent } from '@/lib/generated-page-types';
-import { NewspaperFrontPage } from '@/components/public/newspaper/newspaper-front-page';
-import { GenerateNewspaper } from '@/components/public/newspaper/generate-newspaper';
+import { resolveThemeConfig } from '@/lib/themes';
+
+import { getGeneratedPage,getPageBySlug } from '../_lib/get-page-data';
 
 export default async function NewspaperPage({
   params,

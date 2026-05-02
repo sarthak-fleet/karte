@@ -10,31 +10,33 @@ export function WikiInfobox({ infobox, displayName, avatarUrl, accentColor }: Wi
 
   return (
     <table
-      className="mb-4 w-full border border-collapse border-[#a2a9b1] md:float-right md:ml-5 md:w-[280px]"
+      className="mb-5 w-full border-collapse border border-[#a2a9b1] bg-white shadow-sm md:float-right md:ml-6 md:w-[300px]"
       style={{ fontSize: '14px' }}
     >
-      {/* Header */}
       <caption
-        className="border border-[#a2a9b1] bg-[#cee0f2] px-3 py-2 text-center text-base font-bold"
-        style={{ fontFamily: 'sans-serif', captionSide: 'top' }}
+        className="border border-[#a2a9b1] px-3 py-3 text-center text-base font-bold text-white"
+        style={{
+          fontFamily: 'sans-serif',
+          captionSide: 'top',
+          background: `linear-gradient(135deg, ${accentColor}, #38598f)`,
+        }}
       >
         {displayName}
       </caption>
 
       <tbody>
-        {/* Avatar */}
         {avatarUrl && (
           <tr>
-            <td colSpan={2} className="border border-[#a2a9b1] p-2 text-center">
+            <td colSpan={2} className="border border-[#a2a9b1] bg-[#f8f9fa] p-3 text-center">
               <img
                 src={avatarUrl}
                 alt={displayName}
                 width={200}
                 height={200}
-                className="mx-auto h-[200px] w-[200px] object-cover"
+                className="mx-auto h-[210px] w-[210px] border border-[#c8ccd1] object-cover"
               />
               <p
-                className="mt-1 text-xs text-[#54595d]"
+                className="mt-2 text-xs text-[#54595d]"
                 style={{ fontFamily: 'sans-serif' }}
               >
                 {displayName}
@@ -43,7 +45,6 @@ export function WikiInfobox({ infobox, displayName, avatarUrl, accentColor }: Wi
           </tr>
         )}
 
-        {/* Key-value rows */}
         {entries.map(([label, value], i) => (
           <tr key={label}>
             <th

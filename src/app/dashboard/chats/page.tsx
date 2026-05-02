@@ -1,9 +1,10 @@
-import { getSession } from '@/lib/auth-server';
+import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
+
+import { ChatList } from '@/components/dashboard/chat-list';
 import { db } from '@/db';
 import { pages } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-import { ChatList } from '@/components/dashboard/chat-list';
+import { getSession } from '@/lib/auth-server';
 
 export default async function ChatsPage() {
   const session = await getSession();

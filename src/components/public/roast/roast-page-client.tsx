@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useCallback,useRef, useState } from 'react';
+
 import type { RoastContent } from '@/lib/generated-page-types';
+
 import { RoastScoreCard } from './roast-score-card';
 import { RoastSection } from './roast-section';
-import { ShareCard } from './share-card';
 
 interface RoastPageClientProps {
   slug: string;
@@ -27,8 +28,9 @@ export function RoastPageClient({
 }: RoastPageClientProps) {
   const [roast, setRoast] = useState<RoastContent | null>(existingRoast);
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const shareCardRef = useRef<HTMLDivElement>(null);
+  const captureRef = useRef<HTMLDivElement>(null);
 
   const handleGenerate = useCallback(async () => {
     setLoading(true);
@@ -53,12 +55,15 @@ export function RoastPageClient({
   }, [pageId, linkTitles, projectTitles]);
 
   const handleDownload = useCallback(async () => {
-    if (!shareCardRef.current) return;
+    if (!captureRef.current || downloading) return;
+    setDownloading(true);
     const { toPng } = await import('html-to-image');
     try {
-      const dataUrl = await toPng(shareCardRef.current, {
+      const dataUrl = await toPng(captureRef.current, {
         pixelRatio: 2,
         quality: 1,
+        cacheBust: true,
+        backgroundColor: '#12020b',
       });
       const link = document.createElement('a');
       link.download = `${slug}-roast.png`;
@@ -66,8 +71,10 @@ export function RoastPageClient({
       link.click();
     } catch {
       // silently fail
+    } finally {
+      setDownloading(false);
     }
-  }, [slug]);
+  }, [downloading, slug]);
 
   const handleShareX = useCallback(() => {
     const url = `${window.location.origin}/${slug}/roast`;
@@ -87,18 +94,61 @@ export function RoastPageClient({
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center px-4 py-8">
-        <div className="text-center space-y-6">
-          <div className="text-6xl animate-spin inline-block">🔥</div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-white">
-              Roasting {displayName}...
-            </h2>
-            <p className="text-sm text-gray-500">This might take a moment. The AI is crafting the perfect burns.</p>
+        <div className="w-full max-w-3xl -rotate-1 border-4 border-[#f9ff00] bg-[#210815] p-5 shadow-[14px_14px_0_#00ffd5] sm:p-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-[#00ffd5]">
+                LinkChat Roast Lab
+              </p>
+              <h2 className="mt-3 text-2xl font-black uppercase leading-tight text-white sm:text-4xl">
+                Roasting {displayName}
+              </h2>
+            </div>
+            <div className="flex h-16 w-16 shrink-0 animate-pulse items-center justify-center border-4 border-white bg-black text-2xl font-black text-[#f9ff00]">
+              404
+            </div>
           </div>
-          <div className="max-w-sm mx-auto space-y-3">
-            <div className="h-4 rounded-full bg-white/5 animate-pulse" />
-            <div className="h-4 rounded-full bg-white/5 animate-pulse w-4/5" />
-            <div className="h-4 rounded-full bg-white/5 animate-pulse w-3/5" />
+
+          <div className="mt-7 rotate-1 border-4 border-[#00ffd5] bg-black p-5 shadow-[8px_8px_0_#ff2aa3]">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-[#f9ff00]">
+                Public Vibe Inspection
+              </p>
+              <div className="h-2 w-28 overflow-hidden bg-white/15">
+                <div className="h-full w-2/3 animate-pulse bg-[#ff2aa3]" />
+              </div>
+            </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-[132px_1fr]">
+              <div className="flex h-32 w-32 items-center justify-center rounded-full border-8 border-[#00ffd5]/80 text-4xl font-black text-[#f9ff00] shadow-[0_0_35px_rgba(0,255,213,0.25)]">
+                ??
+              </div>
+              <div className="space-y-4 pt-1">
+                {[
+                  ['Scanning links', 'bg-white/25'],
+                  ['Measuring founder energy', 'bg-[#00ffd5]/40'],
+                  ['Finding the funniest specific detail', 'bg-[#f9ff00]/50'],
+                  ['Removing anything too mean', 'bg-[#ff2aa3]/45'],
+                ].map(([label, color]) => (
+                  <div key={label}>
+                    <div className="mb-2 flex items-center justify-between gap-3 text-[10px] font-black uppercase tracking-[0.16em] text-white/55">
+                      <span>{label}</span>
+                      <span>...</span>
+                    </div>
+                    <div className={`h-3 animate-pulse ${color}`} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {['Red flags', 'Best link', 'Bio autopsy'].map((label) => (
+              <div key={label} className="rotate-1 border-2 border-white bg-[#ff2aa3] p-3 text-black shadow-[5px_5px_0_#f9ff00]">
+                <p className="text-xs font-black uppercase tracking-[0.16em]">{label}</p>
+                <div className="mt-3 h-2 animate-pulse bg-black/35" />
+                <div className="mt-2 h-2 w-2/3 animate-pulse bg-black/25" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -109,30 +159,30 @@ export function RoastPageClient({
   if (!roast) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center px-4 py-8">
-        <div className="border border-white/10 bg-white/5 rounded-2xl backdrop-blur-xl p-8 sm:p-12 max-w-md w-full text-center space-y-6">
+        <div className="w-full max-w-md -rotate-1 space-y-6 border-4 border-[#f9ff00] bg-[#210815] p-8 text-center shadow-[14px_14px_0_#00ffd5] sm:p-12">
           <div className="text-6xl">🔥</div>
           <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">
+            <h1 className="text-3xl font-black uppercase tracking-[-0.02em] text-white sm:text-4xl">
               {displayName}&apos;s Roast
             </h1>
-            <p className="text-gray-400">Ready to get roasted?</p>
+            <p className="text-[#f9ff00]">An unserious audit of a very serious profile.</p>
           </div>
 
           {error && (
-            <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+            <div className="border border-red-400 bg-red-500/10 px-4 py-3 text-sm text-red-200">
               {error}
             </div>
           )}
 
           <button
             onClick={handleGenerate}
-            className="w-full py-3 px-6 rounded-xl font-semibold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-            style={{ backgroundColor: accentColor }}
+            className="w-full border-2 border-white px-6 py-3 text-sm font-black uppercase tracking-[0.14em] text-black transition-all hover:translate-x-1 hover:translate-y-1 active:scale-[0.98]"
+            style={{ backgroundColor: '#f9ff00', boxShadow: `8px 8px 0 ${accentColor}` }}
           >
             Generate Roast
           </button>
 
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-white/50">
             AI-generated humor. Don&apos;t take it personally.
           </p>
         </div>
@@ -143,87 +193,87 @@ export function RoastPageClient({
   // Roast display
   return (
     <div className="w-full text-white">
-      <div className="max-w-3xl mx-auto px-4 py-10 sm:py-16 space-y-8">
-        {/* Headline */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            🔥 The Roast of{' '}
-            <span style={{ color: accentColor }}>{displayName}</span>{' '}
-            🔥
-          </h1>
-          <p
-            className="text-sm font-medium px-3 py-1 rounded-full inline-block"
-            style={{
-              backgroundColor: `${accentColor}20`,
-              color: accentColor,
-              border: `1px solid ${accentColor}40`,
-            }}
-          >
-            {roast.personalityType}
-          </p>
+      <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:py-16">
+        <div ref={captureRef} className="space-y-8 bg-[#12020b] px-2 py-2 sm:px-6 sm:py-6">
+          <div className="mx-auto max-w-4xl border-4 border-white bg-[#210815] px-5 py-8 text-center shadow-[16px_16px_0_#f9ff00]">
+            <p className="mb-3 text-xs font-black uppercase tracking-[0.32em] text-[#00ffd5]">
+              LinkChat Roast Me
+            </p>
+            <h1
+              className="text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-7xl"
+              style={{ textShadow: `5px 5px 0 ${accentColor}` }}
+            >
+              The Roast of {displayName}
+            </h1>
+            <p
+              className="mt-5 inline-block -rotate-1 border-2 border-[#f9ff00] bg-black px-3 py-2 text-sm font-black uppercase tracking-[0.12em]"
+              style={{
+                color: '#f9ff00',
+              }}
+            >
+              {roast.personalityType}
+            </p>
+          </div>
+
+          <RoastScoreCard vibeScore={roast.vibeScore} accentColor={accentColor} />
+
+          <div className="mx-auto max-w-3xl rotate-1 border-4 border-[#00ffd5] bg-black p-6 shadow-[12px_12px_0_#ff2aa3]">
+            <p className="text-base font-medium leading-relaxed text-white sm:text-lg">
+              “{roast.roast}”
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <RoastSection
+              emoji="🚩"
+              title="Red Flags"
+              content={roast.redFlags}
+              accentColor={accentColor}
+            />
+            <RoastSection
+              emoji="🏆"
+              title="Best Link"
+              content={`${roast.bestLink.title} — ${roast.bestLink.reason}`}
+              accentColor={accentColor}
+            />
+            <RoastSection
+              emoji="💀"
+              title="Worst Link"
+              content={`${roast.worstLink.title} — ${roast.worstLink.reason}`}
+              accentColor={accentColor}
+            />
+            <RoastSection
+              emoji="📱"
+              title="Spirit Platform"
+              content={roast.spiritPlatform}
+              accentColor={accentColor}
+            />
+            <RoastSection
+              emoji="⭐"
+              title="Celebrity Match"
+              content={roast.celebrityMatch}
+              accentColor={accentColor}
+            />
+            <RoastSection
+              emoji="🔬"
+              title="Bio Autopsy"
+              content={roast.bioAutopsy}
+              accentColor={accentColor}
+            />
+            <RoastSection
+              emoji="👀"
+              title="First Impression"
+              content={roast.firstImpression}
+              accentColor={accentColor}
+            />
+          </div>
         </div>
 
-        {/* Vibe Score */}
-        <RoastScoreCard vibeScore={roast.vibeScore} accentColor={accentColor} />
-
-        {/* Main roast */}
-        <div className="border border-white/10 bg-white/5 rounded-2xl backdrop-blur-xl p-6">
-          <p className="text-gray-300 leading-relaxed italic text-base sm:text-lg">
-            &ldquo;{roast.roast}&rdquo;
-          </p>
-        </div>
-
-        {/* Section grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <RoastSection
-            emoji="🚩"
-            title="Red Flags"
-            content={roast.redFlags}
-            accentColor={accentColor}
-          />
-          <RoastSection
-            emoji="🏆"
-            title="Best Link"
-            content={`${roast.bestLink.title} — ${roast.bestLink.reason}`}
-            accentColor={accentColor}
-          />
-          <RoastSection
-            emoji="💀"
-            title="Worst Link"
-            content={`${roast.worstLink.title} — ${roast.worstLink.reason}`}
-            accentColor={accentColor}
-          />
-          <RoastSection
-            emoji="📱"
-            title="Spirit Platform"
-            content={roast.spiritPlatform}
-            accentColor={accentColor}
-          />
-          <RoastSection
-            emoji="⭐"
-            title="Celebrity Match"
-            content={roast.celebrityMatch}
-            accentColor={accentColor}
-          />
-          <RoastSection
-            emoji="🔬"
-            title="Bio Autopsy"
-            content={roast.bioAutopsy}
-            accentColor={accentColor}
-          />
-          <RoastSection
-            emoji="👀"
-            title="First Impression"
-            content={roast.firstImpression}
-            accentColor={accentColor}
-          />
-        </div>
-
-        {/* Share controls */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <button
             onClick={handleDownload}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+            disabled={downloading}
+            className="flex items-center gap-2 border-2 border-white bg-black px-5 py-2.5 text-sm font-black uppercase tracking-[0.08em] transition-colors hover:bg-white hover:text-black"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -240,18 +290,18 @@ export function RoastPageClient({
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Download Card
+            {downloading ? 'Rendering...' : 'Download View'}
           </button>
           <button
             onClick={handleShareX}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
-            style={{ backgroundColor: accentColor, color: '#000' }}
+            className="flex items-center gap-2 border-2 border-white px-5 py-2.5 text-sm font-black uppercase tracking-[0.08em] transition-all hover:translate-x-1 hover:translate-y-1 active:scale-[0.98]"
+            style={{ backgroundColor: '#f9ff00', color: '#000', boxShadow: `6px 6px 0 ${accentColor}` }}
           >
             Share on X
           </button>
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2 border-2 border-white bg-[#210815] px-5 py-2.5 text-sm font-black uppercase tracking-[0.08em] transition-colors hover:bg-white hover:text-black"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -271,21 +321,7 @@ export function RoastPageClient({
           </button>
         </div>
 
-        {/* Hidden share card for download */}
-        <div className="absolute -left-[9999px] top-0" aria-hidden="true">
-          <ShareCard
-            ref={shareCardRef}
-            displayName={displayName}
-            slug={slug}
-            vibeScore={roast.vibeScore}
-            personalityType={roast.personalityType}
-            roastSummary={roast.roast}
-            accentColor={accentColor}
-          />
-        </div>
-
-        {/* Disclaimer */}
-        <p className="text-center text-xs text-gray-600 pt-4">
+        <p className="pt-4 text-center text-xs text-white/45">
           AI-generated humor. Don&apos;t take it personally.
         </p>
       </div>

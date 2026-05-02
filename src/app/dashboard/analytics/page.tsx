@@ -1,8 +1,9 @@
-import { getSession } from '@/lib/auth-server';
+import { desc, eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
+
 import { db, ensureProjectsTable } from '@/db';
 import { pageEvents, pages } from '@/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { getSession } from '@/lib/auth-server';
 
 type NativeAnalyticsEvent = {
   id: string;

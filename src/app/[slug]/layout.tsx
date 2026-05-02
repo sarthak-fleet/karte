@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation';
-import { getFullPageData } from './_lib/get-page-data';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { getFullPageData } from './_lib/get-page-data';
 
 type Props = { params: Promise<{ slug: string }>; children: React.ReactNode };
 

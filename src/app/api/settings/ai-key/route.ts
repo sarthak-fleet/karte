@@ -1,8 +1,9 @@
+import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-server';
+
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { getSession } from '@/lib/auth-server';
 import { createIndex } from '@/lib/saasmaker';
 
 export async function GET() {

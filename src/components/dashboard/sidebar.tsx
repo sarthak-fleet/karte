@@ -1,20 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const navItems = [
+  { label: 'Home', href: '/dashboard' },
   { label: 'Links', href: '/dashboard/links' },
   { label: 'Projects', href: '/dashboard/projects' },
-  { label: 'Sections', href: '/dashboard/sections' },
-  { label: 'Pages', href: '/dashboard/pages' },
-  { label: 'Encyclopedia', href: '/dashboard/encyclopedia' },
-  { label: 'Appearance', href: '/dashboard/appearance' },
-  { label: 'Chatbot Memory', href: '/dashboard/memory' },
-  { label: 'Leads', href: '/dashboard/leads' },
+  { label: 'Profile Modes', href: '/dashboard/pages' },
+  { label: 'AI Revamp', href: '/dashboard/revamp' },
+  { label: 'AI Chat', href: '/dashboard/memory' },
+  { label: 'Inbox', href: '/dashboard/inbox' },
   { label: 'Analytics', href: '/dashboard/analytics' },
   { label: 'Chats', href: '/dashboard/chats' },
+  { label: 'Blocks & Blogs', href: '/dashboard/sections' },
+  { label: 'Appearance', href: '/dashboard/appearance' },
+  { label: 'Encyclopedia', href: '/dashboard/encyclopedia' },
 ];
 
 export function Sidebar({ slug }: { slug?: string }) {
@@ -29,7 +31,9 @@ export function Sidebar({ slug }: { slug?: string }) {
     };
   }, [mobileOpen]);
 
-  const activeItem = navItems.find((item) => pathname.startsWith(item.href));
+  const activeItem = [...navItems]
+    .sort((a, b) => b.href.length - a.href.length)
+    .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
   const pageTitle = activeItem?.label ?? 'Dashboard';
 
   function renderNav({
@@ -43,7 +47,7 @@ export function Sidebar({ slug }: { slug?: string }) {
       <>
         <nav className={`flex-1 space-y-1 ${mobile ? 'px-4 pb-4' : 'px-3'}`}>
           {navItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <Link

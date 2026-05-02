@@ -1,8 +1,9 @@
+import { and,eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-server';
+
 import { db } from '@/db';
-import { pages, infoBlocks, users } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { infoBlocks, pages, users } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 import { deleteDocument } from '@/lib/saasmaker';
 
 export async function DELETE(

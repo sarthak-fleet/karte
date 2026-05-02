@@ -1,26 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-import { ImageUploadField } from '@/components/dashboard/image-upload-field';
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
   DragOverlay,
-  PointerSensor,
+  type DragStartEvent,
   KeyboardSensor,
+  PointerSensor,
   useSensor,
   useSensors,
-  type DragStartEvent,
-  type DragEndEvent,
 } from '@dnd-kit/core';
 import {
-  SortableContext,
-  useSortable,
-  rectSortingStrategy,
-  sortableKeyboardCoordinates,
   arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useState } from 'react';
+
+import { ImageUploadField } from '@/components/dashboard/image-upload-field';
 
 interface Project {
   id: string;

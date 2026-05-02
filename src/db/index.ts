@@ -1,5 +1,6 @@
+import { type Client, createClient, type InArgs } from '@libsql/client/web';
 import { drizzle } from 'drizzle-orm/libsql';
-import { createClient, type Client } from '@libsql/client/web';
+
 import * as schema from './schema';
 
 let _client: Client | undefined;
@@ -81,10 +82,29 @@ export async function ensureProjectsTable() {
           visitorId TEXT,
           name TEXT NOT NULL,
           email TEXT NOT NULL,
+          senderType TEXT NOT NULL DEFAULT 'email',
+          status TEXT NOT NULL DEFAULT 'unread',
           message TEXT NOT NULL,
           createdAt INTEGER
         )
       `);
+
+      const contactColumns = await client.execute('PRAGMA table_info(contactSubmissions)');
+      const contactColNames = new Set(
+        contactColumns.rows.map((r) => (r as { name?: string }).name),
+      );
+
+      if (!contactColNames.has('senderType')) {
+        await client.execute(
+          "ALTER TABLE contactSubmissions ADD COLUMN senderType TEXT NOT NULL DEFAULT 'email'",
+        );
+      }
+
+      if (!contactColNames.has('status')) {
+        await client.execute(
+          "ALTER TABLE contactSubmissions ADD COLUMN status TEXT NOT NULL DEFAULT 'unread'",
+        );
+      }
 
       await client.execute(`
         CREATE INDEX IF NOT EXISTS contact_submissions_page_id_created_at_idx
@@ -143,6 +163,10 @@ export async function ensureProjectsTable() {
         }
       }
 
+      if (!pageColNames.has('dmMode')) {
+        await client.execute("ALTER TABLE pages ADD COLUMN dmMode TEXT NOT NULL DEFAULT 'off'");
+      }
+
       if (!pageColNames.has('pageSettings')) {
         await client.execute('ALTER TABLE pages ADD COLUMN pageSettings TEXT');
       }
@@ -151,13 +175,13 @@ export async function ensureProjectsTable() {
         await client.execute('ALTER TABLE pages ADD COLUMN scrapedContent TEXT');
       }
 
-      // Add AI endpoint columns to users if missing
-      const userColumns = await client.execute('PRAGMA table_info(users)');
+      // Add LinkChat-specific columns to the Better Auth user table if missing.
+      const userColumns = await client.execute('PRAGMA table_info("user")');
       const userColNames = new Set(userColumns.rows.map((r) => (r as { name?: string }).name));
 
-      for (const col of ['aiEndpointUrl', 'aiApiKey', 'aiModel']) {
+      for (const col of ['smProjectId', 'smApiKey', 'smIndexId', 'aiEndpointUrl', 'aiApiKey', 'aiModel']) {
         if (!userColNames.has(col)) {
-          await client.execute(`ALTER TABLE users ADD COLUMN ${col} TEXT`);
+          await client.execute(`ALTER TABLE "user" ADD COLUMN ${col} TEXT`);
         }
       }
     })().catch((error) => {
@@ -167,6 +191,10 @@ export async function ensureProjectsTable() {
   }
 
   await featureTablesReady;
+}
+
+export async function appDbExecute(sql: string, args: InArgs = []) {
+  return getClient().execute(sql, args);
 }
 
 // Migration is triggered lazily at request time via ensureProjectsTable()

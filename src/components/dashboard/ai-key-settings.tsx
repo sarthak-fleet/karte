@@ -1,15 +1,22 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback,useState } from 'react';
 
 type Props = {
   hasKey: boolean;
   hasAiConfig: boolean;
   aiEndpointUrl: string;
   aiModel: string;
+  isUsingDefaultAi?: boolean;
 };
 
-export function AiKeySettings({ hasKey, hasAiConfig, aiEndpointUrl: initialUrl, aiModel: initialModel }: Props) {
+export function AiKeySettings({
+  hasKey,
+  hasAiConfig,
+  aiEndpointUrl: initialUrl,
+  aiModel: initialModel,
+  isUsingDefaultAi = false,
+}: Props) {
   // SaaS Maker key (for RAG/chat document indexing)
   const [aiKey, setAiKey] = useState('');
   const [configured, setConfigured] = useState(hasKey);
@@ -167,7 +174,9 @@ export function AiKeySettings({ hasKey, hasAiConfig, aiEndpointUrl: initialUrl, 
       <div className="rounded-2xl border border-white/20 bg-white/5 p-6 backdrop-blur-xl">
         <h2 className="mb-1 text-lg font-semibold text-white">AI Endpoint</h2>
         <p className="mb-4 text-sm text-gray-400">
-          {aiConfigured
+          {isUsingDefaultAi
+            ? 'LinkChat AI is configured by default. Add your own endpoint only if you want to override it.'
+            : aiConfigured
             ? 'Your AI endpoint is configured. Update any field below.'
             : 'Connect any OpenAI-compatible endpoint to power AI features.'}
         </p>

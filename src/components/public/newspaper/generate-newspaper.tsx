@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface GenerateNewspaperProps {
   pageId: string;
@@ -35,75 +35,195 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
     }
   }
 
+  if (loading) {
+    return (
+      <div className="w-full max-w-3xl border border-[#1c1a14]/30 bg-[#f7f0df] p-5 text-[#17130d] shadow-[0_28px_90px_-55px_rgba(0,0,0,0.75)] sm:p-8">
+        <style jsx>{`
+          @keyframes linkchat-news-flip {
+            0% {
+              transform: perspective(820px) rotateY(0deg) translateX(0);
+              opacity: 0.3;
+            }
+            18% {
+              opacity: 1;
+            }
+            52% {
+              transform: perspective(820px) rotateY(-178deg) translateX(-12px);
+              opacity: 0.92;
+            }
+            100% {
+              transform: perspective(820px) rotateY(-178deg) translateX(-12px);
+              opacity: 0;
+            }
+          }
+
+          @keyframes linkchat-ink-pass {
+            0% {
+              transform: translateX(-110%);
+            }
+            100% {
+              transform: translateX(110%);
+            }
+          }
+
+          .news-flip-sheet {
+            animation: linkchat-news-flip 1.85s ease-in-out infinite;
+            backface-visibility: hidden;
+            transform-origin: left center;
+          }
+
+          .news-flip-sheet:nth-child(2) {
+            animation-delay: 0.38s;
+          }
+
+          .news-flip-sheet:nth-child(3) {
+            animation-delay: 0.76s;
+          }
+
+          .ink-pass::after {
+            animation: linkchat-ink-pass 1.45s ease-in-out infinite;
+          }
+        `}</style>
+        <div className="border-b-2 border-[#17130d] pb-4 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.28em]">Special Edition</p>
+          <h2 className="mt-2 font-serif text-4xl font-black leading-none sm:text-5xl">
+            The Profile Times
+          </h2>
+          <p className="mt-3 text-xs font-bold uppercase tracking-[0.22em] text-[#17130d]/55">
+            Sending the front page to press
+          </p>
+        </div>
+
+        <div className="mt-6 grid gap-6 sm:grid-cols-[1fr_250px]">
+          <div>
+            <div className="relative h-40 overflow-hidden border-y-2 border-[#17130d] bg-[#efe2c4] p-4 shadow-[inset_0_0_0_1px_rgba(23,19,13,0.08)]">
+              <div className="absolute inset-x-4 top-4 border-b border-[#17130d]/35 pb-2 text-center font-serif text-2xl font-black">
+                The Profile Times
+              </div>
+              <div className="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-3">
+                {[0, 1, 2].map((item) => (
+                  <div key={item} className="space-y-1.5">
+                    <div className="h-2 bg-[#17130d]/75" />
+                    <div className="h-1.5 bg-[#17130d]/25" />
+                    <div className="h-1.5 w-3/4 bg-[#17130d]/25" />
+                  </div>
+                ))}
+              </div>
+
+              {[0, 1, 2].map((item) => (
+                <div
+                  key={item}
+                  className="news-flip-sheet absolute inset-y-0 left-0 w-[54%] border-r border-[#17130d]/25 bg-[#f7f0df] shadow-[12px_0_28px_rgba(23,19,13,0.18)]"
+                >
+                  <div className="h-full p-4">
+                    <div className="h-3 w-24 bg-[#17130d]/75" />
+                    <div className="mt-4 space-y-2">
+                      <div className="h-2 bg-[#17130d]/28" />
+                      <div className="h-2 w-10/12 bg-[#17130d]/22" />
+                      <div className="h-2 w-8/12 bg-[#17130d]/22" />
+                    </div>
+                    <div className="mt-5 h-12 border border-[#17130d]/15 bg-[#17130d]/8" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="ink-pass relative mt-5 h-10 w-11/12 overflow-hidden bg-[#17130d]/80 after:absolute after:inset-y-0 after:w-1/3 after:bg-[#f7f0df]/28" />
+            <div className="ink-pass relative mt-3 h-10 w-8/12 overflow-hidden bg-[#17130d]/70 after:absolute after:inset-y-0 after:w-1/3 after:bg-[#f7f0df]/25" />
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {[0, 1, 2, 3].map((item) => (
+                <div key={item} className="border-t border-[#17130d]/30 pt-3">
+                  <div className="h-3 w-2/3 animate-pulse bg-[#17130d]/65" />
+                  <div className="mt-3 space-y-2">
+                    <div className="h-2 animate-pulse bg-[#17130d]/25" />
+                    <div className="h-2 w-11/12 animate-pulse bg-[#17130d]/25" />
+                    <div className="h-2 w-8/12 animate-pulse bg-[#17130d]/25" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="border-l border-[#17130d]/20 pl-4">
+            <div
+              className="h-32 animate-pulse border border-[#17130d]/20 bg-[#17130d]/10"
+              style={{ boxShadow: `inset 0 -5px 0 ${accentColor}` }}
+            />
+            <div className="mt-5 space-y-3">
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-[#17130d]/55">
+                Writing headlines
+              </p>
+              <div className="h-2 overflow-hidden bg-[#17130d]/15">
+                <div className="h-full w-2/3 animate-pulse bg-[#17130d]" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full max-w-md rounded-2xl border border-white/20 bg-white/10 p-8 text-center shadow-xl backdrop-blur-xl">
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white/10">
-        <svg
-          className="h-8 w-8 text-white/80"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-          />
-        </svg>
+    <div className="w-full max-w-2xl border border-[#1c1a14]/30 bg-[#f7f0df] p-5 text-[#17130d] shadow-[0_28px_90px_-55px_rgba(0,0,0,0.75)] sm:p-8">
+      <div className="border-b-2 border-[#17130d] pb-4 text-center">
+        <p className="text-xs font-bold uppercase tracking-[0.28em]">Special Edition</p>
+        <h2 className="mt-2 font-serif text-4xl font-black leading-none sm:text-5xl">
+          The Profile Times
+        </h2>
       </div>
 
-      <h2 className="mb-2 text-xl font-bold text-white">
-        Your front page hasn&apos;t been printed yet
-      </h2>
-      <p className="mb-6 text-sm text-white/60">
-        Generate your personal newspaper front page
-      </p>
+      <div className="mt-6 grid gap-6 sm:grid-cols-[1fr_220px]">
+        <div>
+          <h3 className="font-serif text-2xl font-bold">
+            Your front page has not gone to press
+          </h3>
+          <p className="mt-3 text-sm leading-6 text-[#17130d]/70">
+            Generate a newspaper-style profile with headlines, columns, and a
+            shareable editorial angle.
+          </p>
 
-      {error && (
-        <p className="mb-4 rounded-lg bg-red-500/20 px-3 py-2 text-sm text-red-300">
-          {error}
-        </p>
-      )}
+          {error && (
+            <p className="mt-5 border border-red-900/30 bg-red-100 px-3 py-2 text-sm text-red-800">
+              {error}
+            </p>
+          )}
 
-      <button
-        onClick={handleGenerate}
-        disabled={loading}
-        className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition disabled:opacity-50"
-        style={{ backgroundColor: accentColor }}
-      >
-        {loading ? (
-          <>
-            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-            Printing...
-          </>
-        ) : (
-          <>
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18.75 12h.008v.008h-.008V12Zm-3 0h.008v.008h-.008V12Z"
-              />
-            </svg>
-            Print Edition
-          </>
-        )}
-      </button>
+          <button
+            onClick={handleGenerate}
+            disabled={loading}
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 bg-[#17130d] px-6 py-3 text-sm font-bold text-[#f7f0df] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+          >
+            {loading ? (
+              <>
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Sending to press
+              </>
+            ) : (
+              'Print front page'
+            )}
+          </button>
+        </div>
+
+        <div className="border-l border-[#17130d]/20 pl-4">
+          <div className="h-4 w-32 bg-[#17130d]/80" />
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item} className="space-y-2">
+                <div className={`h-2 bg-[#17130d]/60 ${loading ? 'animate-pulse' : ''}`} />
+                <div className={`h-1.5 bg-[#17130d]/25 ${loading ? 'animate-pulse' : ''}`} />
+                <div className={`h-1.5 w-3/4 bg-[#17130d]/25 ${loading ? 'animate-pulse' : ''}`} />
+              </div>
+            ))}
+          </div>
+          <div
+            className={`mt-5 h-20 border border-[#17130d]/20 bg-[#17130d]/10 ${loading ? 'animate-pulse' : ''}`}
+            style={{ boxShadow: `inset 0 -4px 0 ${accentColor}` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

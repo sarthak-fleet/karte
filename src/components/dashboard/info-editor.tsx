@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 type InfoBlock = {
   id: string;
@@ -16,6 +16,9 @@ const BLOCK_TYPES = [
   { value: 'text', label: 'About / Bio' },
   { value: 'resume', label: 'Resume / Experience' },
   { value: 'faq', label: 'FAQ' },
+  { value: 'current', label: 'Current Focus' },
+  { value: 'voice', label: 'Voice / Style' },
+  { value: 'boundaries', label: 'Boundaries' },
 ];
 
 function typeBadgeColor(type: string) {
@@ -26,6 +29,12 @@ function typeBadgeColor(type: string) {
       return 'bg-green-500/20 text-green-300';
     case 'faq':
       return 'bg-purple-500/20 text-purple-300';
+    case 'current':
+      return 'bg-cyan-500/20 text-cyan-300';
+    case 'voice':
+      return 'bg-amber-500/20 text-amber-300';
+    case 'boundaries':
+      return 'bg-rose-500/20 text-rose-300';
     default:
       return 'bg-gray-500/20 text-gray-300';
   }
@@ -130,7 +139,7 @@ export function InfoEditor({
         className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl"
       >
         <h3 className="text-sm font-semibold text-white">
-          Add Info Block
+          Add Profile Memory
         </h3>
 
         <div>
@@ -170,7 +179,7 @@ export function InfoEditor({
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Enter the information visitors can ask about..."
+            placeholder="Add source-backed details the chat and profile modes can use..."
             rows={5}
             className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-white/30"
           />

@@ -1,8 +1,9 @@
+import { asc,eq } from 'drizzle-orm';
+
 import { db } from '@/db';
-import { pages, links, projects } from '@/db/schema';
-import { eq, asc } from 'drizzle-orm';
-import { scrapeUrls, formatScrapedContent, isCacheValid } from '@/lib/scraper';
+import { links, pages, projects } from '@/db/schema';
 import type { ScrapedCache } from '@/lib/scraper';
+import { formatScrapedContent, isCacheValid,scrapeUrls } from '@/lib/scraper';
 
 /**
  * Get scraped content for a page's links and projects.

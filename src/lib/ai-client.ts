@@ -7,12 +7,54 @@ export type AiConfig = {
   model: string;
 };
 
+const DEFAULT_AI_ENDPOINT_URL = 'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1';
+const DEFAULT_AI_MODEL = 'workers-ai-llama-3.3-70b';
+
+export function getDefaultAiConfig(): AiConfig | null {
+  const apiKey = process.env.LINKCHAT_DEFAULT_AI_API_KEY;
+  if (!apiKey) return null;
+
+  return {
+    endpointUrl: process.env.LINKCHAT_DEFAULT_AI_ENDPOINT_URL || DEFAULT_AI_ENDPOINT_URL,
+    apiKey,
+    model: process.env.LINKCHAT_DEFAULT_AI_MODEL || DEFAULT_AI_MODEL,
+  };
+}
+
+export function resolveAiConfig(config?: {
+  aiEndpointUrl?: string | null;
+  aiApiKey?: string | null;
+  aiModel?: string | null;
+}): AiConfig | null {
+  if (config?.aiEndpointUrl && config.aiApiKey && config.aiModel) {
+    return {
+      endpointUrl: config.aiEndpointUrl,
+      apiKey: config.aiApiKey,
+      model: config.aiModel,
+    };
+  }
+
+  return getDefaultAiConfig();
+}
+
 function getProvider(config: AiConfig) {
   return createOpenAICompatible({
     name: 'custom',
     baseURL: config.endpointUrl,
     apiKey: config.apiKey,
   });
+}
+
+function getProviderOptions(config: AiConfig) {
+  if (!config.endpointUrl.includes('free-ai-gateway.sarthakagrawal927.workers.dev')) {
+    return undefined;
+  }
+
+  return {
+    custom: {
+      project_id: 'linkchat',
+    },
+  };
 }
 
 /**
@@ -27,6 +69,7 @@ export async function generate(
     model: provider.chatModel(config.model),
     system: opts.system,
     prompt: opts.prompt,
+    providerOptions: getProviderOptions(config),
   });
   return text;
 }
@@ -43,6 +86,7 @@ export function streamResponse(
     model: provider.chatModel(config.model),
     system: opts.system,
     prompt: opts.prompt,
+    providerOptions: getProviderOptions(config),
   });
   return result.toTextStreamResponse();
 }

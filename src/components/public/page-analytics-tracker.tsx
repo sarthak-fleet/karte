@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
+
 import { getOrCreateVisitorId } from '@/lib/visitor-id';
 
 const RESERVED_PATHS = new Set(['', 'dashboard', 'login', 'api']);

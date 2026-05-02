@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
 import { and, eq } from 'drizzle-orm';
-import { getSession } from '@/lib/auth-server';
+import { NextResponse } from 'next/server';
+
 import { db, ensureProjectsTable } from '@/db';
 import { pages, projects } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 
 export async function DELETE(
   _req: Request,

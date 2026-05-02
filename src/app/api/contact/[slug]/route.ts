@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server';
 import { and, eq } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
+
 import { db, ensureProjectsTable } from '@/db';
-import { pages, contactSubmissions, pageEvents } from '@/db/schema';
+import { contactSubmissions, pageEvents,pages } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 import { rateLimit } from '@/lib/rate-limit';
 import {
   isValidEmail,
@@ -26,8 +28,9 @@ export async function POST(
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   const visitorId = typeof body.visitorId === 'string' ? body.visitorId.trim() : null;
   const sectionId = typeof body.sectionId === 'string' ? body.sectionId.trim() : null;
+  const senderType = body.senderType === 'anonymous' ? 'anonymous' : 'email';
 
-  if (!name || !email || !message) {
+  if (!message || (senderType === 'email' && (!name || !email))) {
     return NextResponse.json(
       { error: 'name, email, and message are required' },
       { status: 400 },
@@ -41,7 +44,7 @@ export async function POST(
     );
   }
 
-  if (!isValidEmail(email)) {
+  if (senderType === 'email' && !isValidEmail(email)) {
     return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
   }
 
@@ -63,14 +66,57 @@ export async function POST(
     return NextResponse.json({ error: 'Page not found' }, { status: 404 });
   }
 
+  const isDmWidgetSubmission = !sectionId;
+  let verifiedSender: { name: string; email: string } | null = null;
+
+  if (isDmWidgetSubmission) {
+    if (page.dmMode === 'off') {
+      return NextResponse.json({ error: 'Direct messages are disabled' }, { status: 403 });
+    }
+
+    if (page.dmMode === 'email') {
+      if (senderType !== 'email') {
+        return NextResponse.json(
+          { error: 'An email address is required for this profile' },
+          { status: 400 },
+        );
+      }
+
+      try {
+        const session = await getSession();
+        if (session?.user?.email) {
+          verifiedSender = {
+            name: session.user.name || name,
+            email: session.user.email,
+          };
+        }
+      } catch {
+        verifiedSender = null;
+      }
+
+      if (!verifiedSender) {
+        return NextResponse.json(
+          { error: 'Sign in to send an email-verified direct message' },
+          { status: 401 },
+        );
+      }
+    }
+  }
+
+  const submissionName =
+    senderType === 'anonymous' ? 'Anonymous' : verifiedSender?.name ?? name;
+  const submissionEmail =
+    senderType === 'anonymous' ? '' : verifiedSender?.email ?? email;
+
   const [submission] = await db
     .insert(contactSubmissions)
     .values({
       pageId: page.id,
       sectionId,
       visitorId,
-      name,
-      email,
+      name: submissionName,
+      email: submissionEmail,
+      senderType,
       message,
     })
     .returning();
@@ -81,10 +127,12 @@ export async function POST(
     eventType: 'contact_submit',
     resourceType: 'contact',
     resourceId: sectionId,
-    resourceLabel: name,
+    resourceLabel: submissionName,
     metadata: {
-      email,
+      email: senderType === 'anonymous' ? null : submissionEmail,
       sectionId,
+      senderType,
+      verified: Boolean(verifiedSender),
     },
   });
 

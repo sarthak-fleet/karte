@@ -1,9 +1,10 @@
-import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
-import { getSession } from '@/lib/auth-server';
+import { redirect } from 'next/navigation';
+
+import { ProjectEditor } from '@/components/dashboard/project-editor';
 import { db, ensureProjectsTable } from '@/db';
 import { pages, projects } from '@/db/schema';
-import { ProjectEditor } from '@/components/dashboard/project-editor';
+import { getSession } from '@/lib/auth-server';
 
 export default async function ProjectsPage() {
   const session = await getSession();

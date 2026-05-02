@@ -1,14 +1,15 @@
-import { NextResponse } from 'next/server';
 import { and, eq } from 'drizzle-orm';
-import { getSession } from '@/lib/auth-server';
+import { NextResponse } from 'next/server';
+
 import { db, ensureProjectsTable } from '@/db';
 import { pages, pageSections } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
+import { isPageSectionType } from '@/lib/page-sections';
 import {
+  isValidUrl,
   MAX_SECTION_CONTENT_LENGTH,
   MAX_TITLE_LENGTH,
-  isValidUrl,
 } from '@/lib/validation';
-import { isPageSectionType } from '@/lib/page-sections';
 
 async function verifyPageOwnership(pageId: string, userId: string) {
   const [page] = await db

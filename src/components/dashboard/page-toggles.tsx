@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { PageSettings } from '@/db/schema';
+
 import {
   Button,
   Card,
@@ -11,6 +11,7 @@ import {
   Textarea,
   Toggle,
 } from '@/components/ui';
+import type { PageSettings } from '@/db/schema';
 
 interface PageTogglesProps {
   pageId: string;
@@ -25,21 +26,21 @@ const PAGE_FEATURES = [
   {
     key: 'encyclopediaEnabled' as const,
     label: 'Encyclopedia',
-    description: 'Wikipedia-style article about you, AI-generated from your profile data',
+    description: 'A Wikipedia-style profile mode generated from your memory and page data',
     path: 'encyclopedia',
     settingsKey: 'encyclopedia' as const,
   },
   {
     key: 'roastEnabled' as const,
     label: 'Roast Me',
-    description: 'AI-generated personality roast with shareable cards',
+    description: 'A sharper, shareable profile mode that captures your vibe',
     path: 'roast',
     settingsKey: 'roast' as const,
   },
   {
     key: 'newspaperEnabled' as const,
     label: 'Newspaper',
-    description: 'A newspaper front page featuring you as the headline story',
+    description: 'A front-page profile mode that turns your story into headlines',
     path: 'newspaper',
     settingsKey: 'newspaper' as const,
   },
@@ -48,6 +49,7 @@ const PAGE_FEATURES = [
 const ROAST_TONES = ['Savage', 'Friendly', 'Sarcastic'] as const;
 const NEWSPAPER_TONES = ['Prestigious', 'Tabloid', 'Local'] as const;
 const ENCYCLOPEDIA_STYLES = ['Formal Wikipedia', 'Casual', 'Academic'] as const;
+type GeneratedModeSettingsKey = 'roast' | 'newspaper' | 'encyclopedia';
 
 export function PageToggles({
   pageId,
@@ -81,7 +83,7 @@ export function PageToggles({
   }
 
   function updatePageSetting(
-    type: keyof PageSettings,
+    type: GeneratedModeSettingsKey,
     field: string,
     value: string,
   ) {
@@ -235,9 +237,10 @@ export function PageToggles({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-2 text-2xl font-bold text-white">Pages</h1>
+      <h1 className="mb-2 text-2xl font-bold text-white">Profile Modes</h1>
       <p className="mb-6 text-sm text-gray-400">
-        Enable extra pages on your public profile. Each page is accessible at{' '}
+        Enable the alternate ways visitors can experience your identity. Each
+        mode is accessible at{' '}
         <code className="text-white/60">/{slug}/&lt;page&gt;</code>
       </p>
 

@@ -1,12 +1,13 @@
+import { and, desc,eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-server';
+
 import { db } from '@/db';
-import { pages, infoBlocks, users } from '@/db/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { infoBlocks, pages, users } from '@/db/schema';
+import { getSession } from '@/lib/auth-server';
 import { ingestDocument } from '@/lib/saasmaker';
 import { MAX_CONTENT_LENGTH } from '@/lib/validation';
 
-const ALLOWED_INFO_BLOCK_TYPES = new Set(['text', 'resume', 'faq']);
+const ALLOWED_INFO_BLOCK_TYPES = new Set(['text', 'resume', 'faq', 'current', 'voice', 'boundaries']);
 
 function isValidInfoBlockType(type: string): boolean {
   return ALLOWED_INFO_BLOCK_TYPES.has(type);
@@ -70,7 +71,7 @@ export async function POST(
 
   if (!isValidInfoBlockType(type)) {
     return NextResponse.json(
-      { error: 'Invalid block type. Must be one of: text, resume, faq' },
+      { error: 'Invalid block type. Must be one of: text, resume, faq, current, voice, boundaries' },
       { status: 400 },
     );
   }

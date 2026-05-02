@@ -1,32 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import {
-  PAGE_SECTION_TYPES,
-  getPageSectionLabel,
-  type PageSectionType,
-} from '@/lib/page-sections';
-import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
   DragOverlay,
-  PointerSensor,
+  type DragStartEvent,
   KeyboardSensor,
+  PointerSensor,
   useSensor,
   useSensors,
-  type DragStartEvent,
-  type DragEndEvent,
 } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
+  arrayMove,
   SortableContext,
+  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-  sortableKeyboardCoordinates,
-  arrayMove,
 } from '@dnd-kit/sortable';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import {
+  getPageSectionLabel,
+  PAGE_SECTION_TYPES,
+  type PageSectionType,
+} from '@/lib/page-sections';
 
 type Section = {
   id: string;
@@ -370,6 +371,7 @@ export function SectionEditor({
 
   const isCta = type === 'cta';
   const isSocial = type === 'social';
+  const isBlog = type === 'blog';
 
   return (
     <div className="space-y-6">
@@ -449,6 +451,11 @@ export function SectionEditor({
                 One social link per line using `Label | https://example.com`.
               </p>
             )}
+            {isBlog && (
+              <p className="mb-2 text-xs text-gray-500">
+                One post per line using `Title | https://example.com/post | Short description | Date`.
+              </p>
+            )}
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -456,6 +463,8 @@ export function SectionEditor({
               placeholder={
                 type === 'social'
                   ? 'X | https://x.com/yourname\nLinkedIn | https://linkedin.com/in/yourname'
+                  : type === 'blog'
+                    ? 'Why I am building this | https://example.com/blog/building | A short essay on the product thesis. | Apr 2026\nNotes from launch week | https://example.com/blog/launch | What changed after shipping the first version. | May 2026'
                   : type === 'testimonial'
                   ? 'A short testimonial quote...'
                   : type === 'contact'

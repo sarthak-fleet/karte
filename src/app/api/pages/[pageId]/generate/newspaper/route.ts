@@ -1,13 +1,14 @@
+import { and,eq } from 'drizzle-orm';
+
 import { db, ensureProjectsTable } from '@/db';
-import { pages, users, infoBlocks, links, projects, generatedPages } from '@/db/schema';
 import type { PageSettings } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
-import { generate, type AiConfig as AIConfig } from '@/lib/ai-client';
-import { parseAIResponse } from '@/lib/saasmaker';
+import { generatedPages,pages, users } from '@/db/schema';
+import { generate, resolveAiConfig } from '@/lib/ai-client';
 import { NEWSPAPER_SYSTEM_PROMPT } from '@/lib/ai-prompts';
-import { rateLimit } from '@/lib/rate-limit';
 import { asGeneratedPageContent, type NewspaperContent } from '@/lib/generated-page-types';
-import { getScrapedContext } from '@/lib/scrape-page-content';
+import { buildProfileMemory } from '@/lib/profile-memory';
+import { rateLimit } from '@/lib/rate-limit';
+import { parseAIResponse } from '@/lib/saasmaker';
 
 export async function POST(
   req: Request,
@@ -36,39 +37,17 @@ export async function POST(
   }
 
   const [user] = await db.select().from(users).where(eq(users.id, page.userId));
-  if (!user?.aiEndpointUrl || !user?.aiApiKey || !user?.aiModel) {
+  const aiConfig = resolveAiConfig(user);
+  if (!aiConfig) {
     return new Response(
       JSON.stringify({ error: 'AI not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }
     );
   }
 
-  const aiConfig: AIConfig = {
-    endpointUrl: user.aiEndpointUrl,
-    apiKey: user.aiApiKey,
-    model: user.aiModel,
-  };
-
-  // Fetch links, projects, info blocks, and scraped content in parallel
-  const [pageLinks, pageProjects, blocks, scrapedContext] = await Promise.all([
-    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
-    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
-    db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)),
-    getScrapedContext(pageId, page),
-  ]);
-
   // Read page settings for newspaper customization
   const settings = (page.pageSettings as PageSettings | null)?.newspaper;
-
-  const context = [
-    `Name: ${page.displayName}`,
-    `Bio: ${page.bio || 'No bio'}`,
-    `Links: ${pageLinks.map((l) => `${l.title} (${l.url})`).join(', ') || 'None'}`,
-    `Projects: ${pageProjects.map((p) => `${p.title}: ${p.description}`).join('\n') || 'None'}`,
-    ...blocks.map((b) => `${b.title || b.type}: ${b.content}`),
-    ...(settings?.context ? [`Additional context from the person: ${settings.context}`] : []),
-    ...(scrapedContext ? [scrapedContext] : []),
-  ].join('\n\n');
+  const memory = await buildProfileMemory({ page, mode: 'newspaper' });
 
   // Build system prompt with tone and name preferences
   let systemPrompt = NEWSPAPER_SYSTEM_PROMPT;
@@ -94,7 +73,7 @@ export async function POST(
   try {
     const raw = await generate(aiConfig, {
       system: systemPrompt,
-      prompt: `Write a newspaper front page about this person:\n\n${context}`,
+      prompt: `Write a newspaper front page about this person using this source desk:\n\n${memory.promptContext}`,
     });
 
     const newspaper = parseAIResponse<NewspaperContent>(raw);

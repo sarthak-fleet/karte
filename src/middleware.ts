@@ -1,14 +1,17 @@
-import { betterFetch } from '@better-fetch/fetch';
-import type { Session } from 'better-auth/types';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+
+function hasSessionCookie(request: NextRequest) {
+  return (
+    request.cookies.has('better-auth.session_token') ||
+    request.cookies.has('__Secure-better-auth.session_token') ||
+    request.cookies.has('better-auth-session_token') ||
+    request.cookies.has('__Secure-better-auth-session_token')
+  );
+}
 
 export async function middleware(request: NextRequest) {
-  const { data: session } = await betterFetch<Session>('/api/auth/get-session', {
-    baseURL: request.nextUrl.origin,
-    headers: { cookie: request.headers.get('cookie') || '' },
-  });
-
-  if (!session) {
+  if (!hasSessionCookie(request)) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
-import type { EncyclopediaContent } from '@/lib/generated-page-types';
+import { useCallback, useRef,useState } from 'react';
+
 import {
   Badge,
   Button,
@@ -9,6 +9,8 @@ import {
   Input,
   Label,
 } from '@/components/ui';
+import type { EncyclopediaContent } from '@/lib/generated-page-types';
+
 import { NovelEditor } from './novel-editor';
 
 interface EncyclopediaEditorProps {

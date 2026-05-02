@@ -1,9 +1,11 @@
+import { and,eq } from 'drizzle-orm';
+
 import { db } from '@/db';
 import { pages, users } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
-import { search } from '@/lib/saasmaker';
-import { streamResponse, type AiConfig as AIConfig } from '@/lib/ai-client';
+import { resolveAiConfig, streamResponse } from '@/lib/ai-client';
+import { buildProfileMemory } from '@/lib/profile-memory';
 import { rateLimit } from '@/lib/rate-limit';
+import { search } from '@/lib/saasmaker';
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -38,42 +40,35 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
 
   const [user] = await db.select().from(users).where(eq(users.id, page.userId));
 
-  // Need SaaS Maker for RAG retrieval AND custom AI endpoint for generation
-  if (!user?.smApiKey || !user?.smIndexId) {
-    return new Response(JSON.stringify({ error: 'Chat not configured — document index missing' }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-  if (!user?.aiEndpointUrl || !user?.aiApiKey || !user?.aiModel) {
+  const aiConfig = resolveAiConfig(user);
+  if (!aiConfig) {
     return new Response(JSON.stringify({ error: 'Chat not configured — AI endpoint missing' }), {
       status: 503,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  const aiConfig: AIConfig = {
-    endpointUrl: user.aiEndpointUrl,
-    apiKey: user.aiApiKey,
-    model: user.aiModel,
-  };
-
   try {
-    // Step 1: Retrieve relevant context from SaaS Maker index
-    const searchResults = await search(user.smApiKey, user.smIndexId, query, 5);
-    const retrievedContext = searchResults.results
-      .map((r) => r.chunk_content)
-      .join('\n\n');
+    const [memory, retrievedContext] = await Promise.all([
+      buildProfileMemory({ page, mode: 'chat', query }),
+      user.smApiKey && user.smIndexId
+        ? search(user.smApiKey, user.smIndexId, query, 5)
+          .then((searchResults) => searchResults.results.map((r) => r.chunk_content).join('\n\n'))
+          .catch(() => '')
+        : Promise.resolve(''),
+    ]);
 
-    // Step 2: Build system prompt with retrieved context
     const baseSystemPrompt = page.chatSystemPrompt
-      || `You are a helpful assistant that answers questions about ${page.displayName}. Use only the provided context to answer. If you don't know, say so.`;
+      || `You are a helpful assistant that answers questions about ${page.displayName}.`;
 
-    const systemPrompt = retrievedContext
-      ? `${baseSystemPrompt}\n\nContext from the knowledge base:\n${retrievedContext}`
-      : baseSystemPrompt;
+    const systemPrompt = [
+      baseSystemPrompt,
+      'Use the Profile Memory source cards as the primary truth. Do not invent facts, dates, credentials, employers, or personal details that are not present in the sources.',
+      'If the sources do not answer the question, say what is missing and suggest contacting the profile owner or using a listed link.',
+      `Profile Memory:\n${memory.promptContext}`,
+      retrievedContext ? `Optional external index matches:\n${retrievedContext}` : '',
+    ].filter(Boolean).join('\n\n');
 
-    // Step 3: Stream LLM response via custom AI endpoint
     return streamResponse(aiConfig, { system: systemPrompt, prompt: query });
   } catch {
     return new Response(JSON.stringify({ error: 'Chat service unavailable' }), {

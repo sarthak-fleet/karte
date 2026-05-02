@@ -9,12 +9,12 @@ interface RoastSectionProps {
 
 export function RoastSection({ emoji, title, content, accentColor }: RoastSectionProps) {
   return (
-    <div className="border border-white/10 bg-white/5 rounded-2xl backdrop-blur-xl p-5">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-xl">{emoji}</span>
+    <div className="border-2 border-white bg-[#210815] p-5 shadow-[6px_6px_0_rgba(249,255,0,0.9)] even:rotate-1 odd:-rotate-1">
+      <div className="mb-3 flex items-center gap-2 border-b border-white/30 pb-3">
+        <span className="flex h-8 w-8 items-center justify-center bg-white text-lg">{emoji}</span>
         <h3
-          className="text-base font-semibold"
-          style={{ color: accentColor }}
+          className="text-base font-black uppercase tracking-[0.08em]"
+          style={{ color: '#f9ff00', textShadow: `2px 2px 0 ${accentColor}` }}
         >
           {title}
         </h3>
@@ -22,17 +22,17 @@ export function RoastSection({ emoji, title, content, accentColor }: RoastSectio
       {Array.isArray(content) ? (
         <ul className="space-y-1.5">
           {content.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+            <li key={i} className="flex items-start gap-2 text-sm leading-relaxed text-white/85">
               <span
-                className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
-                style={{ backgroundColor: accentColor }}
+                className="mt-1.5 h-2 w-2 shrink-0"
+                style={{ backgroundColor: '#00ffd5' }}
               />
               {item}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-gray-300 leading-relaxed">{content}</p>
+        <p className="text-sm leading-relaxed text-white/85">{content}</p>
       )}
     </div>
   );
