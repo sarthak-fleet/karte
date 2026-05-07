@@ -22,6 +22,11 @@
       }
     ]
   },
+  "analytics_engine_datasets": [
+    {
+      "binding": "ANALYTICS"
+    }
+  ],
   "vars": {
     "BETTER_AUTH_URL": "https://linkchat.sarthakagrawal927.workers.dev",
     "LINKCHAT_DEFAULT_AI_ENDPOINT_URL": "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",

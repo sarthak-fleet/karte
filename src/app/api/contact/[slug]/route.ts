@@ -2,7 +2,8 @@ import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
-import { contactSubmissions, pageEvents,pages } from '@/db/schema';
+import { contactSubmissions, pages } from '@/db/schema';
+import { recordEvent } from '@/lib/analytics-server';
 import { getSession } from '@/lib/auth-server';
 import { rateLimit } from '@/lib/rate-limit';
 import {
@@ -121,11 +122,12 @@ export async function POST(
     })
     .returning();
 
-  await db.insert(pageEvents).values({
+  await recordEvent({
+    slug,
     pageId: page.id,
     visitorId,
-    eventType: 'contact_submit',
-    resourceType: 'contact',
+    eventType: isDmWidgetSubmission ? 'dm_submit' : 'contact_submit',
+    resourceType: isDmWidgetSubmission ? 'dm' : 'contact',
     resourceId: sectionId,
     resourceLabel: submissionName,
     metadata: {

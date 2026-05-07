@@ -2,25 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import { getOrCreateVisitorId } from '@/lib/visitor-id';
-
-function postEvent(slug: string, payload: Record<string, unknown>) {
-  const body = JSON.stringify(payload);
-
-  if (navigator.sendBeacon) {
-    const blob = new Blob([body], { type: 'application/json' });
-    if (navigator.sendBeacon(`/api/track/${slug}`, blob)) {
-      return;
-    }
-  }
-
-  void fetch(`/api/track/${slug}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body,
-    keepalive: true,
-  });
-}
+import { trackEvent } from '@/lib/analytics';
 
 export function TrackableSection({
   slug,
@@ -52,9 +34,8 @@ export function TrackableSection({
         }
 
         trackedRef.current = true;
-        postEvent(slug, {
+        trackEvent(slug, {
           eventType: 'section_view',
-          visitorId: getOrCreateVisitorId(),
           resourceType: sectionType,
           resourceId: sectionId,
           resourceLabel: sectionTitle,

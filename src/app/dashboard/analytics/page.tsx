@@ -82,7 +82,9 @@ export default async function AnalyticsPage() {
   const pageViews = events.filter((event) => event.eventType === 'page_view').length;
   const sectionViews = events.filter((event) => event.eventType === 'section_view').length;
   const outboundClicks = events.filter((event) => event.eventType === 'outbound_click').length;
-  const contactSubmits = events.filter((event) => event.eventType === 'contact_submit').length;
+  const contactSubmits = events.filter(
+    (event) => event.eventType === 'contact_submit' || event.eventType === 'dm_submit',
+  ).length;
   const uniqueVisitors = new Set(
     events.map((event) => event.visitorId).filter((value): value is string => Boolean(value)),
   ).size;
@@ -210,9 +212,16 @@ export default async function AnalyticsPage() {
                               ? 'Page viewed'
                               : event.eventType === 'section_view'
                                 ? 'Section viewed'
-                                : event.eventType === 'contact_submit'
+                                : event.eventType === 'contact_submit' ||
+                                    event.eventType === 'dm_submit'
                                   ? 'Lead captured'
-                                  : 'Outbound click'}
+                                  : event.eventType === 'hook_open'
+                                    ? 'Chat opened'
+                                    : event.eventType === 'chat_cta_click'
+                                      ? 'Prompt clicked'
+                                      : event.eventType === 'dm_start'
+                                        ? 'DM started'
+                                        : 'Outbound click'}
                           </p>
                           <p className="mt-1 text-sm text-gray-400">
                             {event.resourceLabel || event.resourceId || 'Public page'}

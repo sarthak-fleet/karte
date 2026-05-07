@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
-import { getOrCreateVisitorId } from '@/lib/visitor-id';
+import { trackEvent } from '@/lib/analytics';
 
 const RESERVED_PATHS = new Set(['', 'dashboard', 'login', 'api']);
 
@@ -35,24 +35,6 @@ function isExternalUrl(href: string) {
   }
 }
 
-function postEvent(slug: string, payload: Record<string, unknown>) {
-  const body = JSON.stringify(payload);
-  const headers = { 'Content-Type': 'application/json' };
-
-  if (navigator.sendBeacon) {
-    const blob = new Blob([body], { type: 'application/json' });
-    const ok = navigator.sendBeacon(`/api/track/${slug}`, blob);
-    if (ok) return;
-  }
-
-  void fetch(`/api/track/${slug}`, {
-    method: 'POST',
-    headers,
-    body,
-    keepalive: true,
-  });
-}
-
 export function PageAnalyticsTracker() {
   const pathname = usePathname();
   const lastTrackedPath = useRef<string | null>(null);
@@ -65,9 +47,8 @@ export function PageAnalyticsTracker() {
 
     lastTrackedPath.current = pathname;
 
-    postEvent(slug, {
+    trackEvent(slug, {
       eventType: 'page_view',
-      visitorId: getOrCreateVisitorId(),
       metadata: {
         pathname,
         referrer: document.referrer || null,
@@ -98,9 +79,8 @@ export function PageAnalyticsTracker() {
         return;
       }
 
-      postEvent(slug, {
+      trackEvent(slug, {
         eventType: 'outbound_click',
-        visitorId: getOrCreateVisitorId(),
         resourceType: anchor.getAttribute('data-track-type') || 'outbound',
         resourceId: anchor.getAttribute('data-track-id') || href,
         resourceLabel:
