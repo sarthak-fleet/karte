@@ -4,6 +4,7 @@ import { useCallback,useEffect, useRef, useState } from 'react';
 
 import { ContactFormSection } from '@/components/public/contact-form-section';
 import type { DmMode } from '@/db/schema';
+import { trackEvent } from '@/lib/analytics';
 import { getOrCreateVisitorId } from '@/lib/visitor-id';
 
 interface Message {
@@ -202,6 +203,25 @@ export function ChatWidget({
   }
 
   useEffect(() => {
+    if (open) {
+      trackEvent(slug, {
+        eventType: 'hook_open',
+        resourceType: 'widget',
+        metadata: { mode },
+      });
+    }
+  }, [open, slug]);
+
+  useEffect(() => {
+    if (open && mode === 'contact') {
+      trackEvent(slug, {
+        eventType: 'dm_start',
+        resourceType: 'widget',
+      });
+    }
+  }, [mode, open, slug]);
+
+  useEffect(() => {
     function handleOpenWidget(event: Event) {
       const detail = (event as CustomEvent<{
         mode?: 'chat' | 'contact';
@@ -210,6 +230,15 @@ export function ChatWidget({
       }>).detail;
       const requestedMode = detail?.mode;
       const prompt = detail?.prompt?.trim();
+
+      if (prompt) {
+        trackEvent(slug, {
+          eventType: 'chat_cta_click',
+          resourceType: 'cta',
+          resourceLabel: prompt,
+          metadata: { autoSend: detail?.autoSend },
+        });
+      }
 
       if (requestedMode === 'contact' && dmEnabled) {
         setMode('contact');
@@ -232,7 +261,7 @@ export function ChatWidget({
 
     window.addEventListener('linkchat:open-widget', handleOpenWidget);
     return () => window.removeEventListener('linkchat:open-widget', handleOpenWidget);
-  }, [chatEnabled, dmEnabled, sendQuery]);
+  }, [chatEnabled, dmEnabled, sendQuery, slug]);
 
   const launcherPositionClass =
     position === 'bottom-left' ? 'left-4 sm:left-6' : 'right-4 sm:right-6';

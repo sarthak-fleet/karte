@@ -2,7 +2,8 @@ import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
-import { pageEvents, pages } from '@/db/schema';
+import { pages } from '@/db/schema';
+import { type EventType, recordEvent } from '@/lib/analytics-server';
 import { isValidSlug } from '@/lib/validation';
 
 const EVENT_TYPES = new Set([
@@ -10,6 +11,10 @@ const EVENT_TYPES = new Set([
   'outbound_click',
   'contact_submit',
   'section_view',
+  'hook_open',
+  'chat_cta_click',
+  'dm_start',
+  'dm_submit',
 ]);
 
 export async function POST(
@@ -34,7 +39,7 @@ export async function POST(
   }
 
   const body = await req.json().catch(() => ({}));
-  const eventType = typeof body.eventType === 'string' ? body.eventType : '';
+  const eventType = (typeof body.eventType === 'string' ? body.eventType : '') as EventType;
   const visitorId =
     typeof body.visitorId === 'string' && body.visitorId.trim()
       ? body.visitorId.trim()
@@ -60,7 +65,8 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid event type' }, { status: 400 });
   }
 
-  await db.insert(pageEvents).values({
+  await recordEvent({
+    slug,
     pageId: page.id,
     visitorId,
     eventType,
