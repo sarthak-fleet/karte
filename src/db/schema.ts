@@ -225,6 +225,36 @@ export const pageEvents = sqliteTable('pageEvents', {
   ),
 });
 
+// ── Page Domains (custom domains mapped to pages) ─────────────────
+export type PageDomainStatus = 'pending' | 'verifying' | 'verified' | 'error';
+export type PageDomainVerification = {
+  type: string;
+  domain: string;
+  value: string;
+  reason?: string;
+};
+
+export const pageDomains = sqliteTable('pageDomains', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
+  hostname: text('hostname').notNull().unique(),
+  status: text('status').$type<PageDomainStatus>().notNull().default('pending'),
+  isPrimary: integer('isPrimary', { mode: 'boolean' }).notNull().default(false),
+  verification: text('verification', { mode: 'json' }).$type<PageDomainVerification[]>(),
+  errorMessage: text('errorMessage'),
+  lastCheckedAt: integer('lastCheckedAt', { mode: 'timestamp' }),
+  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
+  updatedAt: integer('updatedAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
+});
+
 // ── Conversations (chat history) ──────────────────────────────────
 export const conversations = sqliteTable('conversations', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),

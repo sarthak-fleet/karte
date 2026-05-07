@@ -16,6 +16,7 @@ const navItems = [
   { label: 'Chats', href: '/dashboard/chats' },
   { label: 'Blocks & Blogs', href: '/dashboard/sections' },
   { label: 'Appearance', href: '/dashboard/appearance' },
+  { label: 'Domains', href: '/dashboard/domains' },
   { label: 'Encyclopedia', href: '/dashboard/encyclopedia' },
 ];
 

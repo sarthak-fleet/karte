@@ -175,6 +175,27 @@ export async function ensureProjectsTable() {
         await client.execute('ALTER TABLE pages ADD COLUMN scrapedContent TEXT');
       }
 
+      // Page Domains (custom hostname routing)
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS pageDomains (
+          id TEXT PRIMARY KEY NOT NULL,
+          pageId TEXT NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+          hostname TEXT NOT NULL UNIQUE,
+          status TEXT NOT NULL DEFAULT 'pending',
+          isPrimary INTEGER NOT NULL DEFAULT 0,
+          verification TEXT,
+          errorMessage TEXT,
+          lastCheckedAt INTEGER,
+          createdAt INTEGER,
+          updatedAt INTEGER
+        )
+      `);
+
+      await client.execute(`
+        CREATE INDEX IF NOT EXISTS page_domains_page_id_idx
+        ON pageDomains (pageId)
+      `);
+
       // Add LinkChat-specific columns to the Better Auth user table if missing.
       const userColumns = await client.execute('PRAGMA table_info("user")');
       const userColNames = new Set(userColumns.rows.map((r) => (r as { name?: string }).name));
