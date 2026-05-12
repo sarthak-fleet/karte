@@ -8,7 +8,7 @@ Link-in-bio platform with AI-enhanced profile modes — chat, encyclopedia, roas
 - Language: TypeScript (strict)
 - Styling: Tailwind CSS v4 (dark theme, glassmorphism)
 - DB: Turso (libSQL) via Drizzle ORM — schema at `src/db/schema.ts`
-- Auth: NextAuth v5 beta (Google provider + Drizzle adapter)
+- Auth: better-auth (Google provider + Drizzle adapter)
 - Testing: Playwright configured (minimal tests)
 - Deploy: Cloudflare Workers via `@opennextjs/cloudflare` (`pnpm deploy:cf`)
 - Package manager: pnpm
@@ -23,7 +23,7 @@ src/
     dashboard/            # Auth dashboard (links, projects, sections, appearance, analytics)
     [slug]/               # Public profile page (SSR)
     api/
-      auth/               # NextAuth handler
+      auth/               # better-auth handler
       pages/              # CRUD (pages, links, projects, infoBlocks, sections, chat config)
       chat/[slug]/        # Public chat (streaming SSE) + conversations + messages
       contact/[slug]/     # Public contact form
@@ -39,7 +39,7 @@ src/
                           # pageSections, conversations, messages, pageEvents, generatedPages)
     index.ts              # Drizzle client (Turso)
   lib/
-    auth.ts               # NextAuth v5 config
+    auth.ts               # better-auth config (D1-backed adapter)
     ai-prompts.ts         # AI prompts for encyclopedia/roast/newspaper generation
     themes.ts             # Theme presets
     scraper.ts            # URL scraping (Jina Reader)
@@ -77,7 +77,7 @@ pnpm drizzle-kit studio     # Drizzle Studio UI
 - **R2 storage**: avatar/project images in CF R2. Requires `CLOUDFLARE_ACCOUNT_ID`, `R2_BUCKET_NAME`, `R2_PUBLIC_BASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`.
 - **Visitor Identity**: Uses a dual-storage approach for anonymous tracking. A first-party cookie `lc_vid` (2-year expiry, SameSite=Lax, Secure in prod) provides long-term stability, while `localStorage` (`linkchat_visitor_id`) serves as a fallback and mirror for client-side persistence. Managed via `src/lib/visitor-id.ts` and `/api/track/[slug]`. See `docs/analytics.md` for details.
 - **`@saas-maker/ai`** referenced via local file path — will break on other machines.
-- Env vars: `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, R2 vars, `SAASMAKER_API_URL`, `SAASMAKER_ADMIN_KEY`, `NEXT_PUBLIC_APP_URL`.
+- Env vars: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, R2 vars, `SAASMAKER_API_URL`, `SAASMAKER_ADMIN_KEY`, `NEXT_PUBLIC_APP_URL`. (`AUTH_SECRET` / `AUTH_URL` notes below are from the pre-migration NextAuth era and remain in the CF Worker secrets for reference; the live code reads `BETTER_AUTH_*`.)
 - Husky pre-push hook configured.
 - **Auth fix (2026-04-25)**: `AUTH_URL` secret was missing from CF Workers deployment, causing `UntrustedHost` errors in Auth.js v5. Added `AUTH_URL=https://linkchat.sarthakagrawal927.workers.dev` via `wrangler secret put`. Auth flow now correctly redirects to Google OAuth.
 - **Known issue — `AUTH_GOOGLE_ID` empty**: The CF secret `AUTH_GOOGLE_ID` is set but contains an empty string (visible in OAuth redirect as `client_id=`). Google OAuth app credentials were never configured for this deployment. Requires creating/configuring a Google Cloud Console OAuth app with redirect URI `https://linkchat.sarthakagrawal927.workers.dev/api/auth/callback/google`, then running `echo "<client_id>" | wrangler secret put AUTH_GOOGLE_ID --name linkchat` and same for `AUTH_GOOGLE_SECRET`.
