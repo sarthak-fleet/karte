@@ -19,11 +19,26 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     });
   }
 
-  const body = await req.json();
+  let body: { query?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'invalid JSON body' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
   const { query } = body;
 
-  if (!query?.trim()) {
+  if (typeof query !== 'string' || !query.trim()) {
     return new Response(JSON.stringify({ error: 'query required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (query.length > 2000) {
+    return new Response(JSON.stringify({ error: 'query is too long (max 2000 characters)' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
