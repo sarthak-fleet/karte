@@ -5,6 +5,7 @@ import { PostHogProvider } from 'posthog-js/react';
 import { useEffect, useRef } from 'react';
 
 import { authClient } from '@/lib/auth-client';
+import { installBrowserMonitoring } from '@/lib/foundry-monitoring';
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = authClient.useSession();
@@ -22,6 +23,8 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
         autocapture: false, // Disable autocapture to ensure we only send what we want
       });
     }
+
+    return installBrowserMonitoring();
   }, []);
 
   useEffect(() => {
