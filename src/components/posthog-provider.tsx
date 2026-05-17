@@ -7,15 +7,18 @@ import { useEffect, useRef } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { installBrowserMonitoring } from '@/lib/foundry-monitoring';
 
+const DEFAULT_POSTHOG_KEY = 'phc_qgiAarw4Co4pw9fz3Fxj4UJaHmqzFetqs4JrXhGc35Nd';
+const DEFAULT_POSTHOG_HOST = 'https://us.i.posthog.com';
+
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = authClient.useSession();
   const trackedSessionId = useRef<string | null>(null);
 
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-    const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
+    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY ?? DEFAULT_POSTHOG_KEY;
+    const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? DEFAULT_POSTHOG_HOST;
 
-    if (key && host) {
+    if (key) {
       posthog.init(key, {
         api_host: host,
         person_profiles: 'always',
