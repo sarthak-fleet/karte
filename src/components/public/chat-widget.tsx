@@ -73,14 +73,20 @@ export function ChatWidget({
   const [shareCopied, setShareCopied] = useState(false);
   const historyAttemptedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const visitorIdRef = useRef<string | null>(null);
   const accentTextColor = getButtonTextColor(accentColor);
   const dmEnabled = dmMode !== 'off';
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, historyStatus]);
+
+  useEffect(() => {
+    if (!input && inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+  }, [input]);
 
   useEffect(() => {
     if (open && !prevOpenRef.current) {
@@ -267,10 +273,11 @@ export function ChatWidget({
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Something went wrong' }));
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: err.error || 'Something went wrong' },
-        ]);
+        const errMsg =
+          res.status === 429
+            ? "You're sending messages too quickly. Please wait a moment and try again."
+            : err.error || 'Something went wrong';
+        setMessages((prev) => [...prev, { role: 'assistant', content: errMsg }]);
         return;
       }
 
@@ -477,6 +484,14 @@ export function ChatWidget({
                     </button>
                   </div>
                 )}
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="ml-1 flex h-6 w-6 items-center justify-center rounded-full text-white/40 transition hover:bg-white/10 hover:text-white"
+                  aria-label="Close chat"
+                >
+                  ✕
+                </button>
               </div>
             </div>
           </div>
@@ -497,10 +512,13 @@ export function ChatWidget({
                 {historyStatus !== 'loading' &&
                   messages.length === 0 &&
                   historyStatus !== 'error' && (
-                    <p className="mt-8 text-center text-xs text-white/40">
-                      Ask anything about {displayName}. Your chat saves automatically and
-                      can be shared with an invite link.
-                    </p>
+                    <div className="mt-10 flex flex-col items-center gap-3 px-4 text-center">
+                      <div className="text-4xl opacity-20">💬</div>
+                      <p className="text-xs leading-5 text-white/40">
+                        Ask anything about <span className="text-white/60">{displayName}</span>.
+                        Your chat saves automatically and can be shared.
+                      </p>
+                    </div>
                   )}
                 {messages.map((msg, index) => (
                   <div
@@ -519,7 +537,13 @@ export function ChatWidget({
                           : undefined
                       }
                     >
-                      {msg.content || (loading && index === messages.length - 1 ? '...' : '')}
+                      {msg.content === '' && loading && index === messages.length - 1 ? (
+                        <span className="flex gap-1 py-0.5">
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '0ms' }} />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '150ms' }} />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '300ms' }} />
+                        </span>
+                      ) : msg.content}
                     </div>
                   </div>
                 ))}
@@ -531,25 +555,39 @@ export function ChatWidget({
                   e.preventDefault();
                   void handleSend();
                 }}
-                className="flex items-center gap-2 border-t border-white/10 px-4 py-3"
+                className="border-t border-white/10 px-4 py-3"
               >
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type a message..."
-                  disabled={loading || historyStatus === 'loading'}
-                  className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 outline-none focus:border-[#f2c879]"
-                />
-                <button
-                  type="submit"
-                  disabled={loading || historyStatus === 'loading' || !input.trim()}
-                  className="shrink-0 rounded-lg border border-black/10 px-3 py-2 text-sm font-medium transition-opacity disabled:opacity-40"
-                  style={{ backgroundColor: accentColor, color: accentTextColor }}
-                >
-                  Send
-                </button>
+                <div className="flex items-end gap-2">
+                  <textarea
+                    ref={inputRef}
+                    value={input}
+                    rows={1}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      e.target.style.height = 'auto';
+                      e.target.style.height = `${Math.min(e.target.scrollHeight, 96)}px`;
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        void handleSend();
+                      }
+                    }}
+                    placeholder="Type a message..."
+                    disabled={loading || historyStatus === 'loading'}
+                    className="min-w-0 flex-1 resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm leading-5 text-white placeholder-white/40 outline-none focus:border-[#f2c879]"
+                    style={{ maxHeight: '96px', overflowY: 'auto' }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || historyStatus === 'loading' || !input.trim()}
+                    className="shrink-0 self-end rounded-lg border border-black/10 px-3 py-2 text-sm font-medium transition-opacity disabled:opacity-40"
+                    style={{ backgroundColor: accentColor, color: accentTextColor }}
+                  >
+                    Send
+                  </button>
+                </div>
+                <p className="mt-1.5 text-[10px] text-white/25">Enter to send · Shift+Enter for newline</p>
               </form>
             </>
           ) : (
