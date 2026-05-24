@@ -1,6 +1,7 @@
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import Link from 'next/link';
 
+import { HomeProfileDemo } from '@/components/public/home-profile-demo';
 import { PublicTopBar } from '@/components/public/public-top-bar';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -67,101 +68,54 @@ export default function Home() {
 
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:44px_44px]" />
-        <div className="relative mx-auto grid min-h-[calc(100vh-8rem)] max-w-6xl items-center gap-10 px-5 pb-14 pt-12 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:pb-16 lg:pt-14">
-          <div>
+        <div className="relative mx-auto grid min-h-[calc(100vh-8rem)] max-w-6xl items-center gap-8 px-5 pb-14 pt-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10 lg:pb-16 lg:pt-12">
+          <div className="order-2 lg:order-1">
             <p className="text-sm font-medium uppercase tracking-[0.32em] text-cyan-200">
-              Personal presence, not just links
+              Interactive demo
             </p>
-            <h1 className={`${jakarta.className} mt-5 text-5xl font-bold tracking-tight text-white sm:text-7xl`}>
-              LinkChat
+            <h1 className={`${jakarta.className} mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl`}>
+              Profiles people can query
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-gray-300">
-              Replace Linktree with a personal website and an AI version of you.
-              Then give visitors shareable ways to experience your profile:
-              Encyclopedia, Newspaper, and Roast Me.
+            <p className="mt-5 max-w-xl text-base leading-7 text-gray-300 sm:text-lg sm:leading-8">
+              Visitors ask questions, switch into memory-backed modes, and share
+              Encyclopedia, Newspaper, or Roast pages — not just another link list.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-wrap gap-2">
+              {['Ask the profile', 'Browse modes', 'Share outputs'].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-gray-300 sm:text-sm"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
-                href="/create"
+                href="/sarthak"
                 className="rounded-xl bg-cyan-300 px-6 py-3 text-center text-sm font-semibold text-gray-950 transition hover:bg-cyan-200"
               >
-                Build Your Profile
+                Try Live Profile
+              </Link>
+              <Link
+                href="/create"
+                className="rounded-xl border border-white/15 bg-white/[0.04] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              >
+                Build Yours
               </Link>
               <Link
                 href="/login"
-                className="rounded-xl border border-white/15 bg-white/[0.04] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+                className="px-2 py-3 text-center text-sm font-medium text-gray-400 transition hover:text-white"
               >
-                Sign In
+                Sign in
               </Link>
-            </div>
-
-            <div className="mt-8 grid gap-2 text-sm text-gray-300 sm:grid-cols-3">
-              {['Links', 'Website', 'Chat'].map((item) => (
-                <div
-                  key={item}
-                  className="border-l border-cyan-300/50 bg-white/[0.03] px-4 py-3"
-                >
-                  {item}
-                </div>
-              ))}
             </div>
           </div>
 
-          <div className="relative">
-            <div className="rounded-[28px] border border-white/15 bg-[#181817]/95 p-5 shadow-2xl shadow-black/40">
-              <div className="flex items-center gap-4 border-b border-white/10 pb-5">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-300 text-xl font-bold text-gray-950">
-                  LC
-                </div>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.24em] text-cyan-200">
-                    sarthak.linkchat
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-white">
-                    Sarthak Agrawal
-                  </p>
-                  <p className="mt-1 text-sm text-gray-400">
-                    Builder, researcher, product person.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid border-b border-white/10 py-5 sm:grid-cols-3">
-                {['Links', 'Projects', 'DM'].map((item) => (
-                  <div
-                    key={item}
-                    className="border-white/10 py-3 text-center text-sm font-medium text-white sm:border-l first:sm:border-l-0"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-
-              <div className="py-5">
-                <p className="text-sm font-medium text-cyan-100">
-                  Ask this profile
-                </p>
-                <p className="mt-2 text-sm leading-6 text-gray-300">
-                  “What should I know before reaching out?”
-                </p>
-                <p className="mt-4 border-l border-cyan-300/60 bg-cyan-300/10 p-3 text-sm leading-6 text-gray-300">
-                  Start with the current projects. For a real reply, send a
-                  verified DM through the profile.
-                </p>
-              </div>
-
-              <div className="grid gap-3 border-t border-white/10 pt-5 sm:grid-cols-3">
-                {['Encyclopedia', 'Newspaper', 'Roast Me'].map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm font-medium text-white"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="order-1 lg:order-2">
+            <HomeProfileDemo />
           </div>
         </div>
       </section>
@@ -286,12 +240,18 @@ export default function Home() {
             Start your page before you sign in — claim your username when
             you&apos;re ready.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/create"
               className="inline-flex rounded-xl bg-cyan-300 px-7 py-3 text-sm font-semibold text-gray-950 transition hover:bg-cyan-200"
             >
               Build Your Profile
+            </Link>
+            <Link
+              href="/sarthak"
+              className="inline-flex rounded-xl border border-white/15 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.06]"
+            >
+              See Live Demo
             </Link>
           </div>
         </div>

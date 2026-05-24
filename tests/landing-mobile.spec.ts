@@ -11,22 +11,25 @@ import { expect, test } from '@playwright/test';
  * flow is verified manually against the mobile conventions doc.
  */
 test.describe('landing page', () => {
-  test('renders the hero and key sections with no horizontal scroll', async ({
+  test('renders the interactive demo and key sections with no horizontal scroll', async ({
     page,
   }) => {
     await page.goto('/');
 
-    // Hero value prop.
     await expect(
-      page.getByRole('heading', { name: 'LinkChat', level: 1 }),
+      page.getByRole('heading', { name: 'Profiles people can query', level: 1 }),
     ).toBeVisible();
 
-    // Primary CTA (the hero "Build Your Profile" link).
+    await expect(page.getByTestId('home-profile-demo')).toBeVisible();
+
     await expect(
-      page.getByRole('link', { name: /build your profile/i }).first(),
+      page.getByRole('button', { name: 'What is Sarthak building?' }),
     ).toBeVisible();
 
-    // No horizontal scroll — the page must never scroll sideways at 390px.
+    await expect(
+      page.getByRole('link', { name: /try live profile/i }).first(),
+    ).toBeVisible();
+
     const overflow = await page.evaluate(
       () =>
         document.documentElement.scrollWidth >
@@ -35,14 +38,27 @@ test.describe('landing page', () => {
     expect(overflow).toBe(false);
   });
 
+  test('demo prompts and mode tabs are interactive', async ({ page }) => {
+    await page.goto('/');
+
+    const demo = page.getByTestId('home-profile-demo');
+    await expect(demo).toBeVisible();
+
+    await demo.getByRole('button', { name: 'Encyclopedia' }).click();
+    await expect(demo.getByText('Generated from profile memory')).toBeVisible();
+
+    await demo.getByRole('button', { name: 'Chat' }).click();
+    await demo.getByRole('button', { name: 'Which project should I open first?' }).click();
+    await expect(
+      demo.getByText('Open LinkChat if you care about link-in-bio + AI profile modes.'),
+    ).toBeVisible();
+  });
+
   test('the primary CTA is a large enough touch target', async ({ page }) => {
     await page.goto('/');
-    const cta = page
-      .getByRole('link', { name: /build your profile/i })
-      .first();
+    const cta = page.getByRole('link', { name: /try live profile/i }).first();
     const box = await cta.boundingBox();
     expect(box).not.toBeNull();
-    // WCAG 2.5.5 / iOS HIG: tap targets must be at least 44x44px.
     expect(box!.height).toBeGreaterThanOrEqual(44);
   });
 });
