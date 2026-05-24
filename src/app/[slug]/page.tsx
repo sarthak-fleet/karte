@@ -15,12 +15,13 @@ import { getFullPageData } from './_lib/get-page-data';
 
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ variant?: string }>;
+  searchParams?: Promise<{ variant?: string; room?: string }>;
 };
 
 export default async function ProfilePage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { variant: variantParam } = (await searchParams) ?? {};
+  const { variant: variantParam, room: roomParam } = (await searchParams) ?? {};
+  const initialRoomId = typeof roomParam === 'string' ? roomParam : null;
   const data = await getFullPageData(slug);
   if (!data) notFound();
 
@@ -379,6 +380,7 @@ export default async function ProfilePage({ params, searchParams }: Props) {
           position={theme.chatPosition}
           chatEnabled={page.chatEnabled ?? false}
           dmMode={page.dmMode}
+          initialRoomId={initialRoomId}
         />
       )}
     </main>
