@@ -5,6 +5,12 @@ import { useCallback,useEffect, useRef, useState } from 'react';
 import { ContactFormSection } from '@/components/public/contact-form-section';
 import type { DmMode } from '@/db/schema';
 import { trackEvent } from '@/lib/analytics';
+import {
+  buildRoomShareUrl,
+  clearStoredRoomId,
+  getStoredRoomId,
+  setStoredRoomId,
+} from '@/lib/chat-room';
 import { captureActionFailure } from '@/lib/foundry-monitoring';
 import { getOrCreateVisitorId } from '@/lib/visitor-id';
 
@@ -44,6 +50,7 @@ export function ChatWidget({
   position = 'bottom-right',
   chatEnabled = true,
   dmMode = 'off',
+  initialRoomId = null,
 }: {
   slug: string;
   displayName: string;
@@ -51,6 +58,7 @@ export function ChatWidget({
   position?: ChatPosition;
   chatEnabled?: boolean;
   dmMode?: DmMode;
+  initialRoomId?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const prevOpenRef = useRef(false);
@@ -59,6 +67,11 @@ export function ChatWidget({
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [historyStatus, setHistoryStatus] = useState<
+    'idle' | 'loading' | 'error' | 'loaded'
+  >('idle');
+  const [shareCopied, setShareCopied] = useState(false);
+  const historyAttemptedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const visitorIdRef = useRef<string | null>(null);
@@ -100,6 +113,100 @@ export function ChatWidget({
     visitorIdRef.current = getOrCreateVisitorId();
   }, []);
 
+  const loadRoomHistory = useCallback(
+    async (roomId: string) => {
+      setHistoryStatus('loading');
+
+      try {
+        const res = await fetch(
+          `/api/chat/${slug}/messages?conversationId=${encodeURIComponent(roomId)}`,
+        );
+
+        if (!res.ok) {
+          if (res.status === 404) {
+            clearStoredRoomId(slug);
+            setConversationId(null);
+            setMessages([]);
+          }
+          setHistoryStatus('error');
+          return;
+        }
+
+        const msgs = (await res.json()) as Array<{
+          role: 'user' | 'assistant';
+          content: string;
+        }>;
+
+        setConversationId(roomId);
+        setStoredRoomId(slug, roomId);
+        setMessages(
+          msgs.map((msg) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+        );
+        setHistoryStatus('loaded');
+      } catch (err) {
+        captureActionFailure(err, { action: 'chat_load_history' });
+        setHistoryStatus('error');
+      }
+    },
+    [slug],
+  );
+
+  useEffect(() => {
+    if (!initialRoomId || !chatEnabled) return;
+
+    setOpen(true);
+    setMode('chat');
+    historyAttemptedRef.current = true;
+    void loadRoomHistory(initialRoomId);
+  }, [chatEnabled, initialRoomId, loadRoomHistory]);
+
+  useEffect(() => {
+    if (!open || !chatEnabled || mode !== 'chat' || historyAttemptedRef.current) {
+      return;
+    }
+
+    const roomId = initialRoomId ?? getStoredRoomId(slug);
+    if (!roomId) {
+      setHistoryStatus('loaded');
+      historyAttemptedRef.current = true;
+      return;
+    }
+
+    historyAttemptedRef.current = true;
+    void loadRoomHistory(roomId);
+  }, [chatEnabled, initialRoomId, loadRoomHistory, mode, open, slug]);
+
+  function startNewChat() {
+    clearStoredRoomId(slug);
+    setConversationId(null);
+    setMessages([]);
+    setHistoryStatus('loaded');
+    historyAttemptedRef.current = true;
+  }
+
+  async function handleShareRoom() {
+    if (!conversationId) return;
+
+    const url = buildRoomShareUrl(slug, conversationId);
+
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const inputEl = document.createElement('input');
+      inputEl.value = url;
+      document.body.appendChild(inputEl);
+      inputEl.select();
+      document.execCommand('copy');
+      document.body.removeChild(inputEl);
+    }
+
+    setShareCopied(true);
+    window.setTimeout(() => setShareCopied(false), 2000);
+  }
+
   const saveMessage = useCallback(
     async (convId: string, role: 'user' | 'assistant', content: string) => {
       try {
@@ -128,6 +235,7 @@ export function ChatWidget({
 
     const data = await res.json();
     setConversationId(data.id);
+    setStoredRoomId(slug, data.id);
     return data.id;
   }
 
@@ -322,43 +430,78 @@ export function ChatWidget({
               <h3 className="text-sm font-semibold text-white">
                 {title}
               </h3>
-              {showModeTabs && (
-                <div className="flex rounded-full border border-white/10 bg-white/5 p-1">
-                  <button
-                    type="button"
-                    onClick={() => setMode('chat')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                      mode === 'chat'
-                        ? 'bg-white text-gray-900'
-                        : 'text-white/70 hover:text-white'
-                    }`}
-                  >
-                    Chat
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMode('contact')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                      mode === 'contact'
-                        ? 'bg-white text-gray-900'
-                        : 'text-white/70 hover:text-white'
-                    }`}
-                  >
-                    DM
-                  </button>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {mode === 'chat' && chatEnabled && conversationId && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => void handleShareRoom()}
+                      className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:text-white"
+                      aria-label="Copy invite link to this chat"
+                    >
+                      {shareCopied ? 'Copied!' : 'Share'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={startNewChat}
+                      className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:text-white"
+                      aria-label="Start a new chat"
+                    >
+                      New
+                    </button>
+                  </>
+                )}
+                {showModeTabs && (
+                  <div className="flex rounded-full border border-white/10 bg-white/5 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setMode('chat')}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                        mode === 'chat'
+                          ? 'bg-white text-gray-900'
+                          : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      Chat
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMode('contact')}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                        mode === 'contact'
+                          ? 'bg-white text-gray-900'
+                          : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      DM
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {mode === 'chat' && chatEnabled ? (
             <>
               <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
-                {messages.length === 0 && (
-                  <p className="mt-8 text-center text-xs text-white/40">
-                    Ask anything about {displayName}
+                {historyStatus === 'loading' && (
+                  <p className="mt-8 text-center text-xs text-white/50">
+                    Loading your conversation...
                   </p>
                 )}
+                {historyStatus === 'error' && messages.length === 0 && (
+                  <p className="mt-8 text-center text-xs text-white/50">
+                    Couldn&apos;t load this chat room. Start a new conversation below.
+                  </p>
+                )}
+                {historyStatus !== 'loading' &&
+                  messages.length === 0 &&
+                  historyStatus !== 'error' && (
+                    <p className="mt-8 text-center text-xs text-white/40">
+                      Ask anything about {displayName}. Your chat saves automatically and
+                      can be shared with an invite link.
+                    </p>
+                  )}
                 {messages.map((msg, index) => (
                   <div
                     key={index}
@@ -396,12 +539,12 @@ export function ChatWidget({
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type a message..."
-                  disabled={loading}
+                  disabled={loading || historyStatus === 'loading'}
                   className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 outline-none focus:border-[#f2c879]"
                 />
                 <button
                   type="submit"
-                  disabled={loading || !input.trim()}
+                  disabled={loading || historyStatus === 'loading' || !input.trim()}
                   className="shrink-0 rounded-lg border border-black/10 px-3 py-2 text-sm font-medium transition-opacity disabled:opacity-40"
                   style={{ backgroundColor: accentColor, color: accentTextColor }}
                 >

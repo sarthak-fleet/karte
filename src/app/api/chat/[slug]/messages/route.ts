@@ -1,4 +1,4 @@
-import { and,eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
@@ -104,7 +104,8 @@ export async function GET(
   const msgs = await db
     .select()
     .from(messages)
-    .where(eq(messages.conversationId, conversationId));
+    .where(eq(messages.conversationId, conversationId))
+    .orderBy(asc(messages.createdAt));
 
   return NextResponse.json(msgs);
 }
