@@ -28,8 +28,15 @@ type RevampBlock = {
   buttonUrl?: string | null;
 };
 
+type CustomColors = {
+  gradientFrom: string;
+  gradientTo: string;
+  accentColor: string;
+};
+
 type RevampPlan = {
   themePresetId: ThemePresetId;
+  customColors?: CustomColors;
   headline: string;
   rationale: string;
   emphasis: string[];
@@ -57,10 +64,27 @@ function extractJson(text: string) {
   return text;
 }
 
+function isHexColor(v: unknown): v is string {
+  return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim());
+}
+
 function normalizePlan(value: unknown): RevampPlan {
   const source = value && typeof value === 'object' ? value as Record<string, unknown> : {};
   const requestedTheme = typeof source.themePresetId === 'string' ? source.themePresetId : '';
   const themePresetId = isThemePresetId(requestedTheme) ? requestedTheme : 'midnight';
+
+  const rawColors = source.customColors;
+  let customColors: CustomColors | undefined;
+  if (rawColors && typeof rawColors === 'object') {
+    const c = rawColors as Record<string, unknown>;
+    if (isHexColor(c.gradientFrom) && isHexColor(c.gradientTo) && isHexColor(c.accentColor)) {
+      customColors = {
+        gradientFrom: c.gradientFrom.trim(),
+        gradientTo: c.gradientTo.trim(),
+        accentColor: c.accentColor.trim(),
+      };
+    }
+  }
   const rawBlocks = Array.isArray(source.blocks) ? source.blocks : [];
   const blocks = rawBlocks
     .map((raw): RevampBlock | null => {
@@ -107,6 +131,7 @@ function normalizePlan(value: unknown): RevampPlan {
 
   return {
     themePresetId,
+    ...(customColors ? { customColors } : {}),
     headline: clampText(source.headline, 'Sharper profile narrative', 90),
     rationale: clampText(
       source.rationale,
@@ -169,9 +194,10 @@ async function generatePlan(opts: {
   if (!aiConfig) return fallbackPlan(prompt, page);
 
   const result = await generate(aiConfig, {
-    system: `You are a product-minded profile designer for LinkChat.
+    system: `You are a product-minded profile designer for Karte.
 Return only valid JSON. Do not use markdown.
-You may only choose one of these themePresetId values: ${THEME_PRESETS.map((theme) => theme.id).join(', ')}.
+You must choose a themePresetId from: ${THEME_PRESETS.map((theme) => `${theme.id} (${theme.description})`).join(', ')}.
+If the user requests a specific color scheme or visual style not well served by the presets, you may also include a "customColors" object with gradientFrom, gradientTo, and accentColor fields as 6-digit hex codes (e.g. "#8b00ff"). Custom colors override the preset's colors. Only include customColors if the user's design intent clearly calls for it.
 You may recommend at most 3 new public blocks.
 Allowed block types: text, blog, cta, social, testimonial, contact.
 Every block title must be short. Blog content format is one post per line: Title | URL | Short description | Date.
@@ -204,6 +230,7 @@ Do not suggest deleting user content. Prefer adding clarifying blocks and changi
       })),
       requiredJsonShape: {
         themePresetId: 'midnight',
+        customColors: '(optional) { gradientFrom: "#hex", gradientTo: "#hex", accentColor: "#hex" } — only include if user requested a specific color scheme',
         headline: 'Short name for the revamp',
         rationale: 'Why this structure works',
         emphasis: ['ordered list of public blocks to emphasize'],
@@ -232,7 +259,10 @@ async function applyPlan(pageId: string, plan: RevampPlan) {
     await tx
       .update(pages)
       .set({
-        themeConfig: resolveThemeConfig({ presetId: plan.themePresetId }),
+        themeConfig: resolveThemeConfig({
+          presetId: plan.themePresetId,
+          ...(plan.customColors ?? {}),
+        }),
         updatedAt: new Date(),
       })
       .where(eq(pages.id, pageId));
