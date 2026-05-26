@@ -88,7 +88,7 @@ export function RoastPageClient({
 
   const handleShareX = useCallback(() => {
     const url = `${window.location.origin}/${slug}/roast`;
-    const text = `I just got roasted by AI on LinkChat. Vibe score: ${roast?.vibeScore}/100. Think you can handle it?`;
+    const text = `I just got roasted by AI on Karte. Vibe score: ${roast?.vibeScore}/100. Think you can handle it?`;
     window.open(
       `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
       '_blank'
@@ -108,7 +108,7 @@ export function RoastPageClient({
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.28em] text-[#00ffd5]">
-                LinkChat Roast Lab
+                Karte Roast Lab
               </p>
               <h2 className="mt-3 text-2xl font-black uppercase leading-tight text-white sm:text-4xl">
                 Roasting {displayName}
@@ -207,7 +207,7 @@ export function RoastPageClient({
         <div ref={captureRef} className="space-y-8 bg-[#12020b] px-2 py-2 sm:px-6 sm:py-6">
           <div className="mx-auto max-w-4xl border-4 border-white bg-[#210815] px-5 py-8 text-center shadow-[16px_16px_0_#f9ff00]">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.32em] text-[#00ffd5]">
-              LinkChat Roast Me
+              Karte Roast Me
             </p>
             <h1
               className="text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-7xl"

@@ -84,7 +84,7 @@ export default async function RoastPage({
             {page.displayName}
           </Link>
           <span className="rotate-1 border border-[#00ffd5] px-2 py-1 text-xs font-black tracking-wide text-[#00ffd5]">
-            LinkChat Roast Lab
+            Karte Roast Lab
           </span>
         </div>
       </header>

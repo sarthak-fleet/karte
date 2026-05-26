@@ -29,7 +29,7 @@ export async function GET(
   if (page.avatarUrl) lines.push(`PHOTO:${page.avatarUrl}`);
 
   // Primary URL — the profile page itself.
-  lines.push(`URL;TYPE=profile:https://linkchat.bio/${encodeURIComponent(slug)}`);
+  lines.push(`URL;TYPE=profile:https://karte.cc/${encodeURIComponent(slug)}`);
 
   for (const link of links) {
     if (!link.url) continue;
@@ -37,7 +37,7 @@ export async function GET(
     lines.push(`URL;TYPE=${escapeVCardValue(type || "link")}:${link.url}`);
   }
 
-  lines.push(`UID:linkchat-${slug}`);
+  lines.push(`UID:karte-${slug}`);
   lines.push(`REV:${new Date().toISOString()}`);
   lines.push("END:VCARD");
 

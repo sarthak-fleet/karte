@@ -1,6 +1,6 @@
 'use client';
 
-const roomStorageKey = (slug: string) => `linkchat:room:${slug}`;
+const roomStorageKey = (slug: string) => `karte:room:${slug}`;
 
 export function getStoredRoomId(slug: string): string | null {
   if (typeof window === 'undefined') return null;

@@ -28,7 +28,7 @@ function shouldPassThrough(pathname: string): boolean {
 }
 
 function alreadyRewritten(request: NextRequest): boolean {
-  return request.headers.has('x-linkchat-domain-slug');
+  return request.headers.has('x-karte-domain-slug');
 }
 
 export async function middleware(request: NextRequest) {
@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
     const rest = url.pathname === '/' ? '' : url.pathname;
     url.pathname = `/${slug}${rest}`;
     const res = NextResponse.rewrite(url);
-    res.headers.set('x-linkchat-domain-slug', slug);
+    res.headers.set('x-karte-domain-slug', slug);
     return res;
   }
 

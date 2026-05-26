@@ -111,7 +111,7 @@ async function fetchText(url: string, timeoutMs: number): Promise<string | null>
       signal: controller.signal,
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (compatible; LinkChatBot/1.0; +https://linkchat.dev)',
+          'Mozilla/5.0 (compatible; KarteBot/1.0; +https://karte.cc)',
         Accept: 'text/html,application/xhtml+xml,text/plain',
       },
       redirect: 'follow',
@@ -140,7 +140,7 @@ async function fetchReaderText(url: string, timeoutMs: number): Promise<string |
       signal: controller.signal,
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (compatible; LinkChatBot/1.0; +https://linkchat.dev)',
+          'Mozilla/5.0 (compatible; KarteBot/1.0; +https://karte.cc)',
         Accept: 'text/plain,text/markdown',
       },
       redirect: 'follow',

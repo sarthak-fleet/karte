@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About — Linkchat",
+  title: "About — Karte",
   description:
-    "Linkchat is a link-in-bio that talks back. Chat, encyclopedia, roast, and newspaper modes powered by AI on top of your profile content.",
+    "Karte is a link-in-bio that talks back. Chat, encyclopedia, roast, and newspaper modes powered by AI on top of your profile content.",
 };
 
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 text-stone-200">
       <Link href="/" className="text-xs text-stone-500 hover:underline">
-        ← Linkchat
+        ← Karte
       </Link>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-white">
         About
       </h1>
       <p className="mt-4 text-sm leading-6 text-stone-400">
-        Linkchat is a link-in-bio with personality. Visitors don&apos;t
+        Karte is a link-in-bio with personality. Visitors don&apos;t
         just see a list of URLs — they get to interact with your
         profile through one of four AI-enhanced lenses.
       </p>

@@ -175,7 +175,7 @@ export function AiKeySettings({
         <h2 className="mb-1 text-lg font-semibold text-white">AI Endpoint</h2>
         <p className="mb-4 text-sm text-gray-400">
           {isUsingDefaultAi
-            ? 'LinkChat AI is configured by default. Add your own endpoint only if you want to override it.'
+            ? 'Karte AI is configured by default. Add your own endpoint only if you want to override it.'
             : aiConfigured
             ? 'Your AI endpoint is configured. Update any field below.'
             : 'Connect any OpenAI-compatible endpoint to power AI features.'}

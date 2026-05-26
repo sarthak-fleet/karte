@@ -1,22 +1,22 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Terms — Linkchat",
-  description: "Use of Linkchat is provided as-is. You own your profile content.",
+  title: "Terms — Karte",
+  description: "Use of Karte is provided as-is. You own your profile content.",
 };
 
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 text-sm leading-7 text-stone-300">
       <Link href="/" className="text-xs text-stone-500 hover:underline">
-        ← Linkchat
+        ← Karte
       </Link>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-white">Terms</h1>
       <p className="mt-4 text-xs text-stone-500">Last updated: 2026-05-15.</p>
 
       <h2 className="mt-8 text-base font-semibold text-white">Your content</h2>
       <p className="mt-2">
-        You own the content you put in your Linkchat profile. By creating
+        You own the content you put in your Karte profile. By creating
         a public profile you grant the service the rights necessary to
         display that content to visitors and pass it to the AI provider
         configured for chat modes.

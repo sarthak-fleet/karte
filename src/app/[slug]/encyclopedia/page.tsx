@@ -50,7 +50,7 @@ export default async function EncyclopediaPage({
                   <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                 </svg>
                 <span className="text-sm font-semibold text-gray-800">
-                  LinkChat Encyclopedia
+                  Karte Encyclopedia
                 </span>
               </div>
               <span className="hidden text-xs text-gray-400 sm:inline">
@@ -119,7 +119,7 @@ export default async function EncyclopediaPage({
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
               <span className="text-sm font-semibold text-gray-800">
-                LinkChat Encyclopedia
+                Karte Encyclopedia
               </span>
             </div>
             <span className="hidden text-xs text-gray-400 sm:inline">

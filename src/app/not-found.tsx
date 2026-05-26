@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Not found — Linkchat" };
+export const metadata = { title: "Not found — Karte" };
 
 export default function NotFound() {
   return (

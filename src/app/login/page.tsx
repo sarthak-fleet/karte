@@ -49,7 +49,7 @@ export default async function LoginPage() {
                   LC
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-white">LinkChat</p>
+                  <p className="text-lg font-semibold text-white">Karte</p>
                   <p className="text-xs text-gray-400">Creator dashboard</p>
                 </div>
               </div>

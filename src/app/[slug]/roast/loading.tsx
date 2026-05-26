@@ -5,7 +5,7 @@ export default function RoastLoading() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.28em] text-[#00ffd5]">
-              LinkChat Roast Lab
+              Karte Roast Lab
             </p>
             <h1 className="mt-3 text-2xl font-black uppercase leading-tight text-white sm:text-4xl">
               Loading the public vibe inspection

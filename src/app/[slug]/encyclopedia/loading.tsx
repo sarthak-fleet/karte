@@ -5,7 +5,7 @@ export default function EncyclopediaLoading() {
         <div className="grid border-b border-gray-200 bg-[#f8f9fa] sm:grid-cols-[1fr_240px]">
           <div className="px-5 py-5 sm:px-7">
             <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-              LinkChat Encyclopedia
+              Karte Encyclopedia
             </p>
             <h1 className="mt-2 font-serif text-3xl text-gray-950 sm:text-4xl">
               Loading the article

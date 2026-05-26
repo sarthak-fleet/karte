@@ -51,7 +51,7 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
     return (
       <div className="w-full max-w-3xl border border-[#1c1a14]/30 bg-[#f7f0df] p-5 text-[#17130d] shadow-[0_28px_90px_-55px_rgba(0,0,0,0.75)] sm:p-8">
         <style jsx>{`
-          @keyframes linkchat-news-flip {
+          @keyframes karte-news-flip {
             0% {
               transform: perspective(820px) rotateY(0deg) translateX(0);
               opacity: 0.3;
@@ -69,7 +69,7 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
             }
           }
 
-          @keyframes linkchat-ink-pass {
+          @keyframes karte-ink-pass {
             0% {
               transform: translateX(-110%);
             }
@@ -79,7 +79,7 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
           }
 
           .news-flip-sheet {
-            animation: linkchat-news-flip 1.85s ease-in-out infinite;
+            animation: karte-news-flip 1.85s ease-in-out infinite;
             backface-visibility: hidden;
             transform-origin: left center;
           }
@@ -93,7 +93,7 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
           }
 
           .ink-pass::after {
-            animation: linkchat-ink-pass 1.45s ease-in-out infinite;
+            animation: karte-ink-pass 1.45s ease-in-out infinite;
           }
         `}</style>
         <div className="border-b-2 border-[#17130d] pb-4 text-center">

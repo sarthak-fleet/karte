@@ -44,7 +44,7 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
         // `signup` fires the first time a user is seen in this browser;
         // `returned` fires on every later session for a known user.
         try {
-          const key = `linkchat:seen:${session.user.id}`;
+          const key = `karte:seen:${session.user.id}`;
           if (window.localStorage.getItem(key)) {
             trackReturned();
           } else {

@@ -91,7 +91,7 @@ export function Sidebar({ slug }: { slug?: string }) {
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-gray-500">
-              LinkChat
+              Karte
             </p>
             <p className="truncate text-sm font-semibold text-white">
               {pageTitle}
@@ -136,7 +136,7 @@ export function Sidebar({ slug }: { slug?: string }) {
                 className="text-lg font-bold text-white"
                 onClick={() => setMobileOpen(false)}
               >
-                LinkChat
+                Karte
               </Link>
               <button
                 type="button"
@@ -156,7 +156,7 @@ export function Sidebar({ slug }: { slug?: string }) {
       <aside className="hidden h-screen w-64 shrink-0 flex-col border-r border-white/10 bg-gray-950 lg:flex">
         <div className="px-6 py-6">
           <Link href="/dashboard" className="text-xl font-bold text-white">
-            LinkChat
+            Karte
           </Link>
         </div>
 

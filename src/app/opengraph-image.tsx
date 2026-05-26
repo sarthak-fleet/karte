@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
  * Next.js serves this at `/opengraph-image` and wires it into the page's
  * OpenGraph + Twitter card metadata automatically. No binary asset to ship.
  */
-export const alt = "LinkChat — Your links, your story, your AI";
+export const alt = "Karte — Your digital card";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -42,7 +42,7 @@ export default function OpengraphImage() {
           >
             LC
           </div>
-          <div style={{ fontSize: 40, fontWeight: 700 }}>LinkChat</div>
+          <div style={{ fontSize: 40, fontWeight: 700 }}>Karte</div>
         </div>
         <div
           style={{
@@ -53,7 +53,7 @@ export default function OpengraphImage() {
             maxWidth: "960px",
           }}
         >
-          Your links, your story, your AI.
+          Your digital card on the open web.
         </div>
         <div
           style={{
@@ -63,7 +63,7 @@ export default function OpengraphImage() {
             maxWidth: "900px",
           }}
         >
-          A personal site and an AI version of you — replacing your link-in-bio.
+          One page, one link. Links, projects, bio, and an AI version of you.
         </div>
       </div>
     ),

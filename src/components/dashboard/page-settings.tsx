@@ -32,7 +32,7 @@ interface PageSettingsProps {
   loginHref?: string;
 }
 
-const PAGE_DRAFT_STORAGE_KEY = 'linkchat:page-draft';
+const PAGE_DRAFT_STORAGE_KEY = 'karte:page-draft';
 const DM_MODE_OPTIONS: Array<{
   value: DmMode;
   label: string;
@@ -314,7 +314,7 @@ export function PageSettings({
                       className="text-[11px] font-medium uppercase tracking-[0.32em]"
                       style={{ color: previewTheme.accentColor }}
                     >
-                      linkchat.com/{previewSlug}
+                      karte.cc/{previewSlug}
                     </p>
                     <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
                       {previewDisplayName}
@@ -368,7 +368,7 @@ export function PageSettings({
             Page URL
           </label>
           <div className="flex items-center rounded-lg border border-white/20 bg-white/5 backdrop-blur-sm transition focus-within:border-white/40 focus-within:ring-1 focus-within:ring-white/20">
-            <span className="pl-4 text-sm text-gray-400">linkchat.com/</span>
+            <span className="pl-4 text-sm text-gray-400">karte.cc/</span>
             <input
               id="slug"
               type="text"

@@ -1,6 +1,6 @@
 'use client';
 
-const VISITOR_ID_KEY = 'linkchat_visitor_id';
+const VISITOR_ID_KEY = 'karte_visitor_id';
 const COOKIE_NAME = 'lc_vid';
 
 function getCookie(name: string): string | null {

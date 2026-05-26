@@ -220,7 +220,7 @@ async function generatePlan(opts: {
   }
 
   const result = await generate(aiConfig, {
-    system: `You enrich LinkChat profiles from public linked sources.
+    system: `You enrich Karte profiles from public linked sources.
 Return only valid JSON. Use only the supplied links, projects, and scraped source cards.
 Do not invent education, employers, awards, dates, locations, private contact details, or claims not present in the sources.
 Prefer concrete projects and chat-useful memory. Keep wording concise and commercially polished.`,

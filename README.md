@@ -101,3 +101,23 @@ pnpm drizzle-kit studio     # Drizzle Studio UI
 ```bash
 pnpm deploy:cf
 ```
+
+<!-- ACTIVE-AI-TASK-LOG:START -->
+## Active AI Task Log
+
+This section is maintained by the SaaS Maker Active-AI product/design loop so future agents do not reopen duplicate UI tasks.
+
+- Business lane: P0 Can make money
+- Rule: do not create another broad "improve the UI" task unless the acceptance criteria differ materially from the tasks listed here.
+- Source of truth for task status: SaaS Maker task board. README entries are durable context only.
+
+| Task | Status | Priority | Last known note |
+| --- | --- | --- | --- |
+| `3fcb5888` linkchat: full product revamp pass | done | high | 2026-05-26 — hero subtext sharpened; profile right panel hidden when no chat/DM; disabled mode cards no longer shown; top bar "LC"→"K" brand fix |
+| `e01c6bf1` linkchat: add mobile first-message prompt | done | medium | 2026-05-26 — empty-state CTA + starter prompts, larger mobile composer, animated send button on first message |
+| `4e106b44` linkchat: add room safety and expiry proof | done | high | 2026-05-26 |
+| `e2d78f91` Karte: prove the share-link card loop before signup | done | high | 2026-05-26 |
+| `787f89c6` linkchat: add guest join preview state | done | high | 2026-05-26 |
+| `8f82f522` linkchat: review and ship local homepage UI change | done | high | 2026-05-25 18:51:20 |
+| `04c40ddb` linkchat: homepage needs 3-second value + obvious CTA + mode demo | done | high | 2026-05-25 17:07:41 |
+<!-- ACTIVE-AI-TASK-LOG:END -->

@@ -248,7 +248,7 @@ export async function ensureProjectsTable() {
         ON pageDomains (pageId)
       `);
 
-      // Add LinkChat-specific columns to the Better Auth user table if missing.
+      // Add Karte-specific columns to the Better Auth user table if missing.
       const userColumns = await client.execute('PRAGMA table_info("user")');
       const userColNames = new Set(userColumns.rows.map((r) => (r as { name?: string }).name));
 

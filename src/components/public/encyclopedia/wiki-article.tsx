@@ -27,7 +27,7 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
               </div>
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#54595d]">
-                  LinkChat Encyclopedia
+                  Karte Encyclopedia
                 </p>
                 <p className="mt-0.5 text-xs text-[#72777d]">
                   Public profile article
@@ -70,7 +70,7 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
             </header>
 
             <p className="mb-5 border-l-4 border-[#a7d7f9] bg-[#f8f9fa] px-3 py-2 text-xs italic text-[#54595d]">
-              From LinkChat Encyclopedia, a source-backed profile article generated from public profile memory.
+              From Karte Encyclopedia, a source-backed profile article generated from public profile memory.
             </p>
 
             <WikiInfobox

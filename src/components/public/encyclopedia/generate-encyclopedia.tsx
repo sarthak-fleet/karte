@@ -55,7 +55,7 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
           <div className="grid border-b border-gray-200 bg-[#f8f9fa] sm:grid-cols-[1fr_220px]">
             <div className="px-5 py-5 sm:px-7">
               <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-                LinkChat Encyclopedia
+                Karte Encyclopedia
               </p>
               <h1 className="mt-2 font-serif text-3xl text-gray-950 sm:text-4xl">
                 Assembling the article
@@ -114,7 +114,7 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
       <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-300 bg-white shadow-[0_24px_80px_-50px_rgba(0,0,0,0.7)]">
         <div className="border-b border-gray-200 bg-[#f8f9fa] px-5 py-4 sm:px-7">
           <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-            LinkChat Encyclopedia
+            Karte Encyclopedia
           </p>
           <h1 className="mt-2 font-serif text-3xl text-gray-950">
             {slug}&apos;s article is not published yet

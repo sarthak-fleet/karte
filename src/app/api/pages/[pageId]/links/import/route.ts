@@ -209,7 +209,7 @@ async function fetchSource(sourceUrl: string) {
       signal: controller.signal,
       headers: {
         Accept: 'text/html,application/xhtml+xml',
-        'User-Agent': 'Mozilla/5.0 (compatible; LinkChatImporter/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; KarteImporter/1.0)',
       },
       redirect: 'follow',
     });

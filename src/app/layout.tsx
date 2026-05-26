@@ -18,32 +18,32 @@ const geistMono = Geist_Mono({
 
 const SITE_URL = "https://linkchat.sarthakagrawal927.workers.dev";
 const SITE_DESCRIPTION =
-  "Replace Linktree with a personal website and an AI version of you. Then give visitors shareable ways to experience your profile: Encyclopedia, Newspaper, and Roast Me.";
+  "Your digital card on the open web — links, projects, bio, and an AI version of you. One page, one link: karte.cc/yourhandle.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "LinkChat — Your links, your story, your AI",
-    template: "%s — LinkChat",
+    default: "Karte — Your digital card",
+    template: "%s — Karte",
   },
   description: SITE_DESCRIPTION,
-  applicationName: "LinkChat",
+  applicationName: "Karte",
   keywords: [
     "link in bio",
     "personal website",
-    "AI profile",
+    "digital card",
     "Linktree alternative",
   ],
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "LinkChat",
-    title: "LinkChat — Your links, your story, your AI",
+    siteName: "Karte",
+    title: "Karte — Your digital card",
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "LinkChat — Your links, your story, your AI",
+    title: "Karte — Your digital card",
     description: SITE_DESCRIPTION,
   },
 };

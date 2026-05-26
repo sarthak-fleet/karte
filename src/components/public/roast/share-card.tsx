@@ -119,10 +119,10 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         {/* Watermark */}
         <div className="relative z-10 flex items-center justify-between">
           <span className="text-xs text-gray-600">
-            linkchat.com/{slug}
+            karte.cc/{slug}
           </span>
           <span className="text-xs text-gray-600">
-            LinkChat Roast
+            Karte Roast
           </span>
         </div>
       </div>

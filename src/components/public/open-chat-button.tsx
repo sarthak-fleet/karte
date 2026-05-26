@@ -45,7 +45,7 @@ export function OpenChatButton({
           });
         }
 
-        window.dispatchEvent(new CustomEvent('linkchat:open-widget', {
+        window.dispatchEvent(new CustomEvent('karte:open-widget', {
           detail: { mode, prompt, autoSend },
         }));
       }}

@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy — Linkchat",
-  description: "What Linkchat stores and what it never sends to third parties.",
+  title: "Privacy — Karte",
+  description: "What Karte stores and what it never sends to third parties.",
 };
 
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 text-sm leading-7 text-stone-300">
       <Link href="/" className="text-xs text-stone-500 hover:underline">
-        ← Linkchat
+        ← Karte
       </Link>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-white">Privacy</h1>
       <p className="mt-4 text-xs text-stone-500">Last updated: 2026-05-15.</p>
