@@ -154,7 +154,7 @@ function fallbackPlan(prompt: string, page: typeof pages.$inferSelect): RevampPl
         : 'midnight';
   const appUrl = process.env.NEXT_PUBLIC_APP_URL
     || process.env.BETTER_AUTH_URL
-    || 'https://linkchat.sarthakagrawal927.workers.dev';
+    || 'https://karte.cc';
 
   return {
     themePresetId,

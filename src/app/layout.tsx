@@ -23,7 +23,7 @@ const instrumentSerif = Instrument_Serif({
   style: "italic",
 });
 
-const SITE_URL = "https://linkchat.sarthakagrawal927.workers.dev";
+const SITE_URL = "https://karte.cc";
 const SITE_DESCRIPTION =
   "Your digital card on the open web — links, projects, bio, and an AI version of you. One page, one link: karte.cc/yourhandle.";
 

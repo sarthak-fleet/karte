@@ -37,7 +37,7 @@
     }
   ],
   "vars": {
-    "BETTER_AUTH_URL": "https://linkchat.sarthakagrawal927.workers.dev",
+    "BETTER_AUTH_URL": "https://karte.cc",
     "NEXT_PUBLIC_APP_URL": "https://karte.cc",
     "LINKCHAT_DEFAULT_AI_ENDPOINT_URL": "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",
     "LINKCHAT_DEFAULT_AI_MODEL": "groq/llama-3.3-70b-versatile"

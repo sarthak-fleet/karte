@@ -70,7 +70,7 @@ export function getCustomDomainCnameTarget(): string {
     process.env.NEXT_PUBLIC_CUSTOM_DOMAIN_CNAME_TARGET ??
     process.env.CLOUDFLARE_CUSTOM_HOSTNAME_CNAME_TARGET;
   if (explicit) return normalizeHostname(explicit) ?? explicit.trim();
-  return getAppHost() ?? 'linkchat.sarthakagrawal927.workers.dev';
+  return getAppHost() ?? 'karte.cc';
 }
 
 export function getDnsInstructions(hostname: string): DnsInstruction[] {
