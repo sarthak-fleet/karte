@@ -2,6 +2,14 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "linkchat",
   "main": ".open-next/worker.js",
+  // Worker serves: karte.cc apex + any *.karte.cc subdomain. Custom hostnames
+  // (Cloudflare for SaaS) attach to the zone via the CF API in
+  // src/lib/cloudflare-domains.ts. Requires the karte.cc zone in this account
+  // and secrets CLOUDFLARE_API_TOKEN + CLOUDFLARE_ZONE_ID via `wrangler secret put`.
+  "routes": [
+    { "pattern": "karte.cc/*", "zone_name": "karte.cc" },
+    { "pattern": "*.karte.cc/*", "zone_name": "karte.cc" }
+  ],
   "compatibility_date": "2024-12-30",
   "compatibility_flags": ["nodejs_compat_v2", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
