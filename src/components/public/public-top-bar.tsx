@@ -46,11 +46,11 @@ export async function PublicTopBar({
 
   if (variant === 'minimal') {
     return (
-      <nav className="sticky top-0 z-30 border-b border-white/[0.04] bg-[#0a0a0a]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-30 border-b border-white/[0.04] bg-karte-bg/80 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <Link
             href="/"
-            className="group flex items-center gap-2.5 transition-opacity duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:opacity-90"
+            className="group flex items-center gap-2.5 transition-opacity duration-200 ease-[var(--karte-ease)] hover:opacity-90"
           >
             <svg
               aria-hidden="true"
@@ -67,7 +67,7 @@ export async function PublicTopBar({
               <circle cx="16.5" cy="15.5" r="1.25" fill="#0a0a0a" />
               <circle cx="20" cy="15.5" r="1.25" fill="#0a0a0a" />
             </svg>
-            <span className="text-[15px] font-semibold tracking-[-0.01em] text-white">
+            <span className="text-[15px] font-semibold tracking-[-0.01em] text-karte-text">
               Karte
             </span>
           </Link>
@@ -78,17 +78,17 @@ export async function PublicTopBar({
                 {userPage?.slug && current !== 'profile' && (
                   <Link
                     href={`/${userPage.slug}`}
-                    className="hidden text-[13px] font-medium text-zinc-400 transition-colors duration-200 hover:text-white sm:inline-flex"
+                    className="hidden text-[13px] font-medium text-karte-text-3 transition-colors duration-200 hover:text-karte-text sm:inline-flex"
                   >
                     My profile
                   </Link>
                 )}
                 <Link
                   href="/dashboard"
-                  className="group inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-medium text-zinc-950 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-zinc-100"
+                  className="group inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-medium text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:bg-zinc-100"
                 >
                   Dashboard
-                  <span className="transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5">
+                  <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">
                     →
                   </span>
                 </Link>
@@ -97,16 +97,16 @@ export async function PublicTopBar({
               <>
                 <Link
                   href="/login"
-                  className="text-[13px] font-medium text-zinc-400 transition-colors duration-200 hover:text-white"
+                  className="text-[13px] font-medium text-karte-text-3 transition-colors duration-200 hover:text-karte-text"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/create"
-                  className="group inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-medium text-zinc-950 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-zinc-100"
+                  className="group inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-medium text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:bg-zinc-100"
                 >
                   Claim your name
-                  <span className="transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5">
+                  <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">
                     →
                   </span>
                 </Link>
@@ -127,7 +127,7 @@ export async function PublicTopBar({
         <Link href="/" className="min-w-0 transition hover:opacity-85">
           <span className="flex items-center gap-3">
             <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border text-sm font-bold text-white"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border text-sm font-bold text-karte-text"
               style={{
                 borderColor: `${accentColor}40`,
                 backgroundColor: `${accentColor}14`,
@@ -136,8 +136,8 @@ export async function PublicTopBar({
               K
             </span>
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-white sm:text-base">Karte</span>
-              <span className="hidden text-xs text-white/45 md:block">
+              <span className="block text-sm font-semibold text-karte-text sm:text-base">Karte</span>
+              <span className="hidden text-xs text-karte-text/45 md:block">
                 Your digital card on the open web
               </span>
             </span>
@@ -150,19 +150,19 @@ export async function PublicTopBar({
               {userPage?.slug && current !== 'profile' && (
                 <Link
                   href={`/${userPage.slug}`}
-                  className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/10 sm:text-sm"
+                  className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
                 >
                   My Profile
                 </Link>
               )}
               <Link
                 href="/dashboard"
-                className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/10 sm:text-sm"
+                className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
               >
                 Dashboard
               </Link>
               <div
-                className="flex items-center gap-2 rounded-full border px-2 py-1.5 text-white"
+                className="flex items-center gap-2 rounded-full border px-2 py-1.5 text-karte-text"
                 style={{ borderColor: `${accentColor}40`, backgroundColor: `${accentColor}12` }}
               >
                 {session?.user?.image ? (
@@ -192,7 +192,7 @@ export async function PublicTopBar({
               {current !== 'create' && (
                 <Link
                   href="/create"
-                  className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/10 sm:text-sm"
+                  className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
                 >
                   Start Profile
                 </Link>
