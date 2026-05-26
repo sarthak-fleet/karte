@@ -226,13 +226,74 @@ Source: <https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-f
 
 ---
 
+## ⚠ Known platform limitation: tenant hostnames won't actually serve
+
+Custom hostnames (e.g. `karte.sarthakagrawal.dev`) currently **verify** via
+Cloudflare for SaaS but **do not serve traffic to the Worker**. They return
+HTTP 522 from the CF edge.
+
+### Why
+
+Cloudflare for SaaS, when proxying a verified custom hostname through the
+fallback origin, makes an **actual TCP connection** to the resolved IP of the
+fallback hostname — bypassing Worker route matching entirely. Worker routes
+only match when CF receives a request *directly* for the worker's bound
+hostnames (`karte.cc/*` etc.), not when CF internally forwards a SaaS request.
+
+This means the standard CF-for-SaaS pattern — "set the fallback origin to a
+proxied record on your zone, let your worker route catch it" — doesn't work
+with bare Cloudflare Workers.
+
+### Supported architectures
+
+1. **Workers for Platforms** (paid, enterprise tier). Different product from
+   regular Workers. Uses dispatch namespaces to attach workers directly to
+   custom hostnames — no fallback-origin TCP hop. The right long-term path
+   for a multi-tenant SaaS on the CF platform.
+2. **Non-CF origin** (a real HTTP server elsewhere, e.g. Fly.io / Render / a
+   VPS). CF for SaaS proxies to that origin. Worker would only handle
+   `karte.cc` traffic, not custom hostnames.
+3. **Approximated.app** or similar third-party SaaS-domain proxies. They
+   handle SSL + hostname routing as a managed service and forward to your
+   origin (which can be the workers.dev URL).
+
+### What we've configured anyway
+
+So that the dashboard UI works end-to-end for adding/verifying (even though
+the final serving doesn't yet):
+
+- CF for SaaS enabled on `karte.cc` zone with Custom Hostnames feature on
+- `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ZONE_ID` secrets set
+- Fallback origin: `karte.cc`, with a proxied A record on the apex pointing
+  to `192.0.2.1` (RFC 5737 test IP) — required by CF as "a proxied DNS
+  record exists", but unreachable in practice
+- Worker route `karte.cc/*` catches direct traffic — landing, dashboard,
+  `/<slug>` profiles all work
+- `origin.karte.cc` registered as a Worker Custom Domain (separate from the
+  fallback path)
+
+Tenant-added hostnames:
+- ✅ Register on CF (TXT validation works)
+- ✅ Show as `verified` once SSL is issued
+- ❌ Return 522 when visited (until we migrate to one of the architectures
+  above)
+
+### What to do in the UI
+
+Until the architecture migration: surface a clear "Coming soon — verified
+hostnames don't yet serve traffic" banner in the domain editor. Don't claim
+the feature is fully working.
+
 ## Future improvements
 
+- **Migrate to Workers for Platforms** (or pick architecture option 2 / 3
+  above). This is the unblocker for actually serving tenant custom hostnames.
 - **Auto-poll while verifying.** The dashboard currently requires a manual
   "Retry verify" click. Polling every 30s would flip the status without user
   action.
-- **Pre-flight DNS check.** A "Check DNS now" button that runs `dig` server-side
-  and shows what's actually propagating vs not, before the user touches CF.
+- **Pre-flight DNS check.** A "Check DNS now" button that runs `dig`
+  server-side and shows what's actually propagating vs not, before the user
+  touches CF.
 - **Bulk-import.** API endpoint that accepts a CSV of hostname→slug pairs for
   large-customer migrations.
 - **Duplicate-registration detection.** Surface a warning in the UI when CF

@@ -155,6 +155,24 @@ export function DomainEditor({
 
   return (
     <div className="space-y-6">
+      <div className="rounded-2xl border border-amber-300/25 bg-amber-300/[0.04] p-4">
+        <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-amber-200">
+          <span className="text-amber-300">·</span> Beta · limited
+        </p>
+        <p className="mt-2 text-[13px] leading-[1.55] text-karte-text-2">
+          Custom hostnames register and verify cleanly, but{' '}
+          <span className="text-karte-text">don&apos;t yet serve traffic</span> —
+          Cloudflare for SaaS on bare Workers has a platform constraint we
+          haven&apos;t worked around yet. Verified hostnames return HTTP 522 when
+          visited. For now: share your profile via{' '}
+          <code className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[12px]">
+            karte.cc/&lt;your-slug&gt;
+          </code>{' '}
+          instead. See <code className="text-karte-text-3">docs/custom-domains.md</code>{' '}
+          for the architecture migration needed to unblock this.
+        </p>
+      </div>
+
       <form
         onSubmit={add}
         className="flex flex-col gap-3 rounded-2xl border border-karte-border bg-white/[0.03] p-4 sm:flex-row sm:items-end"
