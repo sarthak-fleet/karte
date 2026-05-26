@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "linkchat",
   "main": ".open-next/worker.js",
+  "workers_dev": true,
   // Worker serves: karte.cc apex + any *.karte.cc subdomain. Custom hostnames
   // (Cloudflare for SaaS) attach to the zone via the CF API in
   // src/lib/cloudflare-domains.ts. Requires the karte.cc zone in this account
