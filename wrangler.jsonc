@@ -54,6 +54,33 @@
     {
       "binding": "IMAGES_BUCKET",
       "bucket_name": "linkchat-images"
+    },
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "linkchat-cache"
+    }
+  ],
+  // Durable Object queue powering OpenNext's background revalidation of
+  // ISR cache entries. The queue + the worker self-reference are required
+  // for incrementalCache + queue overrides to function.
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NEXT_CACHE_DO_QUEUE",
+        "class_name": "DOQueueHandler"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DOQueueHandler"]
+    }
+  ],
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "linkchat"
     }
   ]
 }
