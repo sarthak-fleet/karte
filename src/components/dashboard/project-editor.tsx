@@ -306,7 +306,7 @@ export function ProjectEditor({
             placeholder="Project title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-lg border border-karte-border-emphasis bg-white/10 px-4 py-2.5 text-sm text-karte-text placeholder-gray-400 outline-none focus:border-white/40"
+            className="rounded-lg bg-white/[0.045] px-4 py-2.5 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
             required
           />
           <input
@@ -314,7 +314,7 @@ export function ProjectEditor({
             placeholder="https://example.com/project"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="rounded-lg border border-karte-border-emphasis bg-white/10 px-4 py-2.5 text-sm text-karte-text placeholder-gray-400 outline-none focus:border-white/40"
+            className="rounded-lg bg-white/[0.045] px-4 py-2.5 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
             required
           />
         </div>
@@ -335,7 +335,7 @@ export function ProjectEditor({
           placeholder="What is this project? What should visitors know?"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-lg border border-karte-border-emphasis bg-white/10 px-4 py-3 text-sm text-karte-text placeholder-gray-400 outline-none focus:border-white/40"
+          className="w-full rounded-lg bg-white/[0.045] px-4 py-3 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
           required
         />
 

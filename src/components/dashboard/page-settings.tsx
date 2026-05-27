@@ -330,9 +330,9 @@ export function PageSettings({
                   {['Primary Link', 'Newsletter', 'Portfolio'].map((item) => (
                     <div
                       key={item}
-                      className="rounded-xl border border-karte-border-emphasis bg-white/10 px-4 py-3 text-center text-sm font-medium text-white/90 backdrop-blur-lg"
+                      className="rounded-xl bg-white/[0.045] px-4 py-3 text-center text-sm font-medium text-karte-text backdrop-blur-lg"
                       style={{
-                        borderColor: `${previewTheme.accentColor}2a`,
+                        boxShadow: `inset 0 0 0 1px ${previewTheme.accentColor}1a`,
                       }}
                     >
                       {item}

@@ -6,10 +6,12 @@ function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-// Shared field styles — applied to Input, Textarea, Select so every form
-// control on the dashboard reads at the same height + radius + focus state.
+// Shared field styles — applied to Input, Textarea, Select. No permanent
+// border (the white-tinted outlines read busy on dark surfaces). Inputs
+// sit as a slightly darker "well" inside the card, focus reveals the
+// accent ring only.
 const fieldClass =
-  'w-full rounded-xl border border-karte-border-strong bg-white/[0.025] px-3.5 py-2.5 text-[14px] leading-[1.4] text-karte-text placeholder:text-karte-text-4 outline-none transition-all duration-200 ease-[var(--karte-ease)] hover:border-karte-border-emphasis focus:border-karte-accent/50 focus:ring-2 focus:ring-karte-accent/15 disabled:cursor-not-allowed disabled:opacity-50';
+  'w-full rounded-xl bg-white/[0.045] px-3.5 py-2.5 text-[14px] leading-[1.4] text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35 disabled:cursor-not-allowed disabled:opacity-50';
 
 // ─── Atoms ──────────────────────────────────────────────────────────────────
 

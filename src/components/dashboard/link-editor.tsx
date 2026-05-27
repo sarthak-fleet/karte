@@ -451,7 +451,7 @@ export function LinkEditor({
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="flex-1 rounded-lg border border-karte-border-emphasis bg-white/10 px-4 py-2 text-sm text-karte-text placeholder-gray-400 outline-none focus:border-white/40"
+          className="flex-1 rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
           required
         />
         <input
@@ -459,7 +459,7 @@ export function LinkEditor({
           placeholder="https://example.com"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          className="flex-1 rounded-lg border border-karte-border-emphasis bg-white/10 px-4 py-2 text-sm text-karte-text placeholder-gray-400 outline-none focus:border-white/40"
+          className="flex-1 rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
           required
         />
         <button

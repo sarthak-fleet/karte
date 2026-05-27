@@ -143,7 +143,7 @@ export function ImageUploadField({
           type="button"
           disabled={!canUpload || uploading}
           onClick={() => fileInputRef.current?.click()}
-          className="rounded-lg border border-karte-border-emphasis bg-white/10 px-4 py-2 text-sm font-medium text-karte-text transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-white/[0.05] px-4 py-2 text-sm font-medium text-karte-text transition-colors duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {uploading ? 'Uploading...' : `Upload ${kind === 'avatar' ? 'Avatar' : 'Image'}`}
         </button>
@@ -182,7 +182,7 @@ export function ImageUploadField({
           }
         }}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-karte-border-emphasis bg-white/10 px-4 py-2.5 text-sm text-karte-text placeholder-gray-400 outline-none focus:border-blue-400"
+        className="w-full rounded-lg bg-white/[0.045] px-4 py-2.5 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
       />
 
       <p className="mt-2 text-xs text-karte-text-4">
