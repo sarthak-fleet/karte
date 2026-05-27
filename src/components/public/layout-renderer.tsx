@@ -5,17 +5,6 @@ import {
 } from '@/components/public/widgets';
 import { pickLinkVariants, pickProjectVariants } from '@/lib/widget-picker';
 
-// Column spans per variant size, in a 6-col underlying grid. Mixing sizes
-// gives us the bento mosaic without a stored layout plan — the picker
-// decides shapes, we decide spans here.
-const SIZE_SPAN: Record<string, string> = {
-  hero: 'sm:col-span-6',
-  wide: 'sm:col-span-4',
-  square: 'sm:col-span-3',
-  line: 'sm:col-span-6',
-  tall: 'sm:col-span-3',
-};
-
 interface LayoutRendererProps {
   links: ReadonlyArray<LinkCardData>;
   projects: ReadonlyArray<ProjectCardData>;
@@ -23,12 +12,24 @@ interface LayoutRendererProps {
   slug: string;
 }
 
+interface AnyPick {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
+  variantId: string;
+}
+
 /**
- * Picks a variant for every link + project and arranges them as a bento
- * mosaic. One hero (if there's a project that earns it) anchors the top;
- * the rest fill a 6-col grid where squares + wides + lines compose into
- * varied rows. Pure server-side — the picker runs at render time so this
- * stays static-renderable.
+ * Picks a variant for every link + project and arranges them as a
+ * clean three-tier stream:
+ *
+ *   1. Hero (if a project-hero qualifies) — full-bleed visual anchor.
+ *   2. Squares grid — image-bearing projects in a 2-col bento.
+ *   3. Wides stack — projects with a description but no hero treatment.
+ *   4. Lines — every link in a compact row, plus any line-shaped projects.
+ *
+ * Grouping by size class keeps the rhythm consistent: bento up top
+ * (projects, image-led), index at the bottom (links, scannable). No
+ * jagged half-rows from mixing 3-col + 4-col spans.
  */
 export function LayoutRenderer({
   links,
@@ -41,57 +42,56 @@ export function LayoutRenderer({
   const linkPicks = pickLinkVariants(links);
   const projectPicks = pickProjectVariants(projects);
 
-  // Hero block: prefer a project-hero (more visual mass) over a link-hero.
-  // Whichever wins, strip it out of the bento so it doesn't render twice.
-  const projectHeroIdx = projectPicks.findIndex((p) => p.variantId === 'project-hero');
-  const linkHeroIdx =
-    projectHeroIdx === -1 ? linkPicks.findIndex((p) => p.variantId === 'link-hero') : -1;
+  // Pluck the hero (at most one).
+  const heroIdx = projectPicks.findIndex((p) => p.variantId === 'project-hero');
+  const heroPick = heroIdx >= 0 ? projectPicks[heroIdx] : null;
+  const restProjects =
+    heroIdx >= 0 ? projectPicks.filter((_, i) => i !== heroIdx) : projectPicks;
 
-  const heroPick =
-    projectHeroIdx !== -1
-      ? projectPicks[projectHeroIdx]
-      : linkHeroIdx !== -1
-        ? linkPicks[linkHeroIdx]
-        : null;
-
-  const remainingProjects =
-    projectHeroIdx !== -1
-      ? projectPicks.filter((_, i) => i !== projectHeroIdx)
-      : projectPicks;
-  const remainingLinks =
-    linkHeroIdx !== -1
-      ? linkPicks.filter((_, i) => i !== linkHeroIdx)
-      : linkPicks;
-
-  // Interleave projects + links in the bento. Order: projects first (they
-  // tend to be visual / richer), then links. Future versions of the picker
-  // can reshape this.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bento: ReadonlyArray<{ data: any; variantId: string }> = [
-    ...remainingProjects,
-    ...remainingLinks,
+  const squarePicks = restProjects.filter((p) => p.variantId === 'project-square');
+  const widePicks = restProjects.filter((p) => p.variantId === 'project-wide');
+  const linePicks: AnyPick[] = [
+    ...restProjects.filter((p) => p.variantId === 'project-line'),
+    ...linkPicks,
   ];
 
   const ctx = { accentColor, slug };
-  const heroVariant = heroPick ? allVariantsById[heroPick.variantId] : null;
 
   return (
-    <div className="space-y-4">
-      {heroPick && heroVariant && (
-        <div className="w-full">{heroVariant.render(heroPick.data, ctx)}</div>
+    <div className="space-y-6">
+      {heroPick && (
+        <div>{allVariantsById[heroPick.variantId]?.render(heroPick.data, ctx)}</div>
       )}
 
-      {bento.length > 0 && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-6 sm:grid-flow-dense sm:gap-4">
-          {bento.map((pick) => {
-            const variant = allVariantsById[pick.variantId];
-            if (!variant) return null;
-            const sizeClass = SIZE_SPAN[variant.size] ?? 'sm:col-span-6';
-            return (
-              <div key={`${pick.variantId}:${pick.data.id}`} className={sizeClass}>
-                {variant.render(pick.data, ctx)}
-              </div>
-            );
+      {squarePicks.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {squarePicks.map((pick) => {
+            const v = allVariantsById[pick.variantId];
+            return v ? (
+              <div key={pick.data.id}>{v.render(pick.data, ctx)}</div>
+            ) : null;
+          })}
+        </div>
+      )}
+
+      {widePicks.length > 0 && (
+        <div className="space-y-3">
+          {widePicks.map((pick) => {
+            const v = allVariantsById[pick.variantId];
+            return v ? (
+              <div key={pick.data.id}>{v.render(pick.data, ctx)}</div>
+            ) : null;
+          })}
+        </div>
+      )}
+
+      {linePicks.length > 0 && (
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          {linePicks.map((pick) => {
+            const v = allVariantsById[pick.variantId];
+            return v ? (
+              <div key={pick.data.id}>{v.render(pick.data, ctx)}</div>
+            ) : null;
           })}
         </div>
       )}

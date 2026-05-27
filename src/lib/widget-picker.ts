@@ -13,52 +13,22 @@ export interface PickResult<TData> {
 }
 
 /**
- * Pick a variant id for each link. Rules, in order:
- *   1. The single link with the strongest visual (image + body) → `link-hero`,
- *      but only once per page.
- *   2. Links with an image → `link-square`.
- *   3. Links with a body but no image → `link-wide`.
- *   4. Everything else → `link-line`.
+ * Pick a variant for each link. We deliberately ship a single shape
+ * (`link-line`) — see link-card-variants.tsx for the rationale. The
+ * function stays in this shape so the picker contract is consistent
+ * across resource types and we can re-introduce sized link variants
+ * later without touching callers.
  */
 export function pickLinkVariants(
   links: ReadonlyArray<LinkCardData>,
 ): PickResult<LinkCardData>[] {
-  // Pick the hero candidate first: the link with both image + body, longest
-  // body (more weight = more reason to feature it). Falls back to first with
-  // an image. At most one per page so heroes don't pile up.
-  const heroCandidates = links
-    .filter((l) => l.imageUrl && l.body)
-    .sort((a, b) => (b.body?.length ?? 0) - (a.body?.length ?? 0));
-  const heroId = heroCandidates[0]?.id;
-
-  return links.map((link) => {
-    if (link.id === heroId) {
-      return {
-        data: link,
-        variantId: 'link-hero',
-        reason: 'has image + body, strongest weight on this page',
-      };
-    }
-    if (link.imageUrl) {
-      return {
-        data: link,
-        variantId: 'link-square',
-        reason: 'has image — square shows it without dominating the row',
-      };
-    }
-    if (link.body) {
-      return {
-        data: link,
-        variantId: 'link-wide',
-        reason: 'has body copy — wide gives the description room',
-      };
-    }
-    return {
-      data: link,
-      variantId: 'link-line',
-      reason: 'plain link — line keeps the stack scannable',
-    };
-  });
+  return links.map((link) => ({
+    data: link,
+    variantId: 'link-line',
+    reason: link.body
+      ? 'compact row with body for one-line context'
+      : 'compact row — icon auto-detected from host',
+  }));
 }
 
 /**
