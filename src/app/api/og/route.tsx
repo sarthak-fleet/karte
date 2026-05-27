@@ -2,12 +2,13 @@ import { ImageResponse } from 'next/og';
 
 const SIZE = { width: 1200, height: 630 };
 
-export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const slug = url.searchParams.get('slug') || 'karte';
-  const name = url.searchParams.get('name') || slug;
-  const headline = url.searchParams.get('h') || `${name} on Karte`;
-  const accent = `#${url.searchParams.get('accent') || '67e8f9'}`;
+export async function GET() {
+  // Hardcoded for now — diagnosing whether the hang is in req.url or
+  // somewhere else.
+  const slug = 'sarthak';
+  const name = 'Sarthak Agrawal';
+  const headline = 'PUBLIC BUILDER PROFILE EXPANDS';
+  const accent = '#67e8f9';
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
