@@ -22,10 +22,11 @@ import { resolveThemeConfig } from '@/lib/themes';
 
 import { getFullPageData } from './_lib/get-page-data';
 
-// Revalidate the cached profile every 60s. Combined with the middleware's
-// Cache-Control headers, this lets CF's edge serve cached HTML in ~50ms for
-// repeat visitors. First visit pays the SSR cost; subsequent visits within
-// 60s are instant.
+// Force the page into the static-renderable pipeline so OpenNext's
+// incremental cache + Next.js's framework-level Cache-Control headers
+// actually apply. Without force-static, Next.js infers the page as
+// dynamic and ships private/no-store headers regardless of revalidate.
+export const dynamic = 'force-static';
 export const revalidate = 60;
 
 type Props = {
