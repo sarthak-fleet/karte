@@ -6,20 +6,18 @@ function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
+// Shared field styles — applied to Input, Textarea, Select so every form
+// control on the dashboard reads at the same height + radius + focus state.
+const fieldClass =
+  'w-full rounded-xl border border-karte-border-strong bg-white/[0.025] px-3.5 py-2.5 text-[14px] leading-[1.4] text-karte-text placeholder:text-karte-text-4 outline-none transition-all duration-200 ease-[var(--karte-ease)] hover:border-karte-border-emphasis focus:border-karte-accent/50 focus:ring-2 focus:ring-karte-accent/15 disabled:cursor-not-allowed disabled:opacity-50';
+
 // ─── Atoms ──────────────────────────────────────────────────────────────────
 
 export const Input = forwardRef<
   HTMLInputElement,
   ComponentPropsWithoutRef<'input'>
 >(({ className, ...props }, ref) => (
-  <input
-    ref={ref}
-    className={cn(
-      'w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition focus:border-white/40 focus:ring-1 focus:ring-white/20',
-      className,
-    )}
-    {...props}
-  />
+  <input ref={ref} className={cn(fieldClass, className)} {...props} />
 ));
 Input.displayName = 'Input';
 
@@ -27,14 +25,7 @@ export const Textarea = forwardRef<
   HTMLTextAreaElement,
   ComponentPropsWithoutRef<'textarea'>
 >(({ className, ...props }, ref) => (
-  <textarea
-    ref={ref}
-    className={cn(
-      'w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition focus:border-white/40 focus:ring-1 focus:ring-white/20',
-      className,
-    )}
-    {...props}
-  />
+  <textarea ref={ref} className={cn(fieldClass, 'leading-[1.55]', className)} {...props} />
 ));
 Textarea.displayName = 'Textarea';
 
@@ -44,10 +35,11 @@ export const Select = forwardRef<
 >(({ className, children, ...props }, ref) => (
   <select
     ref={ref}
-    className={cn(
-      'w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white outline-none transition focus:border-white/40 focus:ring-1 focus:ring-white/20',
-      className,
-    )}
+    className={cn(fieldClass, 'appearance-none pr-9 bg-no-repeat bg-[right_0.85rem_center]', className)}
+    style={{
+      backgroundImage:
+        "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'><path d='M3 5L6 8L9 5' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>\")",
+    }}
     {...props}
   >
     {children}
@@ -57,30 +49,39 @@ Select.displayName = 'Select';
 
 // ── Button ──────────────────────────────────────────────────────────────────
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'small';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
-const buttonStyles: Record<ButtonVariant, string> = {
+const baseButton =
+  'inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 ease-[var(--karte-ease)] outline-none focus-visible:ring-2 focus-visible:ring-karte-accent/30 focus-visible:ring-offset-2 focus-visible:ring-offset-karte-bg disabled:cursor-not-allowed disabled:opacity-50';
+
+const sizeStyles: Record<ButtonSize, string> = {
+  sm: 'px-3 py-1.5 text-[12px]',
+  md: 'px-4 py-2 text-[13px]',
+  lg: 'px-6 py-3 text-[15px]',
+};
+
+const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-gray-900 transition hover:bg-gray-100 disabled:opacity-50',
+    'bg-karte-text text-karte-bg hover:bg-white',
   secondary:
-    'rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-50',
+    'border border-karte-border-strong bg-transparent text-karte-text hover:border-karte-border-emphasis hover:bg-white/[0.04]',
   ghost:
-    'text-sm font-medium text-gray-400 transition hover:text-white',
+    'text-karte-text-3 hover:text-karte-text',
   danger:
-    'rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/20',
-  small:
-    'rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/10',
+    'border border-red-500/25 bg-red-500/[0.06] text-red-300 hover:border-red-500/40 hover:bg-red-500/10',
 };
 
 interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
   variant?: ButtonVariant;
+  size?: ButtonSize;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', className, ...props }, ref) => (
+  ({ variant = 'primary', size = 'md', className, ...props }, ref) => (
     <button
       ref={ref}
-      className={cn(buttonStyles[variant], className)}
+      className={cn(baseButton, sizeStyles[size], variantStyles[variant], className)}
       {...props}
     />
   ),
@@ -93,25 +94,27 @@ interface ToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   className?: string;
+  disabled?: boolean;
 }
 
-export function Toggle({ checked, onChange, className }: ToggleProps) {
+export function Toggle({ checked, onChange, className, disabled }: ToggleProps) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
+      disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        'relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-gray-950',
-        checked ? 'bg-blue-500' : 'bg-white/20',
+        'relative inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full border border-transparent transition-colors duration-200 ease-[var(--karte-ease)] outline-none focus-visible:ring-2 focus-visible:ring-karte-accent/30 focus-visible:ring-offset-2 focus-visible:ring-offset-karte-bg disabled:cursor-not-allowed disabled:opacity-50',
+        checked ? 'bg-karte-accent/85' : 'bg-white/[0.08]',
         className,
       )}
     >
       <span
         className={cn(
-          'pointer-events-none inline-block h-6 w-6 rounded-full bg-white shadow-lg transition-transform duration-200',
-          checked ? 'translate-x-5' : 'translate-x-0',
+          'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ease-[var(--karte-ease)]',
+          checked ? 'translate-x-[1.125rem]' : 'translate-x-0.5',
         )}
       />
     </button>
@@ -131,7 +134,7 @@ export function Badge({ children, className, onRemove, removeLabel }: BadgeProps
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/70',
+        'inline-flex items-center gap-1.5 rounded-full border border-karte-border-strong bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-karte-text-2',
         className,
       )}
     >
@@ -140,7 +143,7 @@ export function Badge({ children, className, onRemove, removeLabel }: BadgeProps
         <button
           type="button"
           onClick={onRemove}
-          className="text-gray-400 transition hover:text-red-400"
+          className="text-karte-text-4 transition-colors duration-150 hover:text-red-400"
           aria-label={removeLabel}
         >
           <svg
@@ -171,7 +174,10 @@ interface LabelProps extends ComponentPropsWithoutRef<'label'> {
 export function Label({ className, children, ...props }: LabelProps) {
   return (
     <label
-      className={cn('mb-1.5 block text-sm font-medium text-white', className)}
+      className={cn(
+        'mb-1.5 block text-[12px] font-medium tracking-[-0.005em] text-karte-text-2',
+        className,
+      )}
       {...props}
     >
       {children}
@@ -194,7 +200,7 @@ export function Card({ children, className, bordered = false }: CardProps) {
     <div
       className={cn(
         'rounded-2xl bg-white/[0.025] p-6',
-        bordered && 'border border-white/15',
+        bordered && 'border border-karte-border',
         className,
       )}
     >
@@ -224,7 +230,7 @@ export function FormField({
     <div className={className}>
       <Label htmlFor={htmlFor}>{label}</Label>
       {description && (
-        <p className="mb-2 text-xs text-gray-400">{description}</p>
+        <p className="mb-2 text-[12px] leading-[1.5] text-karte-text-4">{description}</p>
       )}
       {children}
     </div>

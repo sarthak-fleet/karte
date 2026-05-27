@@ -207,7 +207,7 @@ export function EncyclopediaEditor({
                 Key facts displayed in the sidebar info panel
               </p>
             </div>
-            <Button variant="small" type="button" onClick={addInfoboxRow}>
+            <Button variant="secondary" size="sm" type="button" onClick={addInfoboxRow}>
               + Add Row
             </Button>
           </div>
@@ -297,7 +297,7 @@ export function EncyclopediaEditor({
               placeholder="e.g. Software Engineer, Open Source"
               className="flex-1"
             />
-            <Button variant="small" type="button" onClick={addCategory}>
+            <Button variant="secondary" size="sm" type="button" onClick={addCategory}>
               Add
             </Button>
           </div>

@@ -48,18 +48,23 @@ export function ChatEmailGate({
     onSubmit(normalized);
   }
 
+  // Hex with alpha — accentColor is dynamic (per-page theme), so we compose
+  // ring + border colors from it inline rather than via Tailwind classes.
+  const focusBorder = `${accentColor}66`; // ~40%
+  const focusRing = `${accentColor}26`;   // ~15%
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="border-t border-white/25 bg-white/[0.04] px-4 py-4"
+      className="border-t border-karte-border-strong bg-white/[0.025] px-4 py-4"
       aria-label="Email gate"
     >
-      <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-white/60">
+      <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
         One quick step
       </p>
-      <p className="mb-3 text-sm leading-5 text-karte-text">
+      <p className="mb-3 text-[13px] leading-[1.5] text-karte-text">
         Drop your email to start chatting.{' '}
-        <span className="text-white/60">
+        <span className="text-karte-text-3">
           {displayName} will see who reached out.
         </span>
       </p>
@@ -78,11 +83,19 @@ export function ChatEmailGate({
           placeholder="you@example.com"
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? 'chat-email-gate-error' : undefined}
-          className="min-w-0 flex-1 rounded-lg border border-white/30 bg-white/5 px-3 py-2.5 text-sm text-karte-text placeholder-white/40 outline-none ring-1 ring-white/15 transition focus:border-[#f2c879] focus:ring-2 focus:ring-[#f2c879]/40"
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = focusBorder;
+            e.currentTarget.style.boxShadow = `0 0 0 2px ${focusRing}`;
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = '';
+            e.currentTarget.style.boxShadow = '';
+          }}
+          className="min-w-0 flex-1 rounded-xl border border-karte-border-strong bg-white/[0.025] px-3.5 py-2.5 text-[13px] text-karte-text placeholder:text-karte-text-4 outline-none transition-all duration-200 ease-[var(--karte-ease)]"
         />
         <button
           type="submit"
-          className="shrink-0 rounded-lg border border-black/10 px-4 py-2.5 text-sm font-semibold transition hover:brightness-110 active:scale-95"
+          className="shrink-0 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-all duration-200 ease-[var(--karte-ease)] hover:brightness-110 active:scale-[0.97]"
           style={{ backgroundColor: accentColor, color: accentTextColor }}
         >
           Continue
@@ -92,12 +105,12 @@ export function ChatEmailGate({
         <p
           id="chat-email-gate-error"
           role="alert"
-          className="mt-2 text-xs text-red-300"
+          className="mt-2 text-[11px] leading-[1.4] text-red-300"
         >
           {error}
         </p>
       )}
-      <p className="mt-2 text-[10px] leading-4 text-white/30">
+      <p className="mt-2 text-[10px] leading-[1.4] text-karte-text-4">
         We use this once so {displayName} can follow up — no spam.
       </p>
     </form>
