@@ -274,7 +274,7 @@ export function OnboardingChat() {
             onClick={handleClaim}
             className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-medium text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:bg-zinc-100"
           >
-            Claim your Talix page
+            Claim your Karte page
             <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">
               →
             </span>

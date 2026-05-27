@@ -91,7 +91,7 @@ export default async function NewspaperPage({
             </Link>
             <span className="text-xs tracking-wide text-gray-400">
               Powered by{' '}
-              <span className="font-semibold text-gray-300">Talix</span>
+              <span className="font-semibold text-gray-300">Karte</span>
             </span>
           </div>
         </header>
@@ -140,7 +140,7 @@ export default async function NewspaperPage({
           </Link>
           <span className="text-xs tracking-wide text-gray-400">
             Powered by{' '}
-            <span className="font-semibold text-gray-300">Talix</span>
+            <span className="font-semibold text-gray-300">Karte</span>
           </span>
         </div>
       </header>

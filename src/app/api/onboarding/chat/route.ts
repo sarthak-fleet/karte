@@ -1,5 +1,5 @@
 // Public, sessionless onboarding chat. Used on /create — the unauth flow
-// where a visitor can have a 1-2 minute conversation to draft a Talix page
+// where a visitor can have a 1-2 minute conversation to draft a Karte page
 // before claiming it. Llama 3.3 70B via free-ai-gateway extracts fields
 // inline and emits a strict JSON envelope so the client can render the
 // reply + merge state without parsing prose.
@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 import { generateChat, resolveAiConfig } from '@/lib/ai-client';
 import { rateLimit } from '@/lib/rate-limit';
 
-const SYSTEM_PROMPT = `You are the Talix onboarding assistant. Talix is a
+const SYSTEM_PROMPT = `You are the Karte onboarding assistant. Karte is a
 personal link-in-bio + AI chat product. Your one job is to have a short
 friendly conversation that captures enough to build the user's page,
 then hand them off.
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
   if (messages.length === 0) {
     return NextResponse.json({
       reply:
-        "Hey! I'm the Talix onboarding bot. Quick chat to build your page — what should I call you?",
+        "Hey! I'm the Karte onboarding bot. Quick chat to build your page — what should I call you?",
       state: prevState,
       done: false,
     });

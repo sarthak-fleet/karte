@@ -1,6 +1,6 @@
 # Custom Domains
 
-Talix lets each user attach their own hostname (e.g. `links.example.com` or
+Karte lets each user attach their own hostname (e.g. `links.example.com` or
 `mike.com`) to their profile. This doc explains the full flow end-to-end, the
 infrastructure it relies on, and how to debug it.
 
@@ -8,7 +8,7 @@ infrastructure it relies on, and how to debug it.
 
 ## TL;DR
 
-A user adds a hostname in the dashboard → Talix calls the Cloudflare for SaaS
+A user adds a hostname in the dashboard → Karte calls the Cloudflare for SaaS
 API to register it on the `karte.cc` zone → the user adds DNS records at their
 own DNS provider → Cloudflare validates ownership + issues an SSL cert →
 requests to the hostname hit our Worker, the middleware reads `Host`, looks up
@@ -39,7 +39,7 @@ requests to the hostname hit our Worker, the middleware reads `Host`, looks up
 | Layer | File | Role |
 |---|---|---|
 | Middleware | `src/middleware.ts` | Reads `Host` header on every request. If it's a known custom hostname, rewrites to `/<slug>`. |
-| Hostname helpers | `src/lib/hostname.ts` | `isAppHost()` (allowlist of Talix's own domains), `normalizeHostname()`, DNS-instruction builder. |
+| Hostname helpers | `src/lib/hostname.ts` | `isAppHost()` (allowlist of Karte's own domains), `normalizeHostname()`, DNS-instruction builder. |
 | Lookup | `src/lib/page-domains.ts` | `resolveSlugForHost()` queries the `pageDomains` table (60s in-memory cache). |
 | CF integration | `src/lib/cloudflare-domains.ts` | Wraps the Cloudflare Custom Hostnames API: add / list / verify / remove. |
 | Schema | `src/db/schema.ts` | `pageDomains` table (hostname, status, verification[], primary flag, lastCheckedAt). |

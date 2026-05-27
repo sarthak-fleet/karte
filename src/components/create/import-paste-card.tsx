@@ -179,7 +179,7 @@ export function ImportPasteCard() {
           </h2>
           <p className="mt-3 max-w-xl text-[14px] leading-[1.6] text-karte-text-3">
             Paste your Linktree, Beacons, Bio.link or Carrd URL. We&apos;ll pull your
-            links and show you exactly how they&apos;ll look on Talix.
+            links and show you exactly how they&apos;ll look on Karte.
           </p>
         </div>
       </div>
@@ -221,14 +221,14 @@ export function ImportPasteCard() {
 
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
             <p className="text-sm text-karte-text-3">
-              Looks good? Sign in to claim your Talix page and bring these links along.
+              Looks good? Sign in to claim your Karte page and bring these links along.
             </p>
             <button
               type="button"
               onClick={handleClaim}
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-medium text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:bg-zinc-100 sm:w-auto"
             >
-              Claim your Talix page
+              Claim your Karte page
               <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">
                 →
               </span>

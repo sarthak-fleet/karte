@@ -70,7 +70,7 @@ export default async function LoginPage() {
                   className="text-[18px] font-normal italic tracking-[-0.005em] text-karte-text"
                   style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
                 >
-                  Talix
+                  Karte
                 </p>
                 <p className="text-[12px] text-karte-text-4">Creator dashboard</p>
               </div>

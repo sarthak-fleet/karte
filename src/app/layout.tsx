@@ -30,11 +30,11 @@ const SITE_DESCRIPTION =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Talix — Your digital card",
-    template: "%s — Talix",
+    default: "Karte — Your digital card",
+    template: "%s — Karte",
   },
   description: SITE_DESCRIPTION,
-  applicationName: "Talix",
+  applicationName: "Karte",
   keywords: [
     "link in bio",
     "personal website",
@@ -44,13 +44,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "Talix",
-    title: "Talix — Your digital card",
+    siteName: "Karte",
+    title: "Karte — Your digital card",
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Talix — Your digital card",
+    title: "Karte — Your digital card",
     description: SITE_DESCRIPTION,
   },
 };

@@ -101,7 +101,7 @@ export function PendingImportBanner() {
     try {
       const pagesRes = await fetch('/api/pages');
       if (!pagesRes.ok) {
-        throw new Error('We couldn’t find your Talix page yet. Save your profile first.');
+        throw new Error('We couldn’t find your Karte page yet. Save your profile first.');
       }
       const pagesData = (await pagesRes.json()) as Array<{ id: string }>;
       const pageId = Array.isArray(pagesData) ? pagesData[0]?.id : undefined;
@@ -183,7 +183,7 @@ export function PendingImportBanner() {
             </strong>{' '}
             from{' '}
             <span className="font-medium text-karte-text">{sourceHost}</span>.
-            Import them to your new Talix page now?
+            Import them to your new Karte page now?
           </p>
           {message ? (
             <p

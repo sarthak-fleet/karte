@@ -154,7 +154,7 @@ export default async function MemoryPage() {
         <SectionEyebrow
           label="AI provider"
           title="Bring your own model"
-          description="By default we use the free Talix AI gateway. Plug in your own key + model if you want full control."
+          description="By default we use the free Karte AI gateway. Plug in your own key + model if you want full control."
         />
         <AiKeySettings
           hasKey={!!user?.smApiKey}

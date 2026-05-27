@@ -27,7 +27,7 @@ export function normalizeHostname(input: string | null | undefined): string | nu
   return host;
 }
 
-// Talix's own brand domains — baked in because Next.js inlines NEXT_PUBLIC_*
+// Karte's own brand domains — baked in because Next.js inlines NEXT_PUBLIC_*
 // env vars at build time, making runtime env var bridging unreliable.
 const KARTE_APP_HOSTS = new Set(['karte.cc', 'www.karte.cc']);
 

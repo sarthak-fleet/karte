@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy — Talix",
-  description: "What Talix stores and what it never sends to third parties.",
+  title: "Privacy — Karte",
+  description: "What Karte stores and what it never sends to third parties.",
 };
 
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 text-sm leading-7 text-karte-text-2">
       <Link href="/" className="text-xs text-karte-text-4 hover:underline">
-        ← Talix
+        ← Karte
       </Link>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-karte-text">Privacy</h1>
       <p className="mt-4 text-xs text-karte-text-4">Last updated: 2026-05-15.</p>

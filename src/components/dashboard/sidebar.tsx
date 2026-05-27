@@ -174,7 +174,7 @@ export function Sidebar({ slug }: { slug?: string }) {
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-              <span className="text-karte-accent/80">·</span> Talix
+              <span className="text-karte-accent/80">·</span> Karte
             </p>
             <p className="mt-0.5 truncate text-[15px] font-semibold tracking-[-0.005em] text-karte-text">
               {pageTitle}
@@ -238,7 +238,7 @@ export function Sidebar({ slug }: { slug?: string }) {
                   className="text-[17px] font-normal italic tracking-[-0.01em] text-karte-text"
                   style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
                 >
-                  Talix
+                  Karte
                 </span>
               </Link>
               <button
@@ -276,7 +276,7 @@ export function Sidebar({ slug }: { slug?: string }) {
               className="text-[19px] font-normal italic tracking-[-0.01em] text-karte-text"
               style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
             >
-              Talix
+              Karte
             </span>
           </Link>
         </div>

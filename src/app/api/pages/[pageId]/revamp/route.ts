@@ -194,7 +194,7 @@ async function generatePlan(opts: {
   if (!aiConfig) return fallbackPlan(prompt, page);
 
   const result = await generate(aiConfig, {
-    system: `You are a product-minded profile designer for Talix.
+    system: `You are a product-minded profile designer for Karte.
 Return only valid JSON. Do not use markdown.
 You must choose a themePresetId from: ${THEME_PRESETS.map((theme) => `${theme.id} (${theme.description})`).join(', ')}.
 If the user requests a specific color scheme or visual style not well served by the presets, you may also include a "customColors" object with gradientFrom, gradientTo, and accentColor fields as 6-digit hex codes (e.g. "#8b00ff"). Custom colors override the preset's colors. Only include customColors if the user's design intent clearly calls for it.
