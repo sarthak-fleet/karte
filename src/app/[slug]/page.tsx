@@ -22,44 +22,46 @@ import { resolveThemeConfig } from '@/lib/themes';
 
 import { getFullPageData } from './_lib/get-page-data';
 
+// Revalidate the cached profile every 60s. Combined with the middleware's
+// Cache-Control headers, this lets CF's edge serve cached HTML in ~50ms for
+// repeat visitors. First visit pays the SSR cost; subsequent visits within
+// 60s are instant.
+export const revalidate = 60;
+
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ variant?: string; room?: string }>;
 };
 
-export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
-  const { room } = (await searchParams) ?? {};
-  if (!room) return {};
-
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const data = await getFullPageData(slug);
   if (!data) return {};
 
   const { page } = data;
-  const name = page.displayName;
-  const title = `Chat with ${name}`;
-  const description = `You've been invited to a conversation with ${name} on Karte. Click to join and continue the chat.`;
   return {
-    title,
-    description,
+    title: page.displayName,
+    description:
+      page.bio ?? `${page.displayName} on Karte — links, chat, and more.`,
     openGraph: {
-      title,
-      description,
+      title: page.displayName,
+      description: page.bio ?? undefined,
       ...(page.avatarUrl && { images: [page.avatarUrl] }),
     },
   };
 }
 
-export default async function ProfilePage({ params, searchParams }: Props) {
+export default async function ProfilePage({ params }: Props) {
   const { slug } = await params;
-  const { variant: variantParam, room: roomParam } = (await searchParams) ?? {};
-  const initialRoomId = typeof roomParam === 'string' ? roomParam : null;
   const data = await getFullPageData(slug);
   if (!data) notFound();
 
   const { page, links: pageLinks, projects: pageProjects, sections: publicSections, readyPages } = data;
   const theme = resolveThemeConfig(page.themeConfig);
-  const variant = getProfileVariant(variantParam);
+  // Variant defaults to baseline. A/B-variant routing was previously driven
+  // by ?variant= search params, which forced dynamic rendering and blocked
+  // edge caching. Variants can come back via URL pattern (/[slug]/v/[id])
+  // when re-enabled — see docs/perf-audit.md.
+  const variant = getProfileVariant(undefined);
 
   const enabledPages = {
     encyclopedia: (page.encyclopediaEnabled ?? false) && readyPages.has('encyclopedia'),
@@ -401,7 +403,6 @@ export default async function ProfilePage({ params, searchParams }: Props) {
           position={theme.chatPosition}
           chatEnabled={page.chatEnabled ?? false}
           dmMode={page.dmMode}
-          initialRoomId={initialRoomId}
         />
       )}
     </main>

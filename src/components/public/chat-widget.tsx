@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useCallback,useEffect, useRef, useState } from 'react';
 
 import { ContactFormSection } from '@/components/public/contact-form-section';
@@ -50,7 +51,7 @@ export function ChatWidget({
   position = 'bottom-right',
   chatEnabled = true,
   dmMode = 'off',
-  initialRoomId = null,
+  initialRoomId: initialRoomIdProp = null,
 }: {
   slug: string;
   displayName: string;
@@ -60,6 +61,12 @@ export function ChatWidget({
   dmMode?: DmMode;
   initialRoomId?: string | null;
 }) {
+  // Read room id from URL on the client so the server page can stay
+  // static-cacheable. Prop still wins if a parent decides to pass it
+  // (e.g. SSR forking from a different param source later).
+  const searchParams = useSearchParams();
+  const initialRoomId = initialRoomIdProp ?? searchParams?.get('room') ?? null;
+
   const [open, setOpen] = useState(false);
   const prevOpenRef = useRef(false);
   const [mode, setMode] = useState<'chat' | 'contact'>(chatEnabled ? 'chat' : 'contact');
