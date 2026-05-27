@@ -23,6 +23,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { Toggle } from '@/components/ui';
 import {
   getPageSectionLabel,
   PAGE_SECTION_TYPES,
@@ -412,21 +413,7 @@ export function SectionEditor({
               <label className="mb-1 block text-xs font-medium text-karte-text-3">
                 Enabled
               </label>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={enabled}
-                onClick={() => setEnabled(!enabled)}
-                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                  enabled ? 'bg-blue-500' : 'bg-white/20'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-6 w-6 rounded-full bg-white  transition-transform duration-200 ${
-                    enabled ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
+              <Toggle checked={enabled} onChange={setEnabled} />
             </div>
           </div>
 

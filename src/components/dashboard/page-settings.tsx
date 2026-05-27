@@ -5,6 +5,7 @@ import posthog from 'posthog-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { ImageUploadField } from '@/components/dashboard/image-upload-field';
+import { Toggle } from '@/components/ui';
 import type { DmMode } from '@/db/schema';
 import { trackActivated, trackCoreAction } from '@/lib/analytics-events';
 import {
@@ -527,21 +528,7 @@ export function PageSettings({
                   Make your page visible to visitors
                 </p>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={published}
-                onClick={() => setPublished(!published)}
-                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-gray-950 ${
-                  published ? 'bg-blue-500' : 'bg-white/20'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-6 w-6 rounded-full bg-white  transition-transform duration-200 ${
-                    published ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
+              <Toggle checked={published} onChange={setPublished} />
             </div>
           </>
         )}
