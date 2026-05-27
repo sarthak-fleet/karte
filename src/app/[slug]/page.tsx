@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { Instrument_Serif } from 'next/font/google';
 import nextDynamic from 'next/dynamic';
+import { Instrument_Serif } from 'next/font/google';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 

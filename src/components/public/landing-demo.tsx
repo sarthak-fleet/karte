@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { TypedText } from '@/components/public/typed-text';
 
@@ -44,17 +44,8 @@ const CHAT_PROMPTS = [
 export function LandingDemo() {
   const [mode, setMode] = useState<DemoMode>('chat');
   const [activePromptId, setActivePromptId] = useState(CHAT_PROMPTS[0].id);
-  const [reducedMotion, setReducedMotion] = useState(false);
 
   const activePrompt = CHAT_PROMPTS.find((p) => p.id === activePromptId) ?? CHAT_PROMPTS[0];
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setReducedMotion(
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      );
-    }
-  }, []);
 
   const handleMode = (newMode: DemoMode) => {
     setMode(newMode);
@@ -125,16 +116,12 @@ export function LandingDemo() {
 
               {/* Assistant — the star, feels written */}
               <div className="max-w-[94%] rounded-2xl rounded-tl-md border border-karte-border bg-karte-surface p-4 text-[15px] leading-[1.65] text-karte-text">
-                {reducedMotion ? (
-                  activePrompt.assistant
-                ) : (
-                  <TypedText
-                    text={activePrompt.assistant}
-                    speed={18}
-                    cursor
-                    cursorColor="var(--karte-accent)"
-                  />
-                )}
+                <TypedText
+                  text={activePrompt.assistant}
+                  speed={18}
+                  cursor
+                  cursorColor="var(--karte-accent)"
+                />
                 <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.2em] text-karte-text-4">
                   Grounded in {activePrompt.source}
                 </p>
