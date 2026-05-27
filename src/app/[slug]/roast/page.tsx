@@ -32,9 +32,40 @@ export default async function RoastPage({
       ? (generatedPage.content as unknown as RoastContent)
       : null;
 
-  // If no content generated and visitor isn't the owner, 404
   const session = await getSession().catch(() => null);
   const isOwner = session?.user?.id === page.userId;
+
+  // Show the generating-in-progress state to visitors so they don't see
+  // a 404 while a background generation is in flight. Owner sees the
+  // editor flow (which can also show a busy state).
+  const isGenerating = generatedPage?.status === 'generating';
+  if (!existingRoast && !isOwner && isGenerating) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-karte-bg px-6 py-16 text-karte-text antialiased">
+        <div className="max-w-md text-center">
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+            <span className="text-karte-accent/80">·</span> Generating
+          </p>
+          <h1 className="mt-5 text-3xl font-semibold tracking-[-0.02em]">
+            The roast is being written.
+          </h1>
+          <p className="mt-4 text-[15px] leading-[1.65] text-karte-text-3">
+            {page.displayName} just turned this surface on. The page will
+            appear here in a moment — usually under 30 seconds. Refresh to
+            check.
+          </p>
+          <Link
+            href={`/${slug}`}
+            className="mt-8 inline-flex items-center gap-2 rounded-full border border-karte-border bg-white/[0.03] px-5 py-2 text-[13px] font-medium text-karte-text-2 transition-all duration-200 ease-[var(--karte-ease)] hover:border-karte-border-emphasis hover:bg-white/[0.06] hover:text-karte-text"
+          >
+            ← Back to profile
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  // If no content and visitor isn't the owner, 404
   if (!existingRoast && !isOwner) notFound();
 
   const linkTitles = links.map((l) => l.title);

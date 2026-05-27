@@ -212,6 +212,54 @@ visiting a custom hostname mid-rollback.
 
 ---
 
+## Adjacent feature: multi-username aliases (priority: likely ships first)
+
+A user keeps asking for multiple usernames on the same profile. Conceptually
+related to custom domains ("control your own brand surface") but expected to
+hit demand much earlier — short vanity URLs are easier wins than full custom
+domains.
+
+**Spec:**
+- Free tier: 1 username (current)
+- Pro tier: up to 5 aliases per user, all routing to the same profile
+- Use cases: agency running multiple brand profiles, personal-vs-work split,
+  vanity short URLs (e.g. `karte.cc/sarthak` + `karte.cc/sa`)
+
+**Schema:**
+```ts
+// new table
+pageAliases {
+  slug: text primary key,         // globally unique across all aliases
+  pageId: text references pages.id on delete cascade,
+  isPrimary: boolean default false,
+  createdAt: timestamp,
+}
+// + a partial unique index ensuring exactly one isPrimary=true per pageId
+```
+
+**Lookup path:**
+- `getPageBySlug(slug)` → check `pages.slug` first (canonical), fall through to
+  `pageAliases.slug` → resolve to canonical page
+- For non-canonical-alias visits, return a 301 to the canonical URL (or rewrite
+  internally and emit canonical link header) — choose based on SEO preference
+
+**API:**
+- `POST /api/pages/<id>/aliases` → add alias, gate on `users.plan === 'pro'`
+  and `count(aliases) < 5`
+- `DELETE /api/pages/<id>/aliases/<slug>` → remove
+
+**Watch-outs:**
+- **Squatting** — one user grabs 5 hot names denies others. Maybe enforce
+  "must remain claimed by an active user" with auto-release after N days of
+  account inactivity.
+- **Cache fragmentation** — each alias gets its own CF edge cache entry. Same
+  TTL applies (60s). Not a real problem at our scale.
+- **Mental model** — clearly mark the "Primary username" in the dashboard so
+  users understand which is canonical for OG / link previews.
+
+**Effort:** ~3 hours end-to-end. Doesn't depend on Workers for Platforms —
+could ship before custom domains. Likely will.
+
 ## Open questions to resolve at execution time
 
 - [ ] Wrangler 4.x syntax for dispatch namespace deployment — verify against

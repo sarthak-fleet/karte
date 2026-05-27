@@ -16,14 +16,17 @@ export async function POST(
 ) {
   const { pageId } = await params;
 
-  const ip =
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const { ok } = rateLimit(`newspaper:${ip}`, { windowMs: 3_600_000, maxRequests: 3 });
-  if (!ok) {
-    return new Response(JSON.stringify({ error: 'Too many requests' }), {
-      status: 429,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  const isBackgroundCall = req.headers.get('x-background-generation') === '1';
+  if (!isBackgroundCall) {
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const { ok } = rateLimit(`newspaper:${ip}`, { windowMs: 3_600_000, maxRequests: 3 });
+    if (!ok) {
+      return new Response(JSON.stringify({ error: 'Too many requests' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
   }
 
   await ensureProjectsTable();
