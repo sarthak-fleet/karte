@@ -4,6 +4,7 @@ import nextDynamic from 'next/dynamic';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { AnimatedReveal } from '@/components/public/animated-reveal';
 import { LayoutRenderer } from '@/components/public/layout-renderer';
 import { PageSectionRenderer } from '@/components/public/page-section-renderer';
 import { ProfileHero } from '@/components/public/profile-hero';
@@ -157,7 +158,9 @@ export default async function ProfilePage({ params }: Props) {
           {/* Right column — scrolling content stream */}
           <div className="space-y-10 lg:py-12">
             {page.videoUrl && (
-              <VideoEmbed url={page.videoUrl} accentColor={theme.accentColor} />
+              <AnimatedReveal>
+                <VideoEmbed url={page.videoUrl} accentColor={theme.accentColor} />
+              </AnimatedReveal>
             )}
 
             {(linkData.length > 0 || projectData.length > 0) && (
@@ -170,7 +173,7 @@ export default async function ProfilePage({ params }: Props) {
             )}
 
             {enabledModeCards.length > 0 && (
-              <section>
+              <AnimatedReveal as="section">
                 <p
                   className="mb-4 text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-4"
                 >
@@ -264,25 +267,26 @@ export default async function ProfilePage({ params }: Props) {
                     </Link>
                   ))}
                 </div>
-              </section>
+              </AnimatedReveal>
             )}
 
             {publicSections.length > 0 && (
               <section className="space-y-4">
-                {publicSections.map((section) => (
-                  <TrackableSection
-                    key={section.id}
-                    slug={slug}
-                    sectionId={section.id}
-                    sectionType={section.type}
-                    sectionTitle={section.title}
-                  >
-                    <PageSectionRenderer
+                {publicSections.map((section, i) => (
+                  <AnimatedReveal key={section.id} delay={Math.min(i * 60, 240)}>
+                    <TrackableSection
                       slug={slug}
-                      section={section}
-                      accentColor={theme.accentColor}
-                    />
-                  </TrackableSection>
+                      sectionId={section.id}
+                      sectionType={section.type}
+                      sectionTitle={section.title}
+                    >
+                      <PageSectionRenderer
+                        slug={slug}
+                        section={section}
+                        accentColor={theme.accentColor}
+                      />
+                    </TrackableSection>
+                  </AnimatedReveal>
                 ))}
               </section>
             )}

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 
+import { HeroChatDock } from '@/components/public/hero-chat-dock';
 import { OpenChatButton } from '@/components/public/open-chat-button';
 
 interface QuickAction {
@@ -34,13 +35,12 @@ function tipLabel(url: string) {
 }
 
 /**
- * The big, sticky-on-desktop hero column. This is the part of the page
- * that stays fixed while content scrolls past on the right — it carries
- * the brand statement: avatar, name set as typographic mass, bio, and
- * the primary actions a visitor can take (chat / book / subscribe / tip).
+ * The big, sticky-on-desktop hero column. Avatar with accent glow,
+ * manifesto-scale name with serif italic accent on the last name,
+ * embedded chat dock, primary CTA, and the quick-action stack.
  *
- * On mobile this just stacks above the content. Sticky behavior only
- * kicks in at lg+ where there's room for the two-column layout.
+ * On lg+ this stays in view while content scrolls past on the right.
+ * On smaller breakpoints it stacks normally.
  */
 export function ProfileHero({
   displayName,
@@ -85,32 +85,64 @@ export function ProfileHero({
   if (tipUrl) quickActions.push({ label: tipLabel(tipUrl), url: tipUrl, icon: '☕' });
 
   return (
-    <aside className="relative lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-center lg:py-12 lg:pr-8">
-      {/* Avatar */}
-      <div className="flex items-start gap-5">
-        {avatarUrl ? (
-          <Image
-            src={avatarUrl}
-            alt={displayName}
-            width={120}
-            height={120}
-            sizes="(min-width: 1024px) 120px, 96px"
-            priority
-            className="h-24 w-24 shrink-0 rounded-3xl object-cover ring-1 ring-white/[0.08] sm:h-[120px] sm:w-[120px]"
-          />
-        ) : (
+    <aside
+      className="relative lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-center lg:py-12 lg:pr-8"
+      style={
+        {
+          // One-shot fade-in on load. Pure CSS, no JS.
+          animation: 'karte-hero-in 800ms cubic-bezier(0.16, 1, 0.3, 1) both',
+        } as React.CSSProperties
+      }
+    >
+      <style>{`
+        @keyframes karte-hero-in {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes karte-avatar-glow {
+          0%, 100% { opacity: 0.45; transform: scale(1); }
+          50%      { opacity: 0.65; transform: scale(1.04); }
+        }
+      `}</style>
+
+      {/* Avatar with accent glow */}
+      <div className="relative flex items-start gap-4">
+        <div className="relative shrink-0">
           <div
-            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl text-3xl font-semibold text-zinc-950 ring-1 ring-white/[0.08] sm:h-[120px] sm:w-[120px] sm:text-4xl"
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-3 rounded-full blur-2xl"
             style={{
-              background: `linear-gradient(135deg, ${accentColor}, ${accentColor}aa)`,
+              backgroundColor: `${accentColor}55`,
+              animation: 'karte-avatar-glow 4s ease-in-out infinite',
             }}
-          >
-            {initials}
-          </div>
-        )}
+          />
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt={displayName}
+              width={128}
+              height={128}
+              sizes="128px"
+              priority
+              className="relative h-28 w-28 rounded-3xl object-cover ring-1 ring-white/[0.10] sm:h-32 sm:w-32"
+            />
+          ) : (
+            <div
+              className="relative flex h-28 w-28 items-center justify-center rounded-3xl text-3xl font-semibold text-zinc-950 ring-1 ring-white/[0.10] sm:h-32 sm:w-32 sm:text-4xl"
+              style={{
+                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}aa)`,
+              }}
+            >
+              {initials}
+            </div>
+          )}
+        </div>
 
         {location && (
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-3 py-1 text-[11px] font-medium text-karte-text-3">
+          <div
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-3 py-1 text-[11px] font-medium text-karte-text-3"
+            style={{ borderColor: `${accentColor}28` }}
+          >
             <span
               aria-hidden="true"
               className="h-1.5 w-1.5 rounded-full"
@@ -122,15 +154,13 @@ export function ProfileHero({
       </div>
 
       {/* Name — manifesto scale */}
-      <h1
-        className="mt-8 text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-karte-text sm:text-[56px] lg:text-[64px]"
-      >
+      <h1 className="mt-7 text-[44px] font-semibold leading-[0.95] tracking-[-0.035em] text-karte-text sm:text-[56px] lg:text-[64px]">
         {firstName}
         {restOfName && (
           <>
             <br />
             <span
-              className="font-normal italic text-karte-accent-soft"
+              className="font-normal italic"
               style={{ fontFamily: serifFontVar, color: accentColor }}
             >
               {restOfName}
@@ -141,16 +171,23 @@ export function ProfileHero({
 
       {/* Bio */}
       {bio && (
-        <p className="mt-6 max-w-md text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3 sm:text-base">
+        <p className="mt-5 max-w-md text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3 sm:text-[16px]">
           {bio}
         </p>
       )}
 
+      {/* Inline chat dock */}
+      <HeroChatDock
+        displayName={displayName}
+        accentColor={accentColor}
+        chatEnabled={chatEnabled}
+      />
+
       {/* Primary CTAs — stacked, not pills */}
-      <div className="mt-8 flex flex-col gap-2.5">
-        {hasMessenger && (
+      <div className="mt-3 flex flex-col gap-2">
+        {hasMessenger && !chatEnabled && (
           <OpenChatButton
-            mode={chatEnabled ? 'chat' : 'contact'}
+            mode="contact"
             className="group inline-flex items-center justify-between rounded-2xl px-5 py-3.5 text-[15px] font-semibold text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:brightness-110 active:scale-[0.98]"
             style={{ backgroundColor: accentColor }}
           >
@@ -176,7 +213,7 @@ export function ProfileHero({
             data-track-type="quick-action"
             data-track-id={action.url}
             data-track-label={action.label}
-            className="group inline-flex items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.025] px-5 py-3 text-[14px] font-medium text-karte-text transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.05]"
+            className="group inline-flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-5 py-3 text-[14px] font-medium text-karte-text transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.05]"
             style={{ borderColor: `${accentColor}1f` }}
           >
             <span className="flex items-center gap-2.5">

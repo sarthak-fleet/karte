@@ -1,3 +1,4 @@
+import { AnimatedReveal } from '@/components/public/animated-reveal';
 import {
   allVariantsById,
   type LinkCardData,
@@ -57,19 +58,26 @@ export function LayoutRenderer({
 
   const ctx = { accentColor, slug };
 
+  // Stagger reveals: each card's delay is its position in the stream so
+  // they fade up in sequence, not all at once. Capped so big lists don't
+  // delay the bottom items past usability.
+  let staggerIdx = 0;
+  const reveal = (node: React.ReactNode, key: string) => (
+    <AnimatedReveal key={key} delay={Math.min(staggerIdx++ * 60, 360)}>
+      {node}
+    </AnimatedReveal>
+  );
+
   return (
     <div className="space-y-6">
-      {heroPick && (
-        <div>{allVariantsById[heroPick.variantId]?.render(heroPick.data, ctx)}</div>
-      )}
+      {heroPick &&
+        reveal(allVariantsById[heroPick.variantId]?.render(heroPick.data, ctx), 'hero')}
 
       {squarePicks.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2">
           {squarePicks.map((pick) => {
             const v = allVariantsById[pick.variantId];
-            return v ? (
-              <div key={pick.data.id}>{v.render(pick.data, ctx)}</div>
-            ) : null;
+            return v ? reveal(v.render(pick.data, ctx), `sq:${pick.data.id}`) : null;
           })}
         </div>
       )}
@@ -78,9 +86,7 @@ export function LayoutRenderer({
         <div className="space-y-3">
           {widePicks.map((pick) => {
             const v = allVariantsById[pick.variantId];
-            return v ? (
-              <div key={pick.data.id}>{v.render(pick.data, ctx)}</div>
-            ) : null;
+            return v ? reveal(v.render(pick.data, ctx), `wd:${pick.data.id}`) : null;
           })}
         </div>
       )}
@@ -89,9 +95,7 @@ export function LayoutRenderer({
         <div className="grid gap-2.5 sm:grid-cols-2">
           {linePicks.map((pick) => {
             const v = allVariantsById[pick.variantId];
-            return v ? (
-              <div key={pick.data.id}>{v.render(pick.data, ctx)}</div>
-            ) : null;
+            return v ? reveal(v.render(pick.data, ctx), `ln:${pick.data.id}`) : null;
           })}
         </div>
       )}
