@@ -55,6 +55,8 @@ export async function POST(
   const title = typeof body.title === 'string' ? body.title.trim() : '';
   const url = typeof body.url === 'string' ? body.url.trim() : '';
   const icon = typeof body.icon === 'string' ? body.icon.trim() : '';
+  const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl.trim() : '';
+  const bodyText = typeof body.body === 'string' ? body.body.trim() : '';
 
   if (!title || !url) {
     return NextResponse.json(
@@ -88,6 +90,8 @@ export async function POST(
       title,
       url,
       icon: icon || null,
+      imageUrl: imageUrl || null,
+      body: bodyText || null,
       sortOrder: nextOrder,
     })
     .returning();

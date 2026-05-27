@@ -104,6 +104,13 @@ export const pages = sqliteTable('pages', {
   newspaperEnabled: integer('newspaperEnabled', { mode: 'boolean' }).default(false),
   pageSettings: text('pageSettings', { mode: 'json' }).$type<PageSettings>(),
   scrapedContent: text('scrapedContent', { mode: 'json' }).$type<ScrapedCache>(),
+  // Quick-action fields. All nullable; surfaced on the public profile only
+  // when set. Pure URL/text — no integrations, just well-rendered links.
+  location: text('location'),
+  calendarUrl: text('calendarUrl'),
+  newsletterUrl: text('newsletterUrl'),
+  tipUrl: text('tipUrl'),
+  videoUrl: text('videoUrl'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),
@@ -134,6 +141,10 @@ export const links = sqliteTable('links', {
   title: text('title').notNull(),
   url: text('url').notNull(),
   icon: text('icon'),
+  // Optional richer content — unlocks the wider link variants. Nullable so
+  // existing links keep their compact line treatment until backfilled.
+  imageUrl: text('imageUrl'),
+  body: text('body'),
   sortOrder: integer('sortOrder').default(0),
   enabled: integer('enabled', { mode: 'boolean' }).default(true),
 });

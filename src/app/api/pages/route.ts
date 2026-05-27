@@ -35,7 +35,18 @@ export async function POST(req: Request) {
   await ensureProjectsTable();
 
   const body = await req.json();
-  const { slug, displayName, bio, avatarUrl, themeConfig } = body;
+  const {
+    slug,
+    displayName,
+    bio,
+    avatarUrl,
+    themeConfig,
+    location,
+    calendarUrl,
+    newsletterUrl,
+    tipUrl,
+    videoUrl,
+  } = body;
 
   if (!slug || !displayName) {
     return NextResponse.json(
@@ -109,6 +120,12 @@ export async function POST(req: Request) {
     );
   }
 
+  // All quick-action URLs are optional + nullable. Trim + accept any
+  // non-empty string — we render-time validate, not save-time, so visitors
+  // never see a half-broken card.
+  const optionalText = (value: unknown) =>
+    typeof value === 'string' && value.trim() ? value.trim() : null;
+
   const [page] = await db
     .insert(pages)
     .values({
@@ -118,6 +135,11 @@ export async function POST(req: Request) {
       bio: bio ?? null,
       avatarUrl: avatarUrl?.trim() || null,
       themeConfig: normalizedThemeConfig,
+      location: optionalText(location),
+      calendarUrl: optionalText(calendarUrl),
+      newsletterUrl: optionalText(newsletterUrl),
+      tipUrl: optionalText(tipUrl),
+      videoUrl: optionalText(videoUrl),
     })
     .returning();
 

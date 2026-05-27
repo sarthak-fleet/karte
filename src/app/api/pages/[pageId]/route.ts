@@ -30,7 +30,29 @@ export async function PUT(
   }
 
   const body = await req.json();
-  const { slug, displayName, bio, avatarUrl, published, themeConfig, dmMode } = body;
+  const {
+    slug,
+    displayName,
+    bio,
+    avatarUrl,
+    published,
+    themeConfig,
+    dmMode,
+    location,
+    calendarUrl,
+    newsletterUrl,
+    tipUrl,
+    videoUrl,
+  } = body;
+
+  // Quick-action URL fields: accept undefined (unchanged), null/empty (clear),
+  // string (set). One-liner so the .set() block reads clean below.
+  const upsertText = <T,>(incoming: unknown, current: T): T | string | null =>
+    incoming === undefined
+      ? current
+      : typeof incoming === 'string' && incoming.trim()
+        ? incoming.trim()
+        : null;
 
   if (slug && !isValidSlug(slug)) {
     return NextResponse.json(
@@ -113,6 +135,11 @@ export async function PUT(
       themeConfig: normalizedThemeConfig,
       published: published !== undefined ? published : page.published,
       dmMode: dmMode ?? page.dmMode,
+      location: upsertText(location, page.location),
+      calendarUrl: upsertText(calendarUrl, page.calendarUrl),
+      newsletterUrl: upsertText(newsletterUrl, page.newsletterUrl),
+      tipUrl: upsertText(tipUrl, page.tipUrl),
+      videoUrl: upsertText(videoUrl, page.videoUrl),
       updatedAt: new Date(),
     })
     .where(eq(pages.id, pageId))

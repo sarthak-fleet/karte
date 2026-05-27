@@ -13,6 +13,8 @@ const ChatWidget = nextDynamic(
 );
 
 import { LinkCard } from '@/components/public/link-card';
+import { QuickActions } from '@/components/public/quick-actions';
+import { VideoEmbed } from '@/components/public/video-embed';
 import { OpenChatButton } from '@/components/public/open-chat-button';
 import { PageSectionRenderer } from '@/components/public/page-section-renderer';
 import { ProjectCard } from '@/components/public/project-card';
@@ -147,6 +149,15 @@ export default async function ProfilePage({ params }: Props) {
                   <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
                     <span style={{ color: theme.accentColor }}>·</span>{' '}
                     {variant.eyebrow}
+                    {page.location && (
+                      <>
+                        {' '}
+                        <span className="text-karte-text-4/60">·</span>{' '}
+                        <span className="text-karte-text-3 normal-case tracking-normal">
+                          {page.location}
+                        </span>
+                      </>
+                    )}
                   </p>
                   <h1 className="mt-2 text-3xl font-semibold leading-[1.05] tracking-[-0.02em] text-karte-text sm:text-5xl">
                     {page.displayName}
@@ -158,6 +169,19 @@ export default async function ProfilePage({ params }: Props) {
                 <p className="mt-7 max-w-2xl text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3 sm:mt-8 sm:text-lg sm:leading-[1.55]">
                   {page.bio}
                 </p>
+              )}
+
+              <QuickActions
+                calendarUrl={page.calendarUrl}
+                newsletterUrl={page.newsletterUrl}
+                tipUrl={page.tipUrl}
+                accentColor={theme.accentColor}
+              />
+
+              {page.videoUrl && (
+                <div className="mt-6 sm:mt-8">
+                  <VideoEmbed url={page.videoUrl} accentColor={theme.accentColor} />
+                </div>
               )}
             </div>
 
@@ -225,6 +249,8 @@ export default async function ProfilePage({ params }: Props) {
                   title={link.title}
                   url={link.url}
                   icon={link.icon}
+                  imageUrl={link.imageUrl}
+                  body={link.body}
                   accentColor={theme.accentColor}
                 />
               ))}
