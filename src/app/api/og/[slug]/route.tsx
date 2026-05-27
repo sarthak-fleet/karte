@@ -1,16 +1,14 @@
 import { ImageResponse } from 'next/og';
 
-import { resolveThemeConfig } from '@/lib/themes';
-
-import { getFullPageData } from '@/app/[slug]/_lib/get-page-data';
-
-// Route Handler that returns a per-slug OG image. Wired into the page's
-// og:image manually via generateMetadata so we control the URL.
+// Per-slug OG image. Reads all the data it needs from URL query params
+// (h, name, loc, accent, grad2, live) — the page's generateMetadata
+// computes those and bakes them into the og:image URL. We skip a D1
+// call here because the OpenNext + CF Workers OG route context can't
+// reliably reach the binding (the call hangs and the runtime kills
+// the request after the time budget).
 //
-// Going with a route handler (not the opengraph-image.tsx convention)
-// because that convention hung on the OpenNext + CF Workers stack —
-// the Worker timed out during Satori WASM init. Route handlers behave
-// differently and seem to work.
+// Cache aggressively at the edge — same payload only re-renders when
+// the headline / theme changes.
 
 const SIZE = { width: 1200, height: 630 };
 
@@ -25,64 +23,26 @@ function getInitials(displayName: string): string {
   );
 }
 
-function safeText(value: string | null | undefined, max: number): string {
-  if (!value) return '';
-  const t = value.replace(/\s+/g, ' ').trim();
-  if (t.length <= max) return t;
-  const slice = t.slice(0, max);
-  const lastSpace = slice.lastIndexOf(' ');
-  return `${(lastSpace > max * 0.6 ? slice.slice(0, lastSpace) : slice).trimEnd()}…`;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractNewspaperHeadline(content: any): string | null {
-  const h = content?.leadStory?.headline;
-  return typeof h === 'string' && h.trim() ? h : null;
-}
-
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  // Temporarily skip DB fetch — diagnosing whether the hang is in
-  // Satori or in the D1 call. If this returns a PNG, the DB call is
-  // the bottleneck and we need a different fetch strategy.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const data = null as Awaited<ReturnType<typeof getFullPageData>>;
+  const url = new URL(req.url);
+  const q = url.searchParams;
 
-  if (!data) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#0a0a0a',
-            color: '#a1a1aa',
-            fontFamily: 'sans-serif',
-            fontSize: 36,
-          }}
-        >
-          karte.cc/{slug}
-        </div>
-      ),
-      SIZE,
-    );
-  }
+  const displayName = q.get('name') || slug;
+  const headline = q.get('h') || `Visit ${displayName} on Karte`;
+  const location = q.get('loc') || '';
+  const isLive = q.get('live') === '1';
+  // accent + grad2 come in as hex without the leading # to keep the
+  // URL clean; reattach here.
+  const accentRaw = q.get('accent') || '67e8f9';
+  const grad2Raw = q.get('grad2') || accentRaw;
+  const accent = `#${accentRaw}`;
+  const grad2 = `#${grad2Raw}`;
 
-  const { page, modeContent } = data;
-  const theme = resolveThemeConfig(page.themeConfig);
-  const accent = theme.accentColor;
-  const grad2 = theme.gradientTo || accent;
-
-  const newsHeadline = extractNewspaperHeadline(modeContent?.newspaper);
-  const headline = newsHeadline || safeText(page.bio, 140) || `Visit ${page.displayName} on Karte`;
-  const isLive = !!newsHeadline;
-  const initials = getInitials(page.displayName);
+  const initials = getInitials(displayName);
 
   return new ImageResponse(
     (
@@ -126,7 +86,7 @@ export async function GET(
                 textTransform: 'uppercase',
               }}
             >
-              karte.cc/{page.slug}
+              karte.cc/{slug}
             </div>
             <div
               style={{
@@ -137,10 +97,10 @@ export async function GET(
                 letterSpacing: -1.5,
               }}
             >
-              {page.displayName}
-              {page.location ? (
+              {displayName}
+              {location ? (
                 <span style={{ color: '#a1a1aa', fontWeight: 500, fontSize: 30 }}>
-                  {`  ·  ${page.location}`}
+                  {`  ·  ${location}`}
                 </span>
               ) : (
                 ''
@@ -238,9 +198,6 @@ export async function GET(
     {
       ...SIZE,
       headers: {
-        // Cache aggressively at the edge so the Satori render only runs
-        // when the underlying content materially changes. Worker will
-        // serve from CF cache for everyone else.
         'cache-control': 'public, s-maxage=300, stale-while-revalidate=86400',
       },
     },

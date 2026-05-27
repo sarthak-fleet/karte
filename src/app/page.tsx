@@ -1,6 +1,7 @@
 import { Geist, Instrument_Serif } from 'next/font/google';
 import Link from 'next/link';
 
+import { LandingDemo } from '@/components/public/landing-demo';
 import { PublicTopBar } from '@/components/public/public-top-bar';
 
 // Landing content changes only on deploy. Long TTL keeps it cached at every
@@ -30,12 +31,6 @@ const mechanics = [
   },
 ];
 
-const flipExamples = [
-  'What is Sarthak building?',
-  'Should I reach out?',
-  'Generate the wiki entry',
-  'Roast this profile',
-];
 
 export default function Home() {
   return (
