@@ -5,7 +5,43 @@ Last audit: 2026-05-27.
 
 ## What's already been fixed
 
-- **Dashboard layout** (was 6-8 RTTs per nav, now 2). See commit `dashboard-lag-fix`. The migration/sync logic now only runs on first dashboard load per user.
+- **Dashboard layout** (was 6-8 RTTs per nav, now 2). The migration/sync logic now only runs on first dashboard load per user.
+- **Analytics page** (9 sequential awaits → 1 Promise.all). 7 independent queries now run in parallel.
+- **Chat widget lazy-loaded** on `/[slug]` via `next/dynamic`. 722-line client component is now code-split into its own chunk.
+- **`getSession()` wrapped in React `cache()`** so multiple calls within a single request dedupe instead of re-hitting D1.
+
+## ⚠ Known remaining bottleneck: public profile is ~1.3s TTFB
+
+Measured `/karte.cc/sarthak`:
+- DNS: 1ms
+- TCP: 280ms (one-time)
+- TLS: 280ms (one-time, ~560ms cumulative)
+- **TTFB: 1.36s** ← server processing
+- Total: 1.6s
+
+The server takes ~800ms after TLS handshake to produce the first byte.
+That's mostly DB query time (`getFullPageData` runs 2 RTTs to Turso) +
+SSR rendering of the heavy profile page.
+
+This needs a focused effort to fix properly:
+
+1. **Cache the page response at the CF edge.** Hardest because the page
+   uses `searchParams` (`?room=`, `?variant=`) and is therefore dynamic
+   in Next.js's model. Options:
+   - HTTP `Cache-Control: public, s-maxage=60` via middleware on profile
+     paths only
+   - Edge-cache via OpenNext's KV-backed cache API
+   - Move searchParams handling into a client component so the page
+     itself can be statically generated
+2. **Move Turso DB region closer to Cloudflare's edge.** If Turso is in
+   a single region and CF Workers are global, every request pays the
+   distance. Turso has edge replicas — check if `karte` DB is configured
+   for them.
+3. **Streaming SSR with Suspense.** Server starts sending HTML
+   immediately, queries finish and stream in. The visitor sees content
+   before the full TTFB.
+
+None of these are 30-minute fixes. Each is a focused session.
 
 ## Open issues, ordered by impact
 
