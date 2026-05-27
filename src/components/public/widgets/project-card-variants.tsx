@@ -75,7 +75,7 @@ const squareVariant: WidgetVariant<ProjectCardData> = {
         <img
           src={data.imageUrl}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
         />
       ) : (
         <span
@@ -122,7 +122,7 @@ const wideVariant: WidgetVariant<ProjectCardData> = {
         <img
           src={data.imageUrl}
           alt=""
-          className="h-16 w-16 shrink-0 rounded-xl object-cover"
+          className="h-16 w-16 shrink-0 rounded-xl object-cover transition-transform duration-300 ease-[var(--karte-ease)] group-hover:scale-[1.06]"
         />
       ) : (
         <span
@@ -185,7 +185,7 @@ const heroVariant: WidgetVariant<ProjectCardData> = {
         <img
           src={data.imageUrl}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
         />
       ) : (
         <span

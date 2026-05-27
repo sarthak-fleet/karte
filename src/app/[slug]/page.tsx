@@ -10,6 +10,7 @@ import { PageSectionRenderer } from '@/components/public/page-section-renderer';
 import { ProfileHero } from '@/components/public/profile-hero';
 import { RoamingCharacter } from '@/components/public/roaming-character';
 import { TrackableSection } from '@/components/public/trackable-section';
+import { TypedText } from '@/components/public/typed-text';
 import { VideoEmbed } from '@/components/public/video-embed';
 import type { ProjectCardData } from '@/components/public/widgets';
 import { getProfileVariant } from '@/lib/profile-variants';
@@ -165,6 +166,23 @@ export default async function ProfilePage({ params }: Props) {
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(ellipse_at_top,#000_30%,transparent_75%)]" />
+
+        {/* Drifting accent orb — slow ambient motion behind everything */}
+        <div
+          className="absolute top-1/4 left-0 h-[600px] w-[600px] rounded-full blur-[120px]"
+          style={{
+            backgroundColor: `${theme.accentColor}1a`,
+            animation: 'karte-orb-drift 32s ease-in-out infinite alternate',
+            willChange: 'transform',
+          }}
+        />
+        <style>{`
+          @keyframes karte-orb-drift {
+            0%   { transform: translate(-15%, 0%) scale(1); }
+            50%  { transform: translate(60%, 20%) scale(1.15); }
+            100% { transform: translate(15%, -10%) scale(0.95); }
+          }
+        `}</style>
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-8 sm:px-8">
@@ -260,7 +278,13 @@ export default async function ProfilePage({ params }: Props) {
                             </h3>
                             {card.preview && (
                               <p className="mt-1.5 line-clamp-2 text-[12px] leading-[1.5] text-karte-text-3">
-                                {card.preview}
+                                <TypedText
+                                  text={card.preview}
+                                  speed={18}
+                                  startDelay={200}
+                                  cursor
+                                  cursorColor="#6ea8fe"
+                                />
                               </p>
                             )}
                             <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#6ea8fe] underline decoration-[#6ea8fe]/40 underline-offset-2 transition-colors duration-200 group-hover:decoration-[#6ea8fe]">
@@ -306,7 +330,13 @@ export default async function ProfilePage({ params }: Props) {
                                 className="mt-2.5 line-clamp-2 text-[12px] font-bold uppercase leading-[1.25] tracking-[-0.005em]"
                                 style={{ fontFamily: serif.style.fontFamily, fontStyle: 'normal' }}
                               >
-                                {paper?.headline || card.preview}
+                                <TypedText
+                                  text={paper?.headline || card.preview}
+                                  speed={20}
+                                  startDelay={400}
+                                  cursor
+                                  cursorColor="#17130d"
+                                />
                               </p>
                             )}
                             <span className="mt-3 inline-flex items-center gap-1 self-start border-b border-[#17130d]/30 pb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#17130d] transition-colors duration-200 group-hover:border-[#17130d]">
@@ -340,7 +370,15 @@ export default async function ProfilePage({ params }: Props) {
                           </h3>
                           {card.preview && (
                             <p className="mt-1.5 line-clamp-2 text-[12px] italic leading-[1.5] text-white/80">
-                              &ldquo;{card.preview}&rdquo;
+                              &ldquo;
+                              <TypedText
+                                text={card.preview}
+                                speed={22}
+                                startDelay={600}
+                                cursor
+                                cursorColor="#ff4d6d"
+                              />
+                              &rdquo;
                             </p>
                           )}
                           <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff4d6d] transition-colors duration-200 group-hover:text-[#ff8aa3]">
