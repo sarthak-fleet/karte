@@ -233,18 +233,12 @@ export function PageSectionRenderer({
   }
 
   return (
-    <GlassCard className="rounded-3xl p-6 sm:p-8">
-      <p
-        className="text-[11px] font-medium uppercase tracking-[0.28em]"
-        style={{ color: accentColor }}
-      >
-        Section
-      </p>
-      <h3 className="mt-3 text-2xl font-semibold text-karte-text">
+    <GlassCard className="rounded-3xl p-5 sm:p-6">
+      <h3 className="text-xl font-semibold tracking-[-0.01em] text-karte-text sm:text-[22px]">
         {section.title}
       </h3>
       {section.content && (
-        <p className="mt-3 text-sm leading-7 text-white/70">
+        <p className="mt-2.5 text-[14px] leading-[1.65] text-karte-text-3">
           {section.content}
         </p>
       )}

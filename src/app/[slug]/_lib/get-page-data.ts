@@ -89,7 +89,13 @@ function extractPreview(type: string, content: unknown): string {
     text = typeof c.roast === 'string' ? c.roast : '';
   }
   if (!text) return '';
-  return text.length > 180 ? `${text.slice(0, 178).trimEnd()}…` : text;
+  // Keep previews short — a tantalizing single line, not a paragraph.
+  // Cut at a word boundary near the limit so we don't slice mid-word.
+  const MAX = 110;
+  if (text.length <= MAX) return text;
+  const slice = text.slice(0, MAX);
+  const lastSpace = slice.lastIndexOf(' ');
+  return `${(lastSpace > 60 ? slice.slice(0, lastSpace) : slice).trimEnd()}…`;
 }
 
 // Keep individual helpers for sub-pages that don't need everything

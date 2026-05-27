@@ -2,6 +2,7 @@ import Image from 'next/image';
 
 import { HeroChatDock } from '@/components/public/hero-chat-dock';
 import { OpenChatButton } from '@/components/public/open-chat-button';
+import { SocialIconRow } from '@/components/public/social-icon-row';
 
 interface QuickAction {
   label: string;
@@ -55,6 +56,7 @@ export function ProfileHero({
   calendarUrl,
   newsletterUrl,
   tipUrl,
+  socialLinks,
 }: {
   displayName: string;
   bio: string | null;
@@ -68,6 +70,12 @@ export function ProfileHero({
   calendarUrl: string | null;
   newsletterUrl: string | null;
   tipUrl: string | null;
+  socialLinks: ReadonlyArray<{
+    id: string;
+    title: string;
+    url: string;
+    icon: string | null;
+  }>;
 }) {
   const firstName = displayName.split(/\s+/)[0] || displayName;
   const restOfName = displayName.slice(firstName.length).trim();
@@ -175,6 +183,9 @@ export function ProfileHero({
           {bio}
         </p>
       )}
+
+      {/* Social icon row — compact, identity-level not content-level */}
+      <SocialIconRow links={socialLinks} accentColor={accentColor} />
 
       {/* Inline chat dock */}
       <HeroChatDock
