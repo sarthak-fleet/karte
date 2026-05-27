@@ -119,10 +119,10 @@ export function ChatList({ pageId }: { pageId: string }) {
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[88%] whitespace-pre-wrap rounded-xl px-3 py-2 text-sm sm:max-w-[80%] ${
+                      className={`max-w-[88%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm leading-[1.5] sm:max-w-[80%] ${
                         msg.role === 'user'
-                          ? 'bg-blue-600 text-karte-text'
-                          : 'border border-karte-border-strong bg-white/5 text-white/90'
+                          ? 'bg-karte-accent/15 text-karte-text ring-1 ring-karte-accent/25'
+                          : 'border border-karte-border-strong bg-white/[0.03] text-karte-text-2'
                       }`}
                     >
                       {msg.content}

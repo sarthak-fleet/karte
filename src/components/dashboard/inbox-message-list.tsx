@@ -106,8 +106,8 @@ export function InboxMessageList({
                   <span
                     className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
                       message.status === 'replied'
-                        ? 'bg-blue-400/10 text-blue-300'
-                        : 'bg-cyan-300/10 text-cyan-200'
+                        ? 'bg-green-400/10 text-green-300'
+                        : 'bg-karte-accent/10 text-karte-accent-soft'
                     }`}
                   >
                     {message.status === 'replied' ? 'Replied' : 'Unread'}
@@ -118,7 +118,7 @@ export function InboxMessageList({
                 ) : (
                   <a
                     href={`mailto:${message.email}`}
-                    className="mt-1 inline-flex text-sm text-blue-300 hover:text-blue-200"
+                    className="mt-1 inline-flex text-sm text-karte-accent-soft transition-colors duration-150 hover:text-karte-accent"
                   >
                     {message.email}
                   </a>
@@ -149,7 +149,7 @@ export function InboxMessageList({
                   type="button"
                   disabled={isUpdating}
                   onClick={() => void updateStatus(message.id, 'replied')}
-                  className="rounded-lg border border-blue-400/20 bg-blue-400/10 px-3 py-2 text-xs font-medium text-blue-200 transition hover:bg-blue-400/15 disabled:opacity-50"
+                  className="rounded-lg border border-green-400/20 bg-green-400/10 px-3 py-2 text-xs font-medium text-green-200 transition-colors duration-150 hover:border-green-400/30 hover:bg-green-400/15 disabled:opacity-50"
                 >
                   Mark Replied
                 </button>
