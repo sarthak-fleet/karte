@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 
 import { EncyclopediaEditor } from '@/components/dashboard/encyclopedia-editor';
 import { db, ensureProjectsTable } from '@/db';
-import { generatedPages,pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { generatedPages } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 import { normalizeEncyclopediaContent } from '@/lib/encyclopedia-compat';
 
 export default async function DashboardEncyclopediaPage() {
@@ -14,9 +14,7 @@ export default async function DashboardEncyclopediaPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

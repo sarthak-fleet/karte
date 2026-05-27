@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation';
 
 import { SectionEditor } from '@/components/dashboard/section-editor';
 import { db, ensureProjectsTable } from '@/db';
-import { pages, pageSections } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { pageSections } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 export default async function SectionsPage() {
   const session = await getSession();
@@ -12,9 +12,7 @@ export default async function SectionsPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

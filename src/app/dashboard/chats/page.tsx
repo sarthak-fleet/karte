@@ -1,21 +1,13 @@
-import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
 import { ChatList } from '@/components/dashboard/chat-list';
-import { db } from '@/db';
-import { pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 export default async function ChatsPage() {
   const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
-  const userPages = await db
-    .select()
-    .from(pages)
-    .where(eq(pages.userId, session.user.id));
-
-  const page = userPages[0];
+  const page = await getCurrentPage(session.user.id);
 
   return (
     <div>

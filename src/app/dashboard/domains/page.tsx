@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation';
 
 import { DomainEditor } from '@/components/dashboard/domain-editor';
 import { db, ensureProjectsTable } from '@/db';
-import { pageDomains, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { pageDomains } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 import {
   getDnsInstructions,
   isCloudflareCustomHostnamesConfigured,
@@ -16,9 +16,7 @@ export default async function DomainsPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

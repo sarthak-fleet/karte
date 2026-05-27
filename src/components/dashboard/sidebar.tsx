@@ -103,12 +103,10 @@ export function Sidebar({ slug }: { slug?: string }) {
                     key={item.href}
                     href={item.href}
                     onClick={onNavigate}
-                    // Disable viewport-based prefetching. Dashboard routes
-                    // are dynamic per-user — letting Next.js prefetch all
-                    // sidebar links eagerly triggered background RSC
-                    // requests that hit the server's DB on every dashboard
-                    // load. Now each click is one request.
-                    prefetch={false}
+                    // Default prefetch: Next.js warms dynamic routes on
+                    // hover/focus, not viewport. Hover-warming makes nav
+                    // feel instant while avoiding the eager DB hits we
+                    // were seeing with prefetch={true}.
                     className={`${baseClass} ${stateClass}`}
                   >
                     <span>{item.label}</span>

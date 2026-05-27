@@ -9,10 +9,9 @@ import {
   generatedPages,
   infoBlocks,
   links,
-  pages,
   projects,
 } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 function statusLabel(done: boolean) {
   return done ? 'Done' : 'Next';
@@ -24,9 +23,7 @@ export default async function DashboardPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

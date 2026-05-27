@@ -5,8 +5,8 @@ import { DashboardTracker } from '@/components/dashboard/dashboard-tracker';
 import { NavProgress } from '@/components/dashboard/nav-progress';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { appDbExecute, db, ensureProjectsTable } from '@/db';
-import { pages, users } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { users } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 // Migration/sync logic moved into syncUserOnce(). It runs:
 //   - The very first time a user opens the dashboard after sign-up, OR
@@ -29,16 +29,14 @@ export default async function DashboardLayout({
   await ensureProjectsTable();
 
   // FAST PATH: in parallel, check if the user is already synced and fetch
-  // their page slug for the sidebar. Most dashboard navigations end here.
+  // their page (full row, since child pages re-call getCurrentPage and reuse
+  // this via React.cache). Most dashboard navigations end here.
   const [appUser, page] = await Promise.all([
     db.query.users.findFirst({
       where: eq(users.id, session.user.id),
       columns: { id: true },
     }),
-    db.query.pages.findFirst({
-      where: eq(pages.userId, session.user.id),
-      columns: { slug: true },
-    }),
+    getCurrentPage(session.user.id),
   ]);
 
   // SLOW PATH: first time this user has hit the dashboard, or a sync was

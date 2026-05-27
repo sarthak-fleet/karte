@@ -2,8 +2,8 @@ import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
 import { db, ensureProjectsTable } from '@/db';
-import { dailyResourceStats, dailyStats, dailyVisitorEvents, pageEvents, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { dailyResourceStats, dailyStats, dailyVisitorEvents, pageEvents } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 function formatNumber(value: number | string | null) {
   const num = typeof value === 'string' ? Number.parseInt(value, 10) : (value as number);
@@ -52,9 +52,7 @@ export default async function AnalyticsPage() {
   // ensureProjectsTable is cached so calling it cheap.
   const [, page] = await Promise.all([
     ensureProjectsTable(),
-    db.query.pages.findFirst({
-      where: eq(pages.userId, session.user.id),
-    }),
+    getCurrentPage(session.user.id),
   ]);
 
   if (!page) {

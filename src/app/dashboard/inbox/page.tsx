@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 
 import { InboxMessageList } from '@/components/dashboard/inbox-message-list';
 import { db, ensureProjectsTable } from '@/db';
-import { contactSubmissions,pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { contactSubmissions } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 export default async function InboxPage() {
   const session = await getSession();
@@ -13,9 +13,7 @@ export default async function InboxPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

@@ -5,17 +5,15 @@ import { AiKeySettings } from '@/components/dashboard/ai-key-settings';
 import { ChatSettings } from '@/components/dashboard/chat-settings';
 import { InfoEditor } from '@/components/dashboard/info-editor';
 import { db } from '@/db';
-import { infoBlocks, links, pages, projects,users } from '@/db/schema';
+import { infoBlocks, links, projects,users } from '@/db/schema';
 import { getDefaultAiConfig } from '@/lib/ai-client';
-import { getSession } from '@/lib/auth-server';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 export default async function MemoryPage() {
   const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (
