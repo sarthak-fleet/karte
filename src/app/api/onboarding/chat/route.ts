@@ -142,25 +142,12 @@ export async function POST(req: Request) {
   const messages = Array.isArray(body.messages) ? body.messages.slice(-20) : [];
   const prevState = (body.state && typeof body.state === 'object' ? body.state : {}) as OnboardingState;
 
-  let ai = resolveAiConfig();
+  const ai = resolveAiConfig();
   if (!ai) {
     return NextResponse.json(
       { error: 'AI service not configured' },
       { status: 503 },
     );
-  }
-
-  // Internal QA hook — `?model=...` lets us test the same prompt against
-  // different models on free-ai-gateway without redeploying. Safe because
-  // we never expose the API key to the client and the body of work is the
-  // exact prompt+state path. REMOVE once model robustness is validated.
-  try {
-    const modelOverride = new URL(req.url).searchParams.get('model');
-    if (modelOverride) {
-      ai = { ...ai, model: modelOverride };
-    }
-  } catch {
-    // ignore
   }
 
   // For the very first turn (no messages), seed an opener so the UI has
