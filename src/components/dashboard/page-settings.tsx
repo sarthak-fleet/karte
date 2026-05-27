@@ -102,6 +102,37 @@ export function PageSettings({
   const [newsletterUrl, setNewsletterUrl] = useState(page?.newsletterUrl ?? '');
   const [tipUrl, setTipUrl] = useState(page?.tipUrl ?? '');
   const [videoUrl, setVideoUrl] = useState(page?.videoUrl ?? '');
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiRunning, setAiRunning] = useState(false);
+  const [aiMessage, setAiMessage] = useState('');
+
+  async function applyAiTheme() {
+    if (!page || !aiPrompt.trim()) {
+      setAiMessage('Describe the vibe you want first.');
+      return;
+    }
+    setAiRunning(true);
+    setAiMessage('');
+    try {
+      const res = await fetch(`/api/pages/${page.id}/revamp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: aiPrompt, apply: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to generate theme');
+      const nextPresetId = data?.plan?.themePresetId;
+      if (typeof nextPresetId === 'string') {
+        setThemePresetId(nextPresetId as ThemePresetId);
+      }
+      setAiMessage('Theme updated — refresh to see it live.');
+      router.refresh();
+    } catch (error) {
+      setAiMessage(error instanceof Error ? error.message : 'Failed to generate theme');
+    } finally {
+      setAiRunning(false);
+    }
+  }
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [message, setMessage] = useState('');
@@ -494,6 +525,41 @@ export function PageSettings({
               );
             })}
           </div>
+
+          {isEditing && (
+            <div className="mt-4 rounded-2xl bg-white/[0.025] p-4">
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-accent-soft">
+                <span className="text-karte-accent/80">·</span> Or describe a vibe
+              </p>
+              <p className="mt-2 text-[12px] leading-[1.5] text-karte-text-3">
+                We&apos;ll pick a preset (and tweak colors) that matches.
+              </p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <input
+                  type="text"
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="e.g. dark editorial with warm gold accents"
+                  className="min-w-0 flex-1 rounded-xl bg-white/[0.045] px-3.5 py-2.5 text-[13px] text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
+                />
+                <button
+                  type="button"
+                  onClick={applyAiTheme}
+                  disabled={aiRunning || !aiPrompt.trim()}
+                  className="shrink-0 rounded-xl bg-karte-accent px-4 py-2.5 text-[13px] font-semibold text-zinc-950 transition hover:bg-karte-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {aiRunning ? 'Generating…' : 'Suggest a theme'}
+                </button>
+              </div>
+              {aiMessage && (
+                <p
+                  className={`mt-2 text-[12px] ${aiMessage.toLowerCase().includes('failed') ? 'text-rose-300/90' : 'text-karte-text-3'}`}
+                >
+                  {aiMessage}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Publish Toggle (edit mode only) */}

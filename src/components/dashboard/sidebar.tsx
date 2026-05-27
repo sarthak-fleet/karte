@@ -19,35 +19,29 @@ const navGroups: NavGroup[] = [
     items: [{ label: 'Home', href: '/dashboard' }],
   },
   {
-    label: 'Build',
+    label: 'Data',
     items: [
       { label: 'Links', href: '/dashboard/links' },
       { label: 'Projects', href: '/dashboard/projects' },
       { label: 'Sections', href: '/dashboard/sections' },
+      { label: 'Memory', href: '/dashboard/memory' },
       { label: 'Modes', href: '/dashboard/pages' },
-      { label: 'AI Revamp', href: '/dashboard/revamp', featured: true },
     ],
   },
   {
-    label: 'Engage',
-    items: [
-      { label: 'Chat', href: '/dashboard/memory' },
-      { label: 'Inbox', href: '/dashboard/inbox' },
-      { label: 'Leads', href: '/dashboard/leads' },
-    ],
-  },
-  {
-    label: 'Analyze',
-    items: [
-      { label: 'Analytics', href: '/dashboard/analytics' },
-    ],
-  },
-  {
-    label: 'Settings',
+    label: 'Design',
     items: [
       { label: 'Appearance', href: '/dashboard/appearance' },
-      { label: 'Domains', href: '/dashboard/domains' },
       { label: 'Widgets', href: '/dashboard/widgets' },
+    ],
+  },
+  {
+    label: 'Settings & analytics',
+    items: [
+      { label: 'Analytics', href: '/dashboard/analytics' },
+      { label: 'Inbox', href: '/dashboard/inbox' },
+      { label: 'Leads', href: '/dashboard/leads' },
+      { label: 'Domains', href: '/dashboard/domains' },
     ],
   },
 ];

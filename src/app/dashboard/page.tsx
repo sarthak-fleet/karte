@@ -95,9 +95,9 @@ export default async function DashboardPage() {
       href: '/dashboard/memory',
     },
     {
-      label: 'Try AI revamp',
+      label: 'Pick a theme',
       done: Boolean(page.themeConfig?.presetId),
-      href: '/dashboard/revamp',
+      href: '/dashboard/appearance',
     },
     {
       label: 'Enable DMs',
