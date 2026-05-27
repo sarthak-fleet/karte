@@ -444,7 +444,7 @@ export function ChatWidget({
     <>
       <button
         onClick={() => setOpen((current) => !current)}
-        className={`fixed bottom-4 ${launcherPositionClass} z-50 flex h-14 w-14 items-center justify-center rounded-full border border-white/20 text-2xl shadow-lg backdrop-blur-xl transition-transform hover:scale-110 active:scale-95 sm:bottom-6`}
+        className={`fixed bottom-4 ${launcherPositionClass} z-50 flex h-14 w-14 items-center justify-center rounded-full border border-karte-border-strong text-2xl backdrop-blur-xl transition-all duration-200 ease-[var(--karte-ease)] hover:scale-105 active:scale-95 sm:bottom-6`}
         aria-label={open ? 'Close messenger' : 'Open messenger'}
         style={{
           backgroundColor: `${accentColor}f2`,
@@ -457,16 +457,16 @@ export function ChatWidget({
 
       {open && (
         <div
-          className={`fixed bottom-20 ${panelPositionClass} z-50 flex h-[min(520px,calc(100vh-6rem))] w-auto flex-col overflow-hidden rounded-2xl border border-white/20 bg-gray-900/80 shadow-2xl backdrop-blur-xl sm:bottom-24`}
+          className={`fixed bottom-20 ${panelPositionClass} z-50 flex h-[min(520px,calc(100vh-6rem))] w-auto flex-col overflow-hidden rounded-2xl border border-karte-border-strong bg-karte-surface/95 backdrop-blur-xl sm:bottom-24`}
         >
-          <div className="border-b border-white/10 px-4 py-3">
+          <div className="border-b border-karte-border-strong px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold text-karte-text">
                 {title}
               </h3>
               <div className="flex items-center gap-2">
                 {!!initialRoomId && (
-                  <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/50">
+                  <span className="rounded-full border border-karte-border-strong bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/50">
                     Invited via link
                   </span>
                 )}
@@ -478,7 +478,7 @@ export function ChatWidget({
                       className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
                         shareCopied
                           ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
-                          : 'border-white/10 text-white/70 hover:text-karte-text'
+                          : 'border-karte-border-strong text-white/70 hover:text-karte-text'
                       }`}
                       aria-label="Copy invite link to this chat"
                     >
@@ -487,7 +487,7 @@ export function ChatWidget({
                     <button
                       type="button"
                       onClick={startNewChat}
-                      className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:text-karte-text"
+                      className="rounded-full border border-karte-border-strong px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:text-karte-text"
                       aria-label="Start a new chat"
                     >
                       New
@@ -495,7 +495,7 @@ export function ChatWidget({
                   </>
                 )}
                 {showModeTabs && (
-                  <div className="flex rounded-full border border-white/10 bg-white/5 p-1">
+                  <div className="flex rounded-full border border-karte-border-strong bg-white/5 p-1">
                     <button
                       type="button"
                       onClick={() => setMode('chat')}
@@ -571,7 +571,7 @@ export function ChatWidget({
                             key={prompt}
                             type="button"
                             onClick={() => handleStarterPrompt(prompt)}
-                            className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm text-white/90 transition hover:bg-white/15 active:scale-95 sm:py-1.5 sm:text-xs"
+                            className="rounded-full border border-karte-border-emphasis bg-white/10 px-3 py-2 text-sm text-white/90 transition hover:bg-white/15 active:scale-95 sm:py-1.5 sm:text-xs"
                           >
                             {prompt}
                           </button>
@@ -591,7 +591,7 @@ export function ChatWidget({
                       className={`max-w-[80%] whitespace-pre-wrap rounded-xl px-3 py-2 text-sm ${
                         msg.role === 'user'
                           ? ''
-                          : 'border border-white/10 bg-white/5 text-white/90'
+                          : 'border border-karte-border-strong bg-white/5 text-white/90'
                       }`}
                       style={
                         msg.role === 'user'
@@ -613,7 +613,7 @@ export function ChatWidget({
               </div>
 
               {isGuestPreview ? (
-                <div className="border-t border-white/10 px-4 py-4 text-center">
+                <div className="border-t border-karte-border-strong px-4 py-4 text-center">
                   <p className="mb-3 text-xs text-white/50">
                     You&apos;re previewing a shared conversation
                   </p>
@@ -635,7 +635,7 @@ export function ChatWidget({
                   className={`border-t px-4 py-3 transition-colors ${
                     isFirstMessage
                       ? 'border-white/25 bg-white/[0.04]'
-                      : 'border-white/10'
+                      : 'border-karte-border-strong'
                   }`}
                 >
                   {isFirstMessage && (
@@ -664,14 +664,14 @@ export function ChatWidget({
                       className={`min-w-0 flex-1 resize-none rounded-lg border bg-white/5 px-3 py-3 text-base leading-5 text-karte-text placeholder-white/40 outline-none transition focus:border-[#f2c879] sm:py-2 sm:text-sm ${
                         isFirstMessage
                           ? 'border-white/30 ring-1 ring-white/15 focus:ring-2 focus:ring-[#f2c879]/40'
-                          : 'border-white/10'
+                          : 'border-karte-border-strong'
                       }`}
                       style={{ maxHeight: '96px', overflowY: 'auto' }}
                     />
                     <button
                       type="submit"
                       disabled={loading || historyStatus === 'loading' || !input.trim()}
-                      className={`flex shrink-0 items-center justify-center gap-1.5 self-end rounded-lg border border-black/10 px-4 py-3 text-base font-semibold shadow-md transition-opacity disabled:opacity-40 sm:px-3 sm:py-2 sm:text-sm ${
+                      className={`flex shrink-0 items-center justify-center gap-1.5 self-end rounded-lg border border-black/10 px-4 py-3 text-base font-medium transition-opacity duration-200 ease-[var(--karte-ease)] disabled:opacity-40 sm:px-3 sm:py-2 sm:text-sm ${
                         isFirstMessage && input.trim() ? 'animate-pulse' : ''
                       }`}
                       style={{ backgroundColor: accentColor, color: accentTextColor }}

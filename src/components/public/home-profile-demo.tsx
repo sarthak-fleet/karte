@@ -62,7 +62,7 @@ function ModePreview({ mode }: { mode: DemoMode }) {
   if (mode === 'encyclopedia') {
     return (
       <div className="grid gap-4 sm:grid-cols-[140px_1fr]">
-        <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-karte-text-3">
+        <div className="rounded-xl border border-karte-border-strong bg-white/[0.04] p-3 text-xs text-karte-text-3">
           <p className="font-semibold text-karte-text">Sarthak Agrawal</p>
           <p className="mt-2">Builder</p>
           <p>Product</p>
@@ -160,12 +160,12 @@ export function HomeProfileDemo({ autoCycle = true }: HomeProfileDemoProps = {})
 
   return (
     <div
-      className="relative overflow-hidden rounded-[28px] border border-white/15 bg-[#181817]/95 p-4 shadow-2xl shadow-black/40 sm:p-5"
+      className="relative overflow-hidden rounded-[28px] border border-karte-border-emphasis bg-[#181817]/95 p-4 shadow-2xl shadow-black/40 sm:p-5"
       data-testid="home-profile-demo"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+      <div className="flex items-center gap-4 border-b border-karte-border-strong pb-4">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan-300 text-lg font-bold text-gray-950 sm:h-16 sm:w-16 sm:text-xl">
           {DEMO_PROFILE.initials}
         </div>
@@ -193,7 +193,7 @@ export function HomeProfileDemo({ autoCycle = true }: HomeProfileDemoProps = {})
             className={`relative rounded-full px-3 py-1.5 text-xs font-medium transition sm:text-sm ${
               mode === tab.id
                 ? 'bg-cyan-300 text-gray-950'
-                : 'border border-white/10 bg-white/[0.03] text-karte-text-2 hover:bg-white/[0.06] hover:text-karte-text'
+                : 'border border-karte-border-strong bg-white/[0.03] text-karte-text-2 hover:bg-white/[0.06] hover:text-karte-text'
             }`}
           >
             {tab.label}
@@ -205,14 +205,14 @@ export function HomeProfileDemo({ autoCycle = true }: HomeProfileDemoProps = {})
         </span>
       </div>
 
-      <div className="mt-4 min-h-[220px] rounded-2xl border border-white/10 bg-black/25 p-4">
+      <div className="mt-4 min-h-[220px] rounded-2xl border border-karte-border-strong bg-black/25 p-4">
         {mode === 'chat' ? (
           <div className="flex h-full flex-col">
             <div className="space-y-3">
               <div className="ml-auto max-w-[88%] rounded-2xl rounded-tr-md bg-cyan-300/15 px-3 py-2 text-sm text-cyan-50">
                 {activePrompt.userMessage}
               </div>
-              <div className="max-w-[92%] rounded-2xl rounded-tl-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm leading-6 text-karte-text">
+              <div className="max-w-[92%] rounded-2xl rounded-tl-md border border-karte-border-strong bg-white/[0.04] px-3 py-2 text-sm leading-6 text-karte-text">
                 {activePrompt.assistantMessage}
                 <p className="mt-3 text-[10px] uppercase tracking-[0.18em] text-cyan-200/75">
                   Grounded in {activePrompt.source}
@@ -237,7 +237,7 @@ export function HomeProfileDemo({ autoCycle = true }: HomeProfileDemoProps = {})
                     className={`rounded-xl px-3 py-2 text-left text-xs leading-5 transition sm:text-sm ${
                       activePromptId === prompt.id
                         ? 'border border-cyan-300/50 bg-cyan-300/10 text-cyan-50'
-                        : 'border border-white/10 bg-white/[0.03] text-karte-text-2 hover:border-white/20 hover:text-karte-text'
+                        : 'border border-karte-border-strong bg-white/[0.03] text-karte-text-2 hover:border-karte-border-emphasis hover:text-karte-text'
                     }`}
                   >
                     {prompt.label}
@@ -251,7 +251,7 @@ export function HomeProfileDemo({ autoCycle = true }: HomeProfileDemoProps = {})
         )}
       </div>
 
-      <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-4 flex flex-col gap-2 border-t border-karte-border-strong pt-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-karte-text-4">
           Same memory powers chat, shareable modes, and the public profile.
         </p>

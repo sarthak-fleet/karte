@@ -10,7 +10,7 @@ interface ShareControlsProps {
 }
 
 const btnClass =
-  'inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-karte-text transition hover:bg-white/10 active:scale-95 disabled:opacity-50';
+  'inline-flex items-center gap-2 rounded-xl border border-karte-border-emphasis bg-white/5 px-4 py-2.5 text-sm font-medium text-karte-text transition hover:bg-white/10 active:scale-95 disabled:opacity-50';
 
 export function ShareControls({ slug, accentColor, newspaperRef }: ShareControlsProps) {
   const [downloading, setDownloading] = useState(false);

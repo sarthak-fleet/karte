@@ -24,7 +24,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     return (
       <div
         ref={ref}
-        className="w-full max-w-2xl aspect-[1200/630] bg-gray-950 rounded-2xl overflow-hidden relative flex flex-col justify-between p-8"
+        className="w-full max-w-2xl aspect-[1200/630] bg-karte-bg rounded-2xl overflow-hidden relative flex flex-col justify-between p-8"
         style={{
           background: `linear-gradient(135deg, ${accentColor}15, #030712 40%, #030712 60%, ${accentColor}10)`,
         }}

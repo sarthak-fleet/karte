@@ -106,7 +106,7 @@ export function ContactFormSection({
       className={compact ? 'space-y-3' : 'space-y-4'}
     >
       {needsVerifiedSession ? (
-        <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
+        <div className="rounded-xl border border-karte-border-strong bg-white/[0.04] p-4">
           <p className="text-sm font-medium text-karte-text">Verify your email</p>
           <p className="mt-1 text-xs leading-5 text-white/55">
             Sign in with Google so the profile owner can see your verified
@@ -136,7 +136,7 @@ export function ContactFormSection({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-white/40 outline-none focus:border-white/30"
+              className="w-full rounded-lg border border-karte-border-strong bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-white/40 outline-none focus:border-white/30"
               required
             />
           </div>
@@ -150,7 +150,7 @@ export function ContactFormSection({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-white/40 outline-none focus:border-white/30"
+              className="w-full rounded-lg border border-karte-border-strong bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-white/40 outline-none focus:border-white/30"
               required
             />
           </div>
@@ -166,7 +166,7 @@ export function ContactFormSection({
           )}
 
           {dmMode === 'anonymous' && (
-            <p className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs leading-5 text-white/55">
+            <p className="rounded-lg border border-karte-border-strong bg-white/[0.04] px-3 py-2 text-xs leading-5 text-white/55">
               No name or email will be attached to this message.
             </p>
           )}
@@ -180,7 +180,7 @@ export function ContactFormSection({
               onChange={(e) => setMessage(e.target.value)}
               placeholder="What would you like to talk about?"
               rows={compact ? 4 : 5}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-white/40 outline-none focus:border-white/30"
+              className="w-full rounded-lg border border-karte-border-strong bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-white/40 outline-none focus:border-white/30"
               required
             />
           </div>

@@ -150,14 +150,14 @@ export async function PublicTopBar({
               {userPage?.slug && current !== 'profile' && (
                 <Link
                   href={`/${userPage.slug}`}
-                  className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
+                  className="rounded-full border border-karte-border-emphasis bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
                 >
                   My Profile
                 </Link>
               )}
               <Link
                 href="/dashboard"
-                className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
+                className="rounded-full border border-karte-border-emphasis bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
               >
                 Dashboard
               </Link>
@@ -192,7 +192,7 @@ export async function PublicTopBar({
               {current !== 'create' && (
                 <Link
                   href="/create"
-                  className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
+                  className="rounded-full border border-karte-border-emphasis bg-white/5 px-3 py-2 text-xs font-medium text-karte-text transition hover:bg-white/10 sm:text-sm"
                 >
                   Start Profile
                 </Link>

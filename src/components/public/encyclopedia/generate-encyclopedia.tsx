@@ -137,7 +137,7 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
             <button
               onClick={handleGenerate}
               disabled={loading}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-950 bg-gray-950 px-5 py-3 text-sm font-semibold text-karte-text transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-950 bg-karte-bg px-5 py-3 text-sm font-semibold text-karte-text transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
             >
               {loading ? (
                 <>
@@ -154,7 +154,7 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-[#f8f9fa] p-4">
-            <div className="h-3 w-28 rounded-full bg-gray-900/70" />
+            <div className="h-3 w-28 rounded-full bg-karte-bg/70" />
             <div className="mt-5 space-y-2">
               <div className={`h-2 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`} />
               <div className={`h-2 w-10/12 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`} />

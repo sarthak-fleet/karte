@@ -37,7 +37,7 @@ export function ProjectCard({
         </div>
 
         <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 transition group-hover:text-karte-text"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-karte-border-emphasis bg-white/5 text-white/70 transition group-hover:text-karte-text"
           style={accentColor ? { borderColor: `${accentColor}33` } : undefined}
           aria-label="Visit project"
         >
