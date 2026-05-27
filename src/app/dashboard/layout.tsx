@@ -26,12 +26,14 @@ export default async function DashboardLayout({
   const session = await getSession();
   if (!session?.user) redirect('/login');
 
-  await ensureProjectsTable();
-
-  // FAST PATH: in parallel, check if the user is already synced and fetch
-  // their page (full row, since child pages re-call getCurrentPage and reuse
-  // this via React.cache). Most dashboard navigations end here.
-  const [appUser, page] = await Promise.all([
+  // Run the Turso DDL bootstrap in parallel with the user/page lookups —
+  // these queries only touch `users.id` and `pages.slug`, both of which exist
+  // in the base Drizzle schema and don't depend on the runtime ALTERs.
+  // Saves the cold-start Turso RTT from being in series with the lookups.
+  // getCurrentPage returns the full page row so child pages re-call it and
+  // reuse this via React.cache.
+  const [, appUser, page] = await Promise.all([
+    ensureProjectsTable(),
     db.query.users.findFirst({
       where: eq(users.id, session.user.id),
       columns: { id: true },

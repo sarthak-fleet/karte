@@ -102,9 +102,9 @@ export async function ensureAuthTables() {
         )`,
       ];
 
-      for (const statement of statements) {
-        await db.prepare(statement).run();
-      }
+      // Single D1 batch call instead of N sequential prepares — saves
+      // ~3 round-trips on Worker cold start.
+      await db.batch(statements.map((sql) => db.prepare(sql)));
     })().catch((error) => {
       authTablesReady = null;
       throw error;
