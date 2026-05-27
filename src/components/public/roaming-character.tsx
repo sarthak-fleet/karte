@@ -39,7 +39,9 @@ export function RoamingCharacter({
   const [speaking, setSpeaking] = useState(false);
   const [lineIdx, setLineIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
+  const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   // Initial enable — skip if reduced-motion or if the lines array is empty.
   useEffect(() => {
@@ -48,6 +50,43 @@ export function RoamingCharacter({
     if (lines.length === 0) return;
     setEnabled(true);
   }, [lines.length]);
+
+  // Look at cursor — apply a small translate that makes the pet lean
+  // toward the mouse. Throttled via requestAnimationFrame.
+  useEffect(() => {
+    if (!enabled) return;
+    let rafId = 0;
+    let pending: { x: number; y: number } | null = null;
+    function onMove(e: MouseEvent) {
+      const node = buttonRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.max(1, Math.hypot(dx, dy));
+      // Lean up to 5px toward cursor, scaled by inverse distance so it
+      // doesn't twitch at long range. Clamp dy upward — leaning down
+      // looks droopy.
+      const lean = Math.min(5, 600 / dist);
+      pending = {
+        x: (dx / dist) * lean,
+        y: Math.min(0, (dy / dist) * lean * 0.5),
+      };
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          if (pending) setLookOffset(pending);
+        });
+      }
+    }
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [enabled]);
 
   // Walk loop — pause walking while speaking so the bubble doesn't drift.
   useEffect(() => {
@@ -143,6 +182,7 @@ export function RoamingCharacter({
       )}
 
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => {
           window.dispatchEvent(new CustomEvent('karte:open-widget', { detail: { mode: 'chat' } }));
@@ -151,8 +191,8 @@ export function RoamingCharacter({
         aria-label={`Chat with ${displayName}`}
         className="pointer-events-auto relative block h-20 w-20 transition-transform duration-150 hover:scale-110 active:scale-95"
         style={{
-          transform: `translateY(${bobUp ? -3 : 0}px) ${facingFlip}`,
-          transition: 'transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
+          transform: `translate(${lookOffset.x}px, calc(${lookOffset.y}px + ${bobUp ? '-3px' : '0px'})) ${facingFlip}`,
+          transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1)',
           filter: `drop-shadow(0 6px 14px ${accentColor}88) drop-shadow(0 2px 4px rgba(0,0,0,0.45))`,
         }}
       >
