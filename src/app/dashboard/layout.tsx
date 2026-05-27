@@ -8,6 +8,16 @@ import { appDbExecute, db, ensureProjectsTable } from '@/db';
 import { pages, users } from '@/db/schema';
 import { getSession } from '@/lib/auth-server';
 
+// Migration/sync logic moved into syncUserOnce(). It runs:
+//   - The very first time a user opens the dashboard after sign-up, OR
+//   - If a legacy/duplicate user row needs cleanup
+// After the first successful sync, subsequent dashboard navigations skip all
+// of it and the layout only does 2 DB round-trips (user existence check +
+// page slug fetch, parallelized into 1 RTT).
+//
+// Previously this ran 6-8 sequential RTTs on every page load — visibly
+// laggy even with one user in the database.
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -17,8 +27,55 @@ export default async function DashboardLayout({
   if (!session?.user) redirect('/login');
 
   await ensureProjectsTable();
+
+  // FAST PATH: in parallel, check if the user is already synced and fetch
+  // their page slug for the sidebar. Most dashboard navigations end here.
+  const [appUser, page] = await Promise.all([
+    db.query.users.findFirst({
+      where: eq(users.id, session.user.id),
+      columns: { id: true },
+    }),
+    db.query.pages.findFirst({
+      where: eq(pages.userId, session.user.id),
+      columns: { slug: true },
+    }),
+  ]);
+
+  // SLOW PATH: first time this user has hit the dashboard, or a sync was
+  // forced. Runs the migration logic once, then the next nav is on the fast
+  // path.
+  if (!appUser) {
+    await syncUserOnce({
+      userId: session.user.id,
+      email: session.user.email!,
+      name: session.user.name ?? '',
+      image: session.user.image ?? null,
+    });
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-200 antialiased lg:flex">
+      <NavProgress />
+      <DashboardTracker />
+      <Sidebar slug={page?.slug} />
+      <main className="min-w-0 flex-1 px-5 pb-10 pt-4 sm:px-8 lg:h-screen lg:overflow-y-auto lg:p-10">
+        {children}
+      </main>
+    </div>
+  );
+}
+
+// One-shot sync to reconcile auth user → app user across both databases.
+// Picks up legacy rows from older schemas, dedupes by email, then writes a
+// clean row to both Turso (app db) and D1 (better-auth db).
+async function syncUserOnce(params: {
+  userId: string;
+  email: string;
+  name: string;
+  image: string | null;
+}) {
+  const { userId, email, name, image } = params;
   const now = new Date();
-  const email = session.user.email!;
 
   const [existingUserByEmail, legacyUserByEmail] = await Promise.all([
     appDbExecute(
@@ -49,9 +106,9 @@ export default async function DashboardLayout({
       }
     | undefined;
   const existingUserId = existingUser?.id;
-  if (typeof existingUserId === 'string' && existingUserId !== session.user.id) {
+  if (typeof existingUserId === 'string' && existingUserId !== userId) {
     await appDbExecute('UPDATE pages SET userId = ? WHERE userId = ?', [
-      session.user.id,
+      userId,
       existingUserId,
     ]);
     await appDbExecute('DELETE FROM "user" WHERE id = ?', [existingUserId]);
@@ -80,10 +137,10 @@ export default async function DashboardLayout({
   await db
     .insert(users)
     .values({
-      id: session.user.id,
+      id: userId,
       email,
-      name: session.user.name ?? '',
-      image: session.user.image ?? null,
+      name,
+      image,
       ...appUserSettings,
       createdAt: now,
       updatedAt: now,
@@ -91,8 +148,8 @@ export default async function DashboardLayout({
     .onConflictDoUpdate({
       target: users.id,
       set: {
-        name: session.user.name ?? '',
-        image: session.user.image ?? null,
+        name,
+        image,
         ...appUserSettings,
         updatedAt: now,
       },
@@ -115,11 +172,11 @@ export default async function DashboardLayout({
        aiApiKey = excluded.aiApiKey,
        aiModel = excluded.aiModel`,
     [
-      session.user.id,
-      session.user.name ?? '',
+      userId,
+      name,
       email,
       1,
-      session.user.image ?? null,
+      image,
       appUserSettings.smProjectId,
       appUserSettings.smApiKey,
       appUserSettings.smIndexId,
@@ -130,26 +187,10 @@ export default async function DashboardLayout({
     ],
   ).catch(() => null);
 
-  if (legacyUser?.id && legacyUser.id !== session.user.id) {
+  if (legacyUser?.id && legacyUser.id !== userId) {
     await appDbExecute('UPDATE pages SET userId = ? WHERE userId = ?', [
-      session.user.id,
+      userId,
       legacyUser.id,
     ]);
   }
-
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-    columns: { slug: true },
-  });
-
-  return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-200 antialiased lg:flex">
-      <NavProgress />
-      <DashboardTracker />
-      <Sidebar slug={page?.slug} />
-      <main className="min-w-0 flex-1 px-5 pb-10 pt-4 sm:px-8 lg:h-screen lg:overflow-y-auto lg:p-10">
-        {children}
-      </main>
-    </div>
-  );
 }
