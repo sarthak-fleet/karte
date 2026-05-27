@@ -45,7 +45,11 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  const data = await getFullPageData(slug);
+  // Temporarily skip DB fetch — diagnosing whether the hang is in
+  // Satori or in the D1 call. If this returns a PNG, the DB call is
+  // the bottleneck and we need a different fetch strategy.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const data = null as Awaited<ReturnType<typeof getFullPageData>>;
 
   if (!data) {
     return new ImageResponse(
