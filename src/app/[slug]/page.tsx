@@ -73,7 +73,6 @@ export default async function ProfilePage({ params, searchParams }: Props) {
       title: 'Encyclopedia',
       href: `/${slug}/encyclopedia`,
       enabled: enabledPages.encyclopedia,
-      accent: '#f4ead8',
       description: `A structured, reference-style page for ${firstName}'s work, background, and public context.`,
       mark: 'Wiki',
       visual: 'wiki',
@@ -83,7 +82,6 @@ export default async function ProfilePage({ params, searchParams }: Props) {
       title: 'Newspaper',
       href: `/${slug}/newspaper`,
       enabled: enabledPages.newspaper,
-      accent: '#f2c879',
       description: `A front-page treatment of what ${firstName} is building, shipping, and thinking about.`,
       mark: 'Times',
       visual: 'newspaper',
@@ -93,7 +91,6 @@ export default async function ProfilePage({ params, searchParams }: Props) {
       title: 'Roast Me',
       href: `/${slug}/roast`,
       enabled: enabledPages.roast,
-      accent: '#f08b5f',
       description: `A shareable, unserious critique of ${firstName}'s links, profile, and internet presence.`,
       mark: 'Roast',
       visual: 'roast',
@@ -103,21 +100,17 @@ export default async function ProfilePage({ params, searchParams }: Props) {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-[#070709] text-white"
+      className="relative min-h-screen overflow-hidden bg-karte-bg text-karte-text antialiased"
       style={{
-        background: `radial-gradient(circle at 50% -16%, ${theme.accentColor}22, transparent 32%), radial-gradient(circle at 14% 18%, ${theme.gradientFrom}10, transparent 24%), radial-gradient(circle at 86% 24%, ${theme.gradientTo}10, transparent 26%), linear-gradient(180deg, #090909 0%, #111111 42%, #070707 100%)`,
+        background: `radial-gradient(circle at 50% -16%, ${theme.accentColor}1f, transparent 36%), linear-gradient(180deg, #0a0a0a 0%, #0b0b0c 50%, #0a0a0a 100%)`,
       }}
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(242,200,121,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:72px_72px]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#f2c879]/55 to-transparent" />
+        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_at_top,#000_30%,transparent_75%)]" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 pb-16 pt-4 sm:px-6 sm:pt-8">
-        <section
-          className="overflow-hidden rounded-[28px] border border-[#f2c879]/18 bg-[#121212]/92 backdrop-blur-2xl sm:rounded-[32px]"
-          style={{ boxShadow: `0 40px 140px -72px ${theme.accentColor}` }}
-        >
+        <section className="overflow-hidden rounded-3xl border border-karte-border bg-karte-surface/85 backdrop-blur-xl">
           <div className={`grid gap-0 ${hasChatPanel ? 'lg:grid-cols-[1fr_360px]' : ''}`}>
             <div className="p-5 sm:p-10">
               <div className="flex items-center gap-3 sm:gap-4">
@@ -128,91 +121,89 @@ export default async function ProfilePage({ params, searchParams }: Props) {
                     width={84}
                     height={84}
                     sizes="84px"
-                    className="h-16 w-16 rounded-2xl border border-white/[0.10] object-cover sm:h-20 sm:w-20"
+                    className="h-16 w-16 rounded-2xl border border-karte-border object-cover sm:h-20 sm:w-20"
                   />
                 )}
                 {!page.avatarUrl && (
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/[0.10] bg-cyan-300 text-xl font-semibold text-zinc-950 sm:h-20 sm:w-20 sm:text-2xl">
+                  <div
+                    className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-karte-border text-xl font-semibold text-zinc-950 sm:h-20 sm:w-20 sm:text-2xl"
+                    style={{ backgroundColor: theme.accentColor }}
+                  >
                     {initials || firstName[0]?.toUpperCase()}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-white/45">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+                    <span style={{ color: theme.accentColor }}>·</span>{' '}
                     {variant.eyebrow}
                   </p>
-                  <h1 className="mt-2 text-3xl font-semibold leading-none text-white sm:text-5xl">
+                  <h1 className="mt-2 text-3xl font-semibold leading-[1.05] tracking-[-0.02em] text-karte-text sm:text-5xl">
                     {page.displayName}
                   </h1>
                 </div>
               </div>
 
               {page.bio && (
-                <p className="mt-7 max-w-2xl text-base leading-7 text-white/70 sm:mt-8 sm:text-xl sm:leading-8">
+                <p className="mt-7 max-w-2xl text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3 sm:mt-8 sm:text-lg sm:leading-[1.55]">
                   {page.bio}
                 </p>
               )}
-
-              <div className="mt-7 sm:mt-9" />
             </div>
 
             {hasChatPanel && (
-            <div className="border-t border-[#f2c879]/12 bg-white/[0.025] p-4 sm:p-5 lg:border-l lg:border-t-0">
-              <div className="rounded-[24px] border border-[#f2c879]/14 bg-black/35 p-5">
-                <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/45">
-                  Ask {firstName}
-                </p>
-                {page.chatEnabled && (
-                  <div className="mt-4 space-y-3">
+              <div className="border-t border-karte-border bg-white/[0.02] p-4 sm:p-5 lg:border-l lg:border-t-0">
+                <div className="rounded-2xl border border-karte-border bg-karte-bg/60 p-5">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+                    <span style={{ color: theme.accentColor }}>·</span> Ask{' '}
+                    {firstName}
+                  </p>
+                  {page.chatEnabled && (
+                    <div className="mt-4 space-y-2.5">
+                      <OpenChatButton
+                        mode="chat"
+                        prompt={variant.promptOne(firstName)}
+                        autoSend
+                        className="block w-full rounded-xl border border-karte-border bg-white/[0.03] px-4 py-3 text-left text-sm text-karte-text-3 transition-all duration-200 ease-[var(--karte-ease)] hover:border-white/15 hover:bg-white/[0.06] hover:text-karte-text"
+                      >
+                        {variant.promptOne(firstName)}
+                      </OpenChatButton>
+                      <OpenChatButton
+                        mode="chat"
+                        prompt={variant.promptTwo}
+                        autoSend
+                        className="block w-full rounded-xl border border-karte-border bg-white/[0.03] px-4 py-3 text-left text-sm text-karte-text-3 transition-all duration-200 ease-[var(--karte-ease)] hover:border-white/15 hover:bg-white/[0.06] hover:text-karte-text"
+                      >
+                        {variant.promptTwo}
+                      </OpenChatButton>
+                    </div>
+                  )}
+                  {hasMessenger && (
                     <OpenChatButton
-                      mode="chat"
-                      prompt={variant.promptOne(firstName)}
-                      autoSend
-                      className="block w-full rounded-2xl border border-[#f2c879]/14 bg-white/[0.045] px-4 py-3 text-left text-sm text-white/58 transition hover:border-[#f2c879]/35 hover:bg-white/[0.075] hover:text-white"
+                      mode={page.chatEnabled ? 'chat' : 'contact'}
+                      className="mt-5 w-full rounded-xl px-4 py-3 text-sm font-semibold text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:brightness-110"
+                      style={{ backgroundColor: theme.accentColor }}
                     >
-                      {variant.promptOne(firstName)}
+                      {page.chatEnabled ? variant.primaryCta : 'Send message'}
                     </OpenChatButton>
-                    <OpenChatButton
-                      mode="chat"
-                      prompt={variant.promptTwo}
-                      autoSend
-                      className="block w-full rounded-2xl border border-[#f2c879]/14 bg-white/[0.045] px-4 py-3 text-left text-sm text-white/58 transition hover:border-[#f2c879]/35 hover:bg-white/[0.075] hover:text-white"
-                    >
-                      {variant.promptTwo}
-                    </OpenChatButton>
-                  </div>
-                )}
-                {hasMessenger && (
-                  <OpenChatButton
-                    mode={page.chatEnabled ? 'chat' : 'contact'}
-                    className="mt-5 w-full rounded-2xl px-4 py-3 text-sm font-semibold text-[#17120a] transition hover:brightness-110"
-                    style={{ backgroundColor: theme.accentColor }}
-                  >
-                    {page.chatEnabled ? variant.primaryCta : 'Send message'}
-                  </OpenChatButton>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
             )}
           </div>
         </section>
 
         {pageLinks.length > 0 && (
-          <section
-            className="mt-5 w-full overflow-hidden rounded-[28px] border border-[#f2c879]/18 bg-[#151515]/82 p-4 backdrop-blur-xl sm:p-6"
-            style={{ boxShadow: `0 28px 95px -62px ${theme.accentColor}` }}
-          >
+          <section className="mt-5 w-full overflow-hidden rounded-3xl border border-karte-border bg-karte-surface/70 p-4 backdrop-blur-xl sm:p-6">
             <div className="mb-5">
-              <div>
-                <p
-                  className="text-[11px] font-medium uppercase tracking-[0.32em]"
-                  style={{ color: theme.accentColor }}
-                >
-                  Find Me Online
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
-                  Links worth opening
-                </h2>
-              </div>
+              <p
+                className="text-[11px] font-medium uppercase tracking-[0.22em]"
+                style={{ color: theme.accentColor }}
+              >
+                <span className="opacity-80">·</span> Find Me Online
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.01em] text-karte-text sm:text-3xl">
+                Links worth opening
+              </h2>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
@@ -231,91 +222,104 @@ export default async function ProfilePage({ params, searchParams }: Props) {
         )}
 
         {enabledModeCards.length > 0 && (
-        <section className="mt-5 grid gap-3 md:grid-cols-3">
-          {enabledModeCards.map((card) => (
-            <Link
-              key={card.key}
-              href={card.href}
-              className="group min-h-64 rounded-[28px] border border-[#f2c879]/14 bg-[#141414]/84 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-[#f2c879]/30 hover:bg-[#191813]"
-            >
-              <div className="mb-6 h-28 overflow-hidden rounded-2xl border border-white/10 bg-black/28">
-                {card.visual === 'wiki' && (
-                  <div className="grid h-full grid-cols-[72px_1fr] gap-3 p-4">
-                    <div className="space-y-2 border-r border-white/10 pr-3">
-                      <div className="h-2 w-10 rounded-full bg-white/45" />
-                      <div className="h-2 w-8 rounded-full bg-white/20" />
-                      <div className="h-2 w-11 rounded-full bg-white/20" />
-                    </div>
-                    <div>
-                      <div className="h-3 w-32 rounded-full bg-white/70" />
-                      <div className="mt-4 space-y-2">
-                        <div className="h-2 rounded-full bg-white/25" />
-                        <div className="h-2 w-11/12 rounded-full bg-white/18" />
-                        <div className="h-2 w-8/12 rounded-full bg-white/18" />
+          <section className="mt-5 grid gap-3 md:grid-cols-3">
+            {enabledModeCards.map((card) => (
+              <Link
+                key={card.key}
+                href={card.href}
+                className="group min-h-64 rounded-3xl border border-karte-border bg-karte-surface/70 p-6 backdrop-blur-xl transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/15 hover:bg-karte-surface"
+              >
+                <div className="mb-6 h-28 overflow-hidden rounded-2xl border border-karte-border bg-black/30">
+                  {card.visual === 'wiki' && (
+                    <div className="grid h-full grid-cols-[72px_1fr] gap-3 p-4">
+                      <div className="space-y-2 border-r border-white/10 pr-3">
+                        <div className="h-2 w-10 rounded-full bg-white/45" />
+                        <div className="h-2 w-8 rounded-full bg-white/20" />
+                        <div className="h-2 w-11 rounded-full bg-white/20" />
+                      </div>
+                      <div>
+                        <div className="h-3 w-32 rounded-full bg-white/70" />
+                        <div className="mt-4 space-y-2">
+                          <div className="h-2 rounded-full bg-white/25" />
+                          <div className="h-2 w-11/12 rounded-full bg-white/18" />
+                          <div className="h-2 w-8/12 rounded-full bg-white/18" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {card.visual === 'newspaper' && (
-                  <div className="h-full bg-[#f4efe4] p-4 text-[#17130d]">
-                    <div className="border-b border-[#17130d]/30 pb-2 text-center font-serif text-lg font-bold leading-none">
-                      The Profile Times
-                    </div>
-                    <div className="mt-3 grid grid-cols-3 gap-3">
-                      <div className="space-y-1">
-                        <div className="h-2 bg-[#17130d]/70" />
-                        <div className="h-1.5 bg-[#17130d]/30" />
-                        <div className="h-1.5 bg-[#17130d]/30" />
+                  )}
+                  {card.visual === 'newspaper' && (
+                    <div className="h-full bg-[#f4efe4] p-4 text-[#17130d]">
+                      <div className="border-b border-[#17130d]/30 pb-2 text-center font-serif text-lg font-bold leading-none">
+                        The Profile Times
                       </div>
-                      <div className="space-y-1">
-                        <div className="h-2 bg-[#17130d]/70" />
-                        <div className="h-1.5 bg-[#17130d]/30" />
-                        <div className="h-1.5 bg-[#17130d]/30" />
+                      <div className="mt-3 grid grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <div className="h-2 bg-[#17130d]/70" />
+                          <div className="h-1.5 bg-[#17130d]/30" />
+                          <div className="h-1.5 bg-[#17130d]/30" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-2 bg-[#17130d]/70" />
+                          <div className="h-1.5 bg-[#17130d]/30" />
+                          <div className="h-1.5 bg-[#17130d]/30" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-2 bg-[#17130d]/70" />
+                          <div className="h-1.5 bg-[#17130d]/30" />
+                          <div className="h-1.5 bg-[#17130d]/30" />
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <div className="h-2 bg-[#17130d]/70" />
-                        <div className="h-1.5 bg-[#17130d]/30" />
-                        <div className="h-1.5 bg-[#17130d]/30" />
+                    </div>
+                  )}
+                  {card.visual === 'roast' && (
+                    <div className="relative h-full bg-[#170611] p-4">
+                      <div
+                        className="absolute left-4 top-4 rotate-[-4deg] border-2 bg-black px-3 py-2 text-xs font-black uppercase tracking-[0.18em]"
+                        style={{
+                          borderColor: theme.accentColor,
+                          color: theme.accentColor,
+                        }}
+                      >
+                        Public Vibe Inspection
+                      </div>
+                      <div
+                        className="absolute bottom-4 right-4 flex h-14 w-14 items-center justify-center rounded-full border-4 text-xl font-black text-karte-text"
+                        style={{ borderColor: theme.accentColor }}
+                      >
+                        82
                       </div>
                     </div>
-                  </div>
-                )}
-                {card.visual === 'roast' && (
-                  <div className="relative h-full bg-[#170611] p-4">
-                    <div className="absolute left-4 top-4 rotate-[-4deg] border-2 border-[#f2c879] bg-black px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#f2c879] shadow-[6px_6px_0_#f08b5f]">
-                      Public Vibe Inspection
-                    </div>
-                    <div className="absolute bottom-4 right-4 flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#f08b5f] text-xl font-black text-white shadow-[0_0_30px_rgba(240,139,95,0.32)]">
-                      82
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center">
-                <div
-                  className="rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em]"
-                  style={{ color: card.accent }}
-                >
-                  {card.mark}
+                  )}
                 </div>
-              </div>
-              <h2 className="mt-5 text-2xl font-semibold text-white">{card.title}</h2>
-              <p className="mt-4 text-sm leading-6 text-white/60">{card.description}</p>
-            </Link>
-          ))}
-        </section>
+                <div className="flex items-center">
+                  <div
+                    className="rounded-full border border-karte-border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em]"
+                    style={{ color: theme.accentColor }}
+                  >
+                    {card.mark}
+                  </div>
+                </div>
+                <h2 className="mt-5 text-2xl font-semibold tracking-[-0.01em] text-karte-text">
+                  {card.title}
+                </h2>
+                <p className="mt-4 text-sm leading-[1.6] text-karte-text-3">
+                  {card.description}
+                </p>
+              </Link>
+            ))}
+          </section>
         )}
 
         {pageProjects.length > 0 && (
           <section className="mt-10 w-full">
             <div className="mb-5">
               <p
-                className="text-[11px] font-medium uppercase tracking-[0.32em]"
+                className="text-[11px] font-medium uppercase tracking-[0.22em]"
                 style={{ color: theme.accentColor }}
               >
-                Projects
+                <span className="opacity-80">·</span> Projects
               </p>
-              <h2 className="mt-2 text-xl font-semibold text-white">
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.01em] text-karte-text">
                 Things I&apos;ve Built
               </h2>
             </div>
@@ -340,12 +344,12 @@ export default async function ProfilePage({ params, searchParams }: Props) {
           <section className="mt-10 w-full">
             <div className="mb-5">
               <p
-                className="text-[11px] font-medium uppercase tracking-[0.32em]"
+                className="text-[11px] font-medium uppercase tracking-[0.22em]"
                 style={{ color: theme.accentColor }}
               >
-                Sections
+                <span className="opacity-80">·</span> Sections
               </p>
-              <h2 className="mt-2 text-xl font-semibold text-white">
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.01em] text-karte-text">
                 More to Explore
               </h2>
             </div>
@@ -370,12 +374,11 @@ export default async function ProfilePage({ params, searchParams }: Props) {
           </section>
         )}
 
-        {/* Footer */}
-        <p className="mt-auto pt-12 text-center text-xs text-white/30">
+        <p className="mt-auto pt-12 text-center text-xs text-karte-text-4">
           Powered by{' '}
           <Link
             href="/"
-            className="font-medium text-white/50 transition-colors hover:text-white"
+            className="font-medium text-karte-text-3 transition-colors duration-200 hover:text-karte-text"
           >
             Karte
           </Link>
