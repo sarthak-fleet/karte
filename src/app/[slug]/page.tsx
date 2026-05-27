@@ -63,6 +63,7 @@ export default async function ProfilePage({ params }: Props) {
     sections: publicSections,
     readyPages,
     modePreviews,
+    modeContent,
   } = data;
   const theme = resolveThemeConfig(page.themeConfig);
   const variant = getProfileVariant(undefined);
@@ -230,139 +231,190 @@ export default async function ProfilePage({ params }: Props) {
                     Three takes, same source
                   </h2>
                   <p className="mt-1.5 text-[14px] leading-[1.55] text-karte-text-3">
-                    Each card opens a different AI-written page about {firstName}.
+                    Each card is the actual opening of a full AI-written page about {firstName}. Click in.
                   </p>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-4 lg:grid-cols-3">
                   {enabledModeCards.map((card) => {
+                    // ── ENCYCLOPEDIA — looks like a real Wikipedia article ──
                     if (card.key === 'encyclopedia') {
+                      const wiki = modeContent?.encyclopedia;
                       return (
                         <Link
                           key={card.key}
                           href={card.href}
-                          className="group relative flex flex-col overflow-hidden rounded-2xl border border-karte-border-strong bg-[#0d0f12] p-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/20"
+                          className="group relative flex h-full min-h-[360px] flex-col overflow-hidden rounded-2xl border border-karte-border-strong bg-[#0d0f12] transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/20"
                         >
                           {/* Wiki tab strip */}
-                          <div className="flex items-center gap-3 border-b border-white/[0.08] pb-2.5 text-[10px] font-medium uppercase tracking-[0.2em]">
+                          <div className="flex items-center gap-3 border-b border-white/[0.08] px-4 pt-3.5 pb-2.5 text-[10px] font-medium uppercase tracking-[0.2em]">
                             <span className="border-b-2 border-[#6ea8fe] pb-[5px] -mb-[7px] text-[#6ea8fe]">
                               Article
                             </span>
                             <span className="text-karte-text-4">Talk</span>
                             <span className="text-karte-text-4">History</span>
                           </div>
-                          <h3
-                            className="mt-3 text-[18px] leading-tight text-karte-text"
-                            style={{
-                              fontFamily: serif.style.fontFamily,
-                            }}
-                          >
-                            {card.title}
-                          </h3>
-                          <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-karte-text-4">
-                            From the AI encyclopedia
-                          </p>
-                          {card.preview && (
-                            <p className="mt-2 line-clamp-2 text-[12.5px] leading-[1.5] text-karte-text-3">
-                              {card.preview}
-                            </p>
-                          )}
-                          <span className="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-[#6ea8fe] underline decoration-[#6ea8fe]/40 underline-offset-2 transition-colors duration-200 group-hover:decoration-[#6ea8fe]">
-                            {card.cta}
-                            <span
-                              aria-hidden="true"
-                              className="no-underline transition-transform duration-200 group-hover:translate-x-0.5"
+                          <div className="flex flex-1 flex-col px-4 py-4">
+                            <h3
+                              className="text-[22px] leading-tight text-karte-text"
+                              style={{ fontFamily: serif.style.fontFamily }}
                             >
-                              →
+                              {card.title}
+                            </h3>
+                            <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-karte-text-4">
+                              From the AI encyclopedia
+                            </p>
+                            <p className="mt-3 line-clamp-5 text-[13px] leading-[1.65] text-karte-text-2">
+                              {wiki?.body || card.preview}
+                            </p>
+                            {wiki?.topics && wiki.topics.length > 0 && (
+                              <>
+                                <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-karte-text-4">
+                                  Contents
+                                </p>
+                                <ol className="mt-1.5 space-y-0.5 text-[12px] text-[#6ea8fe]">
+                                  {wiki.topics.slice(0, 4).map((topic, i) => (
+                                    <li key={topic} className="truncate">
+                                      <span className="mr-1 text-karte-text-4">
+                                        {i + 1}.
+                                      </span>
+                                      <span className="underline decoration-[#6ea8fe]/40 underline-offset-2">
+                                        {topic}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ol>
+                              </>
+                            )}
+                            <span className="mt-auto pt-4 inline-flex items-center gap-1 text-[12px] font-medium text-[#6ea8fe] underline decoration-[#6ea8fe]/40 underline-offset-2 transition-colors duration-200 group-hover:decoration-[#6ea8fe]">
+                              {card.cta}
+                              <span aria-hidden="true" className="no-underline transition-transform duration-200 group-hover:translate-x-0.5">
+                                →
+                              </span>
                             </span>
-                          </span>
+                          </div>
                         </Link>
                       );
                     }
 
+                    // ── NEWSPAPER — looks like a real broadsheet ──
                     if (card.key === 'newspaper') {
+                      const paper = modeContent?.newspaper;
                       return (
                         <Link
                           key={card.key}
                           href={card.href}
-                          className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#f4efe4] p-4 text-[#17130d] transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5"
+                          className="group relative flex h-full min-h-[360px] flex-col overflow-hidden rounded-2xl bg-[#f4efe4] text-[#17130d] transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5"
                           style={{
                             boxShadow:
                               'inset 0 0 0 1px rgba(23,19,13,0.12), 0 8px 24px -16px rgba(0,0,0,0.5)',
                           }}
                         >
-                          {/* Masthead bar */}
-                          <div className="flex items-center justify-between border-b border-[#17130d]/30 pb-2 text-[9px] font-medium uppercase tracking-[0.22em] text-[#17130d]/70">
-                            <span>VOL. I</span>
-                            <span>Latest edition</span>
+                          {/* Top dateline bar */}
+                          <div className="flex items-center justify-between border-b-[3px] border-double border-[#17130d]/60 px-4 pt-3 pb-1.5 text-[9px] font-medium uppercase tracking-[0.22em] text-[#17130d]/75">
+                            <span>VOL. I · ISSUE 1</span>
+                            <span>{paper?.dateline || 'Latest edition'}</span>
+                            <span>Free with profile</span>
                           </div>
-                          <h3
-                            className="mt-3 text-center text-[20px] font-bold leading-tight tracking-[-0.005em]"
-                            style={{
-                              fontFamily: serif.style.fontFamily,
-                              fontStyle: 'normal',
-                            }}
-                          >
-                            {card.title}
-                          </h3>
-                          <p className="mt-0.5 text-center text-[9px] uppercase tracking-[0.22em] text-[#17130d]/60">
-                            ALL THE NEWS FIT TO GENERATE
-                          </p>
-                          {card.preview && (
-                            <p
-                              className="mt-3 line-clamp-3 text-[12.5px] leading-[1.5] text-[#17130d]/85"
-                              style={{ fontFamily: serif.style.fontFamily, fontStyle: 'normal' }}
+                          <div className="flex flex-1 flex-col px-4 py-3">
+                            {/* Masthead — the paper's name */}
+                            <h3
+                              className="text-center text-[26px] font-bold leading-[0.95] tracking-[-0.01em]"
+                              style={{
+                                fontFamily: serif.style.fontFamily,
+                                fontStyle: 'normal',
+                              }}
                             >
-                              {card.preview}
+                              {paper?.mastheadName || card.title}
+                            </h3>
+                            <p className="mt-0.5 text-center text-[9px] uppercase tracking-[0.22em] text-[#17130d]/60">
+                              All the news fit to generate
                             </p>
-                          )}
-                          <span className="mt-3 inline-flex items-center gap-1 self-start border-b border-[#17130d]/30 pb-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#17130d] transition-colors duration-200 group-hover:border-[#17130d]">
-                            {card.cta}
-                            <span
-                              aria-hidden="true"
-                              className="border-none transition-transform duration-200 group-hover:translate-x-0.5"
-                            >
-                              →
+                            {/* Headline column */}
+                            <div className="mt-3 border-t border-[#17130d]/20 pt-3">
+                              <h4
+                                className="text-[14px] font-bold uppercase leading-[1.2] tracking-[-0.005em]"
+                                style={{ fontFamily: serif.style.fontFamily, fontStyle: 'normal' }}
+                              >
+                                {paper?.headline || card.preview}
+                              </h4>
+                              {paper?.subheadline && (
+                                <p
+                                  className="mt-1.5 text-[12px] italic leading-[1.45] text-[#17130d]/80"
+                                  style={{ fontFamily: serif.style.fontFamily }}
+                                >
+                                  {paper.subheadline}
+                                </p>
+                              )}
+                              {paper?.body && (
+                                <p
+                                  className="mt-2 line-clamp-3 text-[11.5px] leading-[1.55] text-[#17130d]/80"
+                                  style={{ fontFamily: serif.style.fontFamily, fontStyle: 'normal' }}
+                                >
+                                  {paper.body}
+                                </p>
+                              )}
+                            </div>
+                            <span className="mt-auto pt-3 inline-flex items-center gap-1 self-start border-b border-[#17130d]/30 pb-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#17130d] transition-colors duration-200 group-hover:border-[#17130d]">
+                              {card.cta}
+                              <span aria-hidden="true" className="border-none transition-transform duration-200 group-hover:translate-x-0.5">
+                                →
+                              </span>
                             </span>
-                          </span>
+                          </div>
                         </Link>
                       );
                     }
 
-                    // Roast — bold, dramatic, spotlit
+                    // ── ROAST — comedy spotlight ──
+                    const roast = modeContent?.roast;
                     return (
                       <Link
                         key={card.key}
                         href={card.href}
-                        className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#170611] p-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5"
+                        className="group relative flex h-full min-h-[360px] flex-col overflow-hidden rounded-2xl bg-[#170611] p-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5"
                       >
-                        {/* Spotlight gradient */}
                         <div
                           aria-hidden="true"
-                          className="pointer-events-none absolute -top-12 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#ff4d6d]/30 blur-3xl"
+                          className="pointer-events-none absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-[#ff4d6d]/30 blur-3xl"
                         />
-                        <div className="relative">
-                          <div
-                            className="inline-block rotate-[-3deg] border-2 border-[#ff4d6d] bg-black px-2 py-0.5 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#ff4d6d]"
-                          >
-                            🔥 Roast
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(255,77,109,0.18),transparent_55%)]" />
+                        <div className="relative flex flex-1 flex-col">
+                          <div className="flex items-center justify-between">
+                            <div className="inline-block rotate-[-3deg] border-2 border-[#ff4d6d] bg-black px-2 py-0.5 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#ff4d6d]">
+                              🔥 Roast
+                            </div>
+                            <div className="rotate-[2deg] font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff4d6d]/80">
+                              SHOW · NIGHTLY
+                            </div>
                           </div>
-                          <h3 className="mt-4 text-[18px] font-bold tracking-[-0.015em] text-white">
+                          <h3 className="mt-4 text-[22px] font-bold leading-tight tracking-[-0.015em] text-white">
                             {card.title}
                           </h3>
                           <p className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-[#ff4d6d]/80">
                             Caution: AI with no manners
                           </p>
-                          {card.preview && (
-                            <p className="mt-2 line-clamp-2 text-[12.5px] italic leading-[1.5] text-white/80">
-                              &ldquo;{card.preview}&rdquo;
+                          <blockquote className="mt-3 border-l-2 pl-3" style={{ borderColor: '#ff4d6d80' }}>
+                            <p className="line-clamp-5 text-[13.5px] italic leading-[1.55] text-white/85">
+                              &ldquo;{roast?.quote || card.preview}&rdquo;
                             </p>
-                          )}
-                          <span className="mt-3 inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-[0.18em] text-[#ff4d6d] transition-colors duration-200 group-hover:text-[#ff8aa3]">
+                          </blockquote>
+                          <div className="mt-3 flex items-center gap-1 text-[10px] uppercase tracking-[0.18em]">
+                            <span className="text-[#ff4d6d]/70">Heat</span>
+                            <span aria-hidden="true" className="ml-1 flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((n) => (
+                                <span
+                                  key={n}
+                                  className="block h-1.5 w-3 rounded-sm"
+                                  style={{
+                                    backgroundColor: n <= 4 ? '#ff4d6d' : '#ff4d6d33',
+                                  }}
+                                />
+                              ))}
+                            </span>
+                          </div>
+                          <span className="mt-auto pt-3 inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-[0.18em] text-[#ff4d6d] transition-colors duration-200 group-hover:text-[#ff8aa3]">
                             {card.cta}
-                            <span
-                              aria-hidden="true"
-                              className="transition-transform duration-200 group-hover:translate-x-0.5"
-                            >
+                            <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">
                               →
                             </span>
                           </span>

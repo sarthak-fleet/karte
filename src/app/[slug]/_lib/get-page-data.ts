@@ -43,13 +43,17 @@ export const getFullPageData = cache(async (slug: string) => {
       .where(and(eq(generatedPages.pageId, page.id), eq(generatedPages.status, 'ready'))),
   ]);
 
-  // Pre-extract a one-line preview from each ready mode so the profile
-  // page can surface real generated copy in the mode cards (much better
-  // than the placeholder mock thumbs).
+  // Pre-extract typed previews for each ready mode. The profile page
+  // uses these to render proper mini-page previews (Wikipedia tabs +
+  // body, newspaper masthead + headline + lede, roast quote) instead
+  // of one-line placeholders.
   const modePreviews: Record<string, string> = {};
+  const modeContent: ModeContent = {};
   for (const row of readyGeneratedPages) {
     const preview = extractPreview(row.type, row.content);
     if (preview) modePreviews[row.type] = preview;
+    const structured = extractStructured(row.type, row.content);
+    if (structured) modeContent[row.type as keyof ModeContent] = structured;
   }
 
   return {
@@ -60,8 +64,90 @@ export const getFullPageData = cache(async (slug: string) => {
     sections: publicSections,
     readyPages: new Set(readyGeneratedPages.map((r) => r.type)),
     modePreviews,
+    modeContent,
   };
 });
+
+export interface ModeContent {
+  encyclopedia?: {
+    body: string;
+    topics: string[];
+  };
+  newspaper?: {
+    mastheadName: string;
+    dateline: string;
+    headline: string;
+    subheadline: string;
+    body: string;
+  };
+  roast?: {
+    quote: string;
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractStructured(type: string, content: unknown): any {
+  if (!content || typeof content !== 'object') return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c = content as any;
+
+  if (type === 'encyclopedia') {
+    const html = typeof c.markdown === 'string' ? c.markdown : '';
+    // Plain-text body — first paragraph, trimmed.
+    const stripped = html
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const body = truncate(stripped, 240);
+    // Topic chips — pull <h2> headings from the HTML, max 4.
+    const topics: string[] = [];
+    const h2Re = /<h2[^>]*>([\s\S]*?)<\/h2>/gi;
+    let m;
+    while ((m = h2Re.exec(html)) !== null && topics.length < 4) {
+      const t = m[1].replace(/<[^>]+>/g, '').trim();
+      if (t) topics.push(t);
+    }
+    return body ? { body, topics } : null;
+  }
+
+  if (type === 'newspaper') {
+    return {
+      mastheadName: typeof c.mastheadName === 'string' ? c.mastheadName : '',
+      dateline: typeof c.dateline === 'string' ? c.dateline : '',
+      headline:
+        typeof c?.leadStory?.headline === 'string' ? c.leadStory.headline : '',
+      subheadline:
+        typeof c?.leadStory?.subheadline === 'string'
+          ? c.leadStory.subheadline
+          : '',
+      body:
+        typeof c?.leadStory?.body === 'string'
+          ? truncate(c.leadStory.body, 200)
+          : '',
+    };
+  }
+
+  if (type === 'roast') {
+    const text = typeof c.roast === 'string' ? c.roast : '';
+    // First two sentences make the strongest pull-quote.
+    const first =
+      text
+        .split(/(?<=[.!?])\s+/)
+        .slice(0, 2)
+        .join(' ')
+        .trim() || text;
+    return { quote: truncate(first, 240) };
+  }
+
+  return null;
+}
+
+function truncate(s: string, max: number): string {
+  if (s.length <= max) return s;
+  const slice = s.slice(0, max);
+  const lastSpace = slice.lastIndexOf(' ');
+  return `${(lastSpace > max * 0.6 ? slice.slice(0, lastSpace) : slice).trimEnd()}…`;
+}
 
 /**
  * Mode-specific preview extractor. Each generated mode stores its content
