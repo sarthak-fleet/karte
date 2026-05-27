@@ -220,7 +220,6 @@ export async function ensureProjectsTable() {
       if (missingAlters.length > 0) {
         await client.migrate(missingAlters);
       }
-      }
     })().catch((error) => {
       featureTablesReady = null;
       throw error;
