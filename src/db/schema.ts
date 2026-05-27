@@ -111,6 +111,11 @@ export const pages = sqliteTable('pages', {
   newsletterUrl: text('newsletterUrl'),
   tipUrl: text('tipUrl'),
   videoUrl: text('videoUrl'),
+  // Roaming pet: a cartoon image that walks across the profile and
+  // pops up with AI-generated lines. Separate from avatarUrl so the
+  // user can keep a real photo as the avatar and a character as pet.
+  petUrl: text('petUrl'),
+  petEnabled: integer('petEnabled', { mode: 'boolean' }).default(true),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),

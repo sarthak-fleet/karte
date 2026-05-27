@@ -419,12 +419,14 @@ export default async function ProfilePage({ params }: Props) {
           custom cartoon character — pages.petUrl is on the roadmap)
           walks along the bottom of the viewport and pops up with
           AI-generated lines every 6-14 seconds. Click → opens chat. */}
-      <RoamingCharacter
-        avatarUrl={page.avatarUrl}
-        displayName={page.displayName}
-        accentColor={theme.accentColor}
-        lines={greetingLines}
-      />
+      {(page.petEnabled ?? true) && (page.petUrl || page.avatarUrl) && (
+        <RoamingCharacter
+          avatarUrl={page.petUrl || page.avatarUrl}
+          displayName={page.displayName}
+          accentColor={theme.accentColor}
+          lines={greetingLines}
+        />
+      )}
     </main>
   );
 }

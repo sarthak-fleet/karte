@@ -38,6 +38,8 @@ export default async function AppearancePage() {
                 newsletterUrl: page.newsletterUrl,
                 tipUrl: page.tipUrl,
                 videoUrl: page.videoUrl,
+                petUrl: page.petUrl,
+                petEnabled: page.petEnabled,
               }
             : null
         }

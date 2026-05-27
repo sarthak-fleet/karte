@@ -31,6 +31,8 @@ interface PageData {
   newsletterUrl?: string | null;
   tipUrl?: string | null;
   videoUrl?: string | null;
+  petUrl?: string | null;
+  petEnabled?: boolean | null;
 }
 
 interface PageSettingsProps {
@@ -103,6 +105,8 @@ export function PageSettings({
   const [newsletterUrl, setNewsletterUrl] = useState(page?.newsletterUrl ?? '');
   const [tipUrl, setTipUrl] = useState(page?.tipUrl ?? '');
   const [videoUrl, setVideoUrl] = useState(page?.videoUrl ?? '');
+  const [petUrl, setPetUrl] = useState(page?.petUrl ?? '');
+  const [petEnabled, setPetEnabled] = useState(page?.petEnabled ?? true);
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiRunning, setAiRunning] = useState(false);
   const [aiMessage, setAiMessage] = useState('');
@@ -249,6 +253,8 @@ export function PageSettings({
         newsletterUrl: newsletterUrl.trim() || null,
         tipUrl: tipUrl.trim() || null,
         videoUrl: videoUrl.trim() || null,
+        petUrl: petUrl.trim() || null,
+        petEnabled,
       };
       if (isEditing) {
         body.published = published;
@@ -639,6 +645,49 @@ export function PageSettings({
                   />
                 </FormField>
               </div>
+            </div>
+
+            {/* Roaming pet */}
+            <div>
+              <div className="mb-3 flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-karte-text">
+                    Roaming pet
+                  </h3>
+                  <p className="text-xs text-karte-text-3">
+                    A cartoon character that walks along the bottom of your
+                    public page and pops up with AI-generated lines from
+                    your wiki / newspaper / roast.
+                  </p>
+                </div>
+                <Toggle checked={petEnabled} onChange={setPetEnabled} />
+              </div>
+              {petEnabled && (
+                <div className="grid gap-3 sm:grid-cols-[1fr_72px]">
+                  <FormField
+                    label="Pet image URL"
+                    htmlFor="pet"
+                    description="Try DiceBear: e.g. https://api.dicebear.com/9.x/bottts/svg?seed=yourname"
+                  >
+                    <Input
+                      id="pet"
+                      type="url"
+                      value={petUrl}
+                      onChange={(e) => setPetUrl(e.target.value)}
+                      placeholder="https://api.dicebear.com/9.x/bottts/svg?seed=…"
+                    />
+                  </FormField>
+                  {petUrl.trim() && (
+                    <div className="flex items-end justify-center pb-1">
+                      <div
+                        className="h-16 w-16 rounded-2xl bg-white/[0.025] bg-contain bg-center bg-no-repeat ring-1 ring-white/[0.08]"
+                        style={{ backgroundImage: `url(${petUrl.trim()})` }}
+                        title="Pet preview"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
