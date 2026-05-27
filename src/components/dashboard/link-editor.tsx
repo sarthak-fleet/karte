@@ -166,6 +166,9 @@ export function LinkEditor({
   );
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [bodyText, setBodyText] = useState('');
+  const [showOptional, setShowOptional] = useState(false);
   const [loading, setLoading] = useState(false);
   const [importUrl, setImportUrl] = useState('');
   const [importedLinks, setImportedLinks] = useState<ImportedLink[]>([]);
@@ -249,7 +252,12 @@ export function LinkEditor({
       const res = await fetch(`/api/pages/${pageId}/links`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, url }),
+        body: JSON.stringify({
+          title,
+          url,
+          imageUrl: imageUrl.trim() || undefined,
+          body: bodyText.trim() || undefined,
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to add link');
@@ -258,6 +266,9 @@ export function LinkEditor({
       setLinks((prev) => normalizeLinks([...prev, newLink]));
       setTitle('');
       setUrl('');
+      setImageUrl('');
+      setBodyText('');
+      setShowOptional(false);
     } catch {
       alert('Failed to add link');
     } finally {
@@ -445,30 +456,59 @@ export function LinkEditor({
         )}
       </section>
 
-      <form onSubmit={addLink} className="flex flex-col gap-3 sm:flex-row">
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="flex-1 rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
-          required
-        />
-        <input
-          type="url"
-          placeholder="https://example.com"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          className="flex-1 rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
-          required
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-white px-6 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-100 disabled:opacity-50 sm:w-auto"
-        >
-          {loading ? 'Adding...' : 'Add'}
-        </button>
+      <form onSubmit={addLink} className="space-y-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="flex-1 rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
+            required
+          />
+          <input
+            type="url"
+            placeholder="https://example.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="flex-1 rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
+            required
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-white px-6 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-100 disabled:opacity-50 sm:w-auto"
+          >
+            {loading ? 'Adding...' : 'Add'}
+          </button>
+        </div>
+
+        {!showOptional ? (
+          <button
+            type="button"
+            onClick={() => setShowOptional(true)}
+            className="text-[12px] font-medium text-karte-text-3 transition-colors duration-150 hover:text-karte-text"
+          >
+            + Add image / description
+          </button>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input
+              type="url"
+              placeholder="Image URL (optional)"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className="rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
+            />
+            <input
+              type="text"
+              placeholder="One-line description (optional)"
+              value={bodyText}
+              onChange={(e) => setBodyText(e.target.value)}
+              className="rounded-lg bg-white/[0.045] px-4 py-2 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
+            />
+          </div>
+        )}
       </form>
 
       <hr className="border-karte-border" />

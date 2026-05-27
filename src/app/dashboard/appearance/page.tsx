@@ -32,6 +32,11 @@ export default async function AppearancePage() {
                 themeConfig: page.themeConfig,
                 published: page.published,
                 dmMode: page.dmMode,
+                location: page.location,
+                calendarUrl: page.calendarUrl,
+                newsletterUrl: page.newsletterUrl,
+                tipUrl: page.tipUrl,
+                videoUrl: page.videoUrl,
               }
             : null
         }

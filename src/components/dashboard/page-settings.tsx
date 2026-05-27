@@ -5,7 +5,7 @@ import posthog from 'posthog-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { ImageUploadField } from '@/components/dashboard/image-upload-field';
-import { Toggle } from '@/components/ui';
+import { FormField, Input, Toggle } from '@/components/ui';
 import type { DmMode } from '@/db/schema';
 import { trackActivated, trackCoreAction } from '@/lib/analytics-events';
 import {
@@ -25,6 +25,11 @@ interface PageData {
   themeConfig?: ThemeConfig | null;
   published: boolean | null;
   dmMode: DmMode;
+  location?: string | null;
+  calendarUrl?: string | null;
+  newsletterUrl?: string | null;
+  tipUrl?: string | null;
+  videoUrl?: string | null;
 }
 
 interface PageSettingsProps {
@@ -92,6 +97,11 @@ export function PageSettings({
   );
   const [published, setPublished] = useState(page?.published ?? false);
   const [dmMode, setDmMode] = useState<DmMode>(page?.dmMode ?? 'off');
+  const [location, setLocation] = useState(page?.location ?? '');
+  const [calendarUrl, setCalendarUrl] = useState(page?.calendarUrl ?? '');
+  const [newsletterUrl, setNewsletterUrl] = useState(page?.newsletterUrl ?? '');
+  const [tipUrl, setTipUrl] = useState(page?.tipUrl ?? '');
+  const [videoUrl, setVideoUrl] = useState(page?.videoUrl ?? '');
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [message, setMessage] = useState('');
@@ -197,6 +207,11 @@ export function PageSettings({
         avatarUrl,
         themeConfig: { presetId: themePresetId },
         dmMode,
+        location: location.trim() || null,
+        calendarUrl: calendarUrl.trim() || null,
+        newsletterUrl: newsletterUrl.trim() || null,
+        tipUrl: tipUrl.trim() || null,
+        videoUrl: videoUrl.trim() || null,
       };
       if (isEditing) {
         body.published = published;
@@ -518,6 +533,69 @@ export function PageSettings({
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-3">
+                <h3 className="text-sm font-medium text-karte-text">
+                  Quick actions
+                </h3>
+                <p className="text-xs text-karte-text-3">
+                  Optional URLs that appear as pill CTAs on your public page.
+                  Leave blank to hide.
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <FormField label="Location" htmlFor="loc">
+                  <Input
+                    id="loc"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Bangalore, IN"
+                  />
+                </FormField>
+                <FormField label="Booking link" htmlFor="cal">
+                  <Input
+                    id="cal"
+                    type="url"
+                    value={calendarUrl}
+                    onChange={(e) => setCalendarUrl(e.target.value)}
+                    placeholder="https://cal.com/you"
+                  />
+                </FormField>
+                <FormField label="Newsletter link" htmlFor="news">
+                  <Input
+                    id="news"
+                    type="url"
+                    value={newsletterUrl}
+                    onChange={(e) => setNewsletterUrl(e.target.value)}
+                    placeholder="https://yoursubstack.substack.com"
+                  />
+                </FormField>
+                <FormField label="Tip / Support link" htmlFor="tip">
+                  <Input
+                    id="tip"
+                    type="url"
+                    value={tipUrl}
+                    onChange={(e) => setTipUrl(e.target.value)}
+                    placeholder="https://ko-fi.com/you"
+                  />
+                </FormField>
+                <FormField
+                  label="Featured video"
+                  htmlFor="video"
+                  className="sm:col-span-2"
+                  description="YouTube, Vimeo, or Loom — embeds at the top of your page."
+                >
+                  <Input
+                    id="video"
+                    type="url"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    placeholder="https://youtu.be/…"
+                  />
+                </FormField>
               </div>
             </div>
 
