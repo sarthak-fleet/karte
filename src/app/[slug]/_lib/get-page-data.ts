@@ -38,10 +38,19 @@ export const getFullPageData = cache(async (slug: string) => {
     db.select().from(pageSections)
       .where(and(eq(pageSections.pageId, page.id), eq(pageSections.enabled, true)))
       .orderBy(asc(pageSections.sortOrder)),
-    db.select({ type: generatedPages.type })
+    db.select({ type: generatedPages.type, content: generatedPages.content })
       .from(generatedPages)
       .where(and(eq(generatedPages.pageId, page.id), eq(generatedPages.status, 'ready'))),
   ]);
+
+  // Pre-extract a one-line preview from each ready mode so the profile
+  // page can surface real generated copy in the mode cards (much better
+  // than the placeholder mock thumbs).
+  const modePreviews: Record<string, string> = {};
+  for (const row of readyGeneratedPages) {
+    const preview = extractPreview(row.type, row.content);
+    if (preview) modePreviews[row.type] = preview;
+  }
 
   return {
     page,
@@ -50,8 +59,38 @@ export const getFullPageData = cache(async (slug: string) => {
     projects: pageProjects,
     sections: publicSections,
     readyPages: new Set(readyGeneratedPages.map((r) => r.type)),
+    modePreviews,
   };
 });
+
+/**
+ * Mode-specific preview extractor. Each generated mode stores its content
+ * in a different shape (encyclopedia: markdown HTML; newspaper: structured
+ * front-page; roast: long string), so the preview pulls the right field
+ * per type and trims to ~140 chars.
+ */
+function extractPreview(type: string, content: unknown): string {
+  if (!content || typeof content !== 'object') return '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c = content as any;
+  let text = '';
+  if (type === 'encyclopedia') {
+    const html = typeof c.markdown === 'string' ? c.markdown : '';
+    text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  } else if (type === 'newspaper') {
+    const headline =
+      typeof c?.leadStory?.headline === 'string' ? c.leadStory.headline : '';
+    const sub =
+      typeof c?.leadStory?.subheadline === 'string'
+        ? c.leadStory.subheadline
+        : '';
+    text = [headline, sub].filter(Boolean).join(' — ').trim();
+  } else if (type === 'roast') {
+    text = typeof c.roast === 'string' ? c.roast : '';
+  }
+  if (!text) return '';
+  return text.length > 180 ? `${text.slice(0, 178).trimEnd()}…` : text;
+}
 
 // Keep individual helpers for sub-pages that don't need everything
 export const getPageBySlug = cache(async (slug: string) => {
