@@ -11,7 +11,7 @@ import { getCurrentPage, getSession } from '@/lib/auth-server';
 // Single-DB era: better-auth and app data both live on D1, so the `user`
 // row created by better-auth on sign-in IS the same row the app reads from.
 // The old cross-DB syncUserOnce() reconciliation is gone — we just confirm
-// the row carries the Talix-specific columns and fetch the page slug.
+// the row carries the Karte-specific columns and fetch the page slug.
 
 export default async function DashboardLayout({
   children,

@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Talix",
-    short_name: "Talix",
+    name: "Karte",
+    short_name: "Karte",
     description: "Link-in-bio with AI-enhanced profile modes.",
     start_url: "/",
     display: "standalone",

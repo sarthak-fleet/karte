@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: page.displayName,
     description:
-      page.bio ?? `${page.displayName} on Talix — links, chat, and more.`,
+      page.bio ?? `${page.displayName} on Karte — links, chat, and more.`,
     openGraph: {
       title: page.displayName,
       description: page.bio ?? undefined,
@@ -417,7 +417,7 @@ export default async function ProfilePage({ params }: Props) {
             href="/"
             className="font-medium text-karte-text-3 transition-colors duration-200 hover:text-karte-text"
           >
-            Talix
+            Karte
           </Link>
         </p>
       </div>

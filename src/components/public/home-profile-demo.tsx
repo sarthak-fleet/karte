@@ -30,7 +30,7 @@ const CHAT_PROMPTS: ChatPrompt[] = [
     label: 'What is Sarthak building?',
     userMessage: 'What is Sarthak building?',
     assistantMessage:
-      'Talix is the main bet — digital cards with chat, Encyclopedia, Newspaper, and Roast modes grounded in your memory. Also shipping fleet tooling and AI product experiments.',
+      'Karte is the main bet — digital cards with chat, Encyclopedia, Newspaper, and Roast modes grounded in your memory. Also shipping fleet tooling and AI product experiments.',
     source: 'Projects + bio',
   },
   {
@@ -46,7 +46,7 @@ const CHAT_PROMPTS: ChatPrompt[] = [
     label: 'Which project should I open first?',
     userMessage: 'Which project should I open first?',
     assistantMessage:
-      'Open Talix if you care about digital cards + AI profile modes. Open the fleet tooling repos if you want to see how the builder stack ships in production.',
+      'Open Karte if you care about digital cards + AI profile modes. Open the fleet tooling repos if you want to see how the builder stack ships in production.',
     source: 'Projects',
   },
 ];
@@ -71,7 +71,7 @@ function ModePreview({ mode }: { mode: DemoMode }) {
         <div>
           <p className="text-lg font-semibold text-karte-text">Sarthak Agrawal</p>
           <p className="mt-3 text-sm leading-6 text-karte-text-2">
-            Sarthak Agrawal is a builder working on Talix — a digital card platform
+            Sarthak Agrawal is a builder working on Karte — a digital card platform
             where visitors query a memory-backed profile instead of scrolling static links.
           </p>
           <p className="mt-3 text-sm leading-6 text-karte-text-3">
@@ -97,7 +97,7 @@ function ModePreview({ mode }: { mode: DemoMode }) {
             Builder edition · Generated from memory
           </p>
           <h3 className="mt-2 font-serif text-2xl font-bold leading-tight">
-            Talix turns your bio into a card people actually talk to
+            Karte turns your bio into a card people actually talk to
           </h3>
           <p className="mt-3 text-sm leading-6 text-[#17130d]/75">
             Sarthak Agrawal ships a link page that answers questions, publishes

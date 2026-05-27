@@ -57,7 +57,7 @@ export default function Home() {
           className={`${serif.className} pointer-events-none absolute -right-12 top-16 select-none text-[280px] leading-none tracking-[-0.04em] text-karte-text/[0.025] sm:-right-20 sm:text-[420px] lg:-right-32 lg:top-24 lg:text-[560px]`}
           style={{ fontStyle: 'italic' }}
         >
-          Talix
+          Karte
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-24 lg:pb-28 lg:pt-32">
@@ -78,16 +78,18 @@ export default function Home() {
             </span>
           </h1>
 
-          {/* Brand tagline */}
+          {/* Dictionary-entry tagline */}
           <div className="mt-10 max-w-2xl border-l border-white/[0.08] pl-5 text-[15px] leading-[1.7] tracking-[-0.005em] text-karte-text-3 sm:text-[17px] sm:leading-[1.65]">
+            <span className="font-medium text-karte-text">karte</span>{' '}
+            <span className="text-karte-text-4">/ˈkartə/</span>{' '}
             <span
-              className={`${serif.className} text-karte-text`}
+              className={`${serif.className} text-karte-text-4`}
               style={{ fontStyle: 'italic' }}
             >
-              Talix
+              (n.)
             </span>{' '}
-            <span className="text-karte-text-3">is a digital card that talks back —</span>{' '}
-            <span className="text-karte-text">links, chat, and AI-generated pages on one shareable URL.</span>
+            <span className="text-karte-text-3">German for &ldquo;card.&rdquo;</span>{' '}
+            <span className="text-karte-text">This one talks back.</span>
           </div>
 
           <div className="mt-12 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
@@ -146,7 +148,7 @@ export default function Home() {
           </div>
 
           <p className="mt-12 max-w-2xl text-[15px] leading-[1.7] tracking-[-0.005em] text-karte-text-3 sm:text-[17px]">
-            Talix profiles are static-rendered and edge-cached at every
+            Karte profiles are static-rendered and edge-cached at every
             Cloudflare data center on Earth. By the time a visitor&apos;s thumb
             lifts off the link, the page is already painted.
           </p>
@@ -350,7 +352,7 @@ export default function Home() {
               className={`${serif.className} max-w-2xl text-[28px] font-normal leading-[1.3] tracking-[-0.01em] text-karte-text sm:text-[36px]`}
               style={{ fontStyle: 'italic' }}
             >
-              &ldquo;Talix is the main bet — digital cards with chat,
+              &ldquo;Karte is the main bet — digital cards with chat,
               Encyclopedia, Newspaper, and Roast modes grounded in your
               memory.&rdquo;
             </blockquote>
@@ -376,7 +378,7 @@ export default function Home() {
               builder and product person whose work spans AI tooling and the
               open-web profile category. Since 2024 he has shipped{' '}
               <a className="underline decoration-cyan-300/40 underline-offset-4">
-                Talix
+                Karte
               </a>{' '}
               — a digital card platform where visitors query a
               memory-backed profile instead of scrolling static links.
@@ -408,7 +410,7 @@ export default function Home() {
               className={`${serif.className} mt-2 text-[32px] font-normal leading-[1.05] tracking-[-0.01em] text-karte-text sm:text-[44px]`}
               style={{ fontStyle: 'normal' }}
             >
-              Talix turns your bio into a card people actually talk to.
+              Karte turns your bio into a card people actually talk to.
             </h4>
             <p
               className={`${serif.className} mt-4 text-[14px] uppercase tracking-[0.18em] text-karte-text-4`}
@@ -539,7 +541,7 @@ export default function Home() {
 
       <footer className="border-t border-karte-border">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-12 sm:flex-row sm:items-center">
-          <p className="text-[13px] text-karte-text-4">© 2026 Talix.</p>
+          <p className="text-[13px] text-karte-text-4">© 2026 Karte.</p>
           <nav className="flex items-center gap-6 text-[13px] text-karte-text-4">
             <Link href="/about" className="transition-colors duration-200 hover:text-karte-text-2">About</Link>
             <Link href="/privacy" className="transition-colors duration-200 hover:text-karte-text-2">Privacy</Link>

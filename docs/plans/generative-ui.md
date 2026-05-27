@@ -202,7 +202,7 @@ profiles render exactly as they do today, with no DB change.
 
 ## Why this is worth doing
 
-Most link-in-bio products treat layout as a fixed template. Talix's
+Most link-in-bio products treat layout as a fixed template. Karte's
 existing differentiator is that the *content* is AI-generated (chat,
 encyclopedia, newspaper, roast). Extending the AI to also pick the
 arrangement makes the whole product feel generative end-to-end — not just

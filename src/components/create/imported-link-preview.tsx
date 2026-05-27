@@ -8,8 +8,8 @@ export interface ImportedLinkItem {
 }
 
 /**
- * Renders the imported links as a mini Talix profile preview — just the
- * stacked link cards, no chat widget or other Talix chrome. Visual tone
+ * Renders the imported links as a mini Karte profile preview — just the
+ * stacked link cards, no chat widget or other Karte chrome. Visual tone
  * mirrors the real public profile so the visitor can see exactly what
  * their page will look like after claiming.
  */

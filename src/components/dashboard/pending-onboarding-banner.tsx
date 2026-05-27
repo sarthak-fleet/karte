@@ -65,7 +65,7 @@ function clearPending() {
 
 /**
  * Picks up the OnboardingChat handoff and offers a single click to
- * create the page on Talix. Renders only when `?onboarded=1` is on
+ * create the page on Karte. Renders only when `?onboarded=1` is on
  * the URL and there's a valid payload in localStorage.
  */
 export function PendingOnboardingBanner() {

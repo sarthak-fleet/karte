@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ─── Talix design tokens ────────────────────────────────────────────── */
+/* ─── Karte design tokens ────────────────────────────────────────────── */
 /* The single source of truth for landing, dashboard, and default public  */
 /* profile chrome. User-customizable profile themes still override via    */
 /* THEME_PRESETS + resolveThemeConfig.                                    */
@@ -42,7 +42,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Talix tokens — accessible as bg-karte-bg, text-karte-text, etc */
+  /* Karte tokens — accessible as bg-karte-bg, text-karte-text, etc */
   --color-karte-bg: var(--karte-bg);
   --color-karte-surface: var(--karte-surface);
   --color-karte-surface-2: var(--karte-surface-2);

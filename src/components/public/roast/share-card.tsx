@@ -122,7 +122,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             karte.cc/{slug}
           </span>
           <span className="text-xs text-karte-text-4">
-            Talix Roast
+            Karte Roast
           </span>
         </div>
       </div>

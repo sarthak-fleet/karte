@@ -339,7 +339,7 @@ function ValidationSections({
       {domain.dnsInstructions.length > 0 && (
         <Section
           eyebrow="Step 1 · Point the hostname"
-          tagline="Required. CNAME your hostname to Talix so traffic reaches us."
+          tagline="Required. CNAME your hostname to Karte so traffic reaches us."
         >
           {domain.dnsInstructions.map((rec, i) => (
             <DnsRecordRow

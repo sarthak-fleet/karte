@@ -160,7 +160,7 @@ export function NewspaperFrontPage({
           <div className="px-4 pt-4 sm:px-8 sm:pt-6">
             <div className="flex items-center justify-between border-y border-stone-900 py-2 text-[10px] uppercase tracking-[0.18em] text-stone-700 sm:text-xs">
               <p>{content.dateline}</p>
-              <p>Talix Edition</p>
+              <p>Karte Edition</p>
               <p>Vol. I</p>
             </div>
             <div className="py-4 text-center">
@@ -224,7 +224,7 @@ export function NewspaperFrontPage({
                     />
                   </div>
                   <figcaption className="mt-2 text-[10px] uppercase tracking-[0.12em] text-karte-text-4">
-                    {displayName} | Photo: Talix
+                    {displayName} | Photo: Karte
                   </figcaption>
                 </figure>
               )}
@@ -347,7 +347,7 @@ export function NewspaperFrontPage({
           <div className="border-t border-stone-900 bg-stone-950 px-5 py-3 sm:px-8">
             <div className="flex items-center justify-between">
               <p className="text-[10px] uppercase tracking-widest text-karte-text-3">
-                Published by Talix
+                Published by Karte
               </p>
               <p
                 className="text-[10px] tracking-wider text-karte-text-3 italic"
