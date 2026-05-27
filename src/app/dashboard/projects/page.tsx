@@ -3,16 +3,14 @@ import { redirect } from 'next/navigation';
 
 import { ProjectEditor } from '@/components/dashboard/project-editor';
 import { db, ensureProjectsTable } from '@/db';
-import { pages, projects } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { projects } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 export default async function ProjectsPage() {
   const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

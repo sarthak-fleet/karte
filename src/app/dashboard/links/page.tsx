@@ -3,16 +3,14 @@ import { redirect } from 'next/navigation';
 
 import { LinkEditor } from '@/components/dashboard/link-editor';
 import { db } from '@/db';
-import { links,pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { links } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 export default async function LinksPage() {
   const session = await getSession();
   if (!session?.user?.id) redirect('/login');
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) redirect('/dashboard');
 

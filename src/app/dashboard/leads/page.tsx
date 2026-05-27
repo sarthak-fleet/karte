@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { db, ensureProjectsTable } from '@/db';
-import { contactSubmissions, conversations, messages, pageEvents, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { contactSubmissions, conversations, messages, pageEvents } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 import { type QualifiedLead,qualifyVisitorLeads } from '@/lib/lead-qualification';
 
 function formatDate(value: Date | null) {
@@ -52,9 +52,7 @@ export default async function LeadsPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

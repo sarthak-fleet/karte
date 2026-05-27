@@ -1,10 +1,8 @@
-import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
 import { ProfileRevampAssistant } from '@/components/dashboard/profile-revamp-assistant';
-import { db, ensureProjectsTable } from '@/db';
-import { pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { ensureProjectsTable } from '@/db';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 import { resolveThemeConfig } from '@/lib/themes';
 
 export default async function RevampPage() {
@@ -13,9 +11,7 @@ export default async function RevampPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

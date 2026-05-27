@@ -115,7 +115,88 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── 2. THE PROBLEM — manifesto-scale display ────────── */}
+      {/* ─── 2. SPEED — credibility flex ──────────────────────── */}
+      <section className="border-t border-karte-border">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+            <span className="text-karte-accent/80">·</span> Speed
+          </p>
+
+          <div className="mt-8 grid items-end gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+            <h2 className="text-3xl font-semibold leading-[1.05] tracking-[-0.025em] text-karte-text sm:text-5xl lg:text-[64px]">
+              Loads before they{' '}
+              <span
+                className={`${serif.className} font-normal text-karte-accent-soft`}
+                style={{ fontStyle: 'italic' }}
+              >
+                look away.
+              </span>
+            </h2>
+
+            <div>
+              <p
+                className={`${serif.className} text-[80px] font-normal leading-[0.9] tracking-[-0.045em] text-karte-text sm:text-[120px]`}
+                style={{ fontStyle: 'italic' }}
+              >
+                &lt;100ms
+              </p>
+              <p className="mt-3 text-[13px] leading-[1.55] text-karte-text-3">
+                Median time-to-first-byte for a published profile. Anywhere in
+                the world.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-12 max-w-2xl text-[15px] leading-[1.7] tracking-[-0.005em] text-karte-text-3 sm:text-[17px]">
+            Karte profiles are static-rendered and edge-cached at every
+            Cloudflare data center on Earth. By the time a visitor&apos;s thumb
+            lifts off the link, the page is already painted.
+          </p>
+
+          <dl className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-karte-border sm:grid-cols-3">
+            <div className="bg-karte-bg p-6">
+              <dt className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-karte-text-4">
+                TTFB
+              </dt>
+              <dd className="mt-2 font-mono text-[22px] font-semibold tracking-tight text-karte-text">
+                &lt; 100 ms
+              </dd>
+              <dd className="mt-1 text-[12px] text-karte-text-3">
+                cached at the edge
+              </dd>
+            </div>
+            <div className="bg-karte-bg p-6 sm:border-l sm:border-karte-border">
+              <dt className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-karte-text-4">
+                Spinners
+              </dt>
+              <dd className="mt-2 font-mono text-[22px] font-semibold tracking-tight text-karte-text">
+                0
+              </dd>
+              <dd className="mt-1 text-[12px] text-karte-text-3">
+                no client-JS to first paint
+              </dd>
+            </div>
+            <div className="bg-karte-bg p-6 sm:border-l sm:border-karte-border">
+              <dt className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-karte-text-4">
+                PoPs
+              </dt>
+              <dd className="mt-2 font-mono text-[22px] font-semibold tracking-tight text-karte-text">
+                330+
+              </dd>
+              <dd className="mt-1 text-[12px] text-karte-text-3">
+                worldwide, serving from CF
+              </dd>
+            </div>
+          </dl>
+
+          <p className="mt-8 text-[13px] text-karte-text-4">
+            A link-in-bio that lags is a link-in-bio that doesn&apos;t get
+            clicked.
+          </p>
+        </div>
+      </section>
+
+      {/* ─── 3. THE PROBLEM — manifesto-scale display ─────────── */}
       <section className="border-t border-karte-border">
         <div className="mx-auto max-w-6xl px-6 py-24 lg:py-32">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">

@@ -1,10 +1,8 @@
-import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
 import { PageToggles } from '@/components/dashboard/page-toggles';
-import { db, ensureProjectsTable } from '@/db';
-import { pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { ensureProjectsTable } from '@/db';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 export default async function DashboardPagesPage() {
   const session = await getSession();
@@ -12,9 +10,7 @@ export default async function DashboardPagesPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (

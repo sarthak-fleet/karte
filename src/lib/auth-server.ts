@@ -1,8 +1,12 @@
 import 'server-only';
 
+import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { connection } from 'next/server';
 import { cache } from 'react';
+
+import { db } from '@/db';
+import { pages } from '@/db/schema';
 
 import { createAuth, ensureAuthTables } from './auth';
 
@@ -19,4 +23,16 @@ export const getSession = cache(async () => {
   await connection();
   await ensureAuthTables();
   return createAuth().api.getSession({ headers: await headers() });
+});
+
+/**
+ * Returns the current user's page row (or undefined). React.cached so the
+ * dashboard layout's slug-fetch and each child page's page lookup
+ * deduplicate to one Turso roundtrip per navigation. Previously every
+ * dashboard nav cost 2 separate page queries.
+ */
+export const getCurrentPage = cache(async (userId: string) => {
+  return db.query.pages.findFirst({
+    where: eq(pages.userId, userId),
+  });
 });

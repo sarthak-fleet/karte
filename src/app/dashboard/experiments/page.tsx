@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { db, ensureProjectsTable } from '@/db';
-import { pageEvents, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { pageEvents } from '@/db/schema';
+import { getCurrentPage, getSession } from '@/lib/auth-server';
 import {
   buildVariantPreviewUrl,
   PROFILE_VARIANTS,
@@ -36,9 +36,7 @@ export default async function ExperimentsPage() {
 
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: eq(pages.userId, session.user.id),
-  });
+  const page = await getCurrentPage(session.user.id);
 
   if (!page) {
     return (
