@@ -106,40 +106,26 @@ export default async function OgImage({ params }: Props) {
           fontFamily: 'sans-serif',
         }}
       >
-        {/* Top row: avatar + identity */}
+        {/* Top row: avatar tile + identity. Skip external <img> fetch
+            (Satori can't reliably load arbitrary remote images in the
+            Worker environment) — render an initials tile instead. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-          {page.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-            <img
-              src={page.avatarUrl}
-              width={104}
-              height={104}
-              style={{
-                width: 104,
-                height: 104,
-                borderRadius: 28,
-                objectFit: 'cover',
-                border: `1px solid ${accent}55`,
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 104,
-                height: 104,
-                borderRadius: 28,
-                background: `linear-gradient(135deg, ${grad1}, ${grad2})`,
-                color: '#0a0a0a',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 44,
-                fontWeight: 700,
-              }}
-            >
-              {initials}
-            </div>
-          )}
+          <div
+            style={{
+              width: 104,
+              height: 104,
+              borderRadius: 28,
+              background: `linear-gradient(135deg, ${grad1}, ${grad2})`,
+              color: '#0a0a0a',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 44,
+              fontWeight: 700,
+            }}
+          >
+            {initials}
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{
