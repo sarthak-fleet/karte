@@ -1,368 +1,205 @@
 'use client';
 
-import { useState } from 'react';
-
 import {
-  Badge,
-  Button,
-  FormField,
-  Input,
-  Label,
-  Select,
-  Textarea,
-  Toggle,
-} from '@/components/ui';
-import { linkCardVariants } from '@/components/public/widgets';
+  linkCardVariants,
+  projectCardVariants,
+} from '@/components/public/widgets';
+import { PAGE_SECTION_TYPES } from '@/lib/page-sections';
 
-// One row in the gallery: heading + 1-line desc on the left, live preview
-// of the widget on the right. Self-contained so we can drop new sections
-// in without restructuring the page.
-function GalleryRow({
+const sampleLinkData = {
+  id: 'preview',
+  title: 'Read the latest essay',
+  url: 'https://example.com',
+  icon: '✍️',
+  imageUrl:
+    'https://images.unsplash.com/photo-1517089596392-fb9a9033e05b?w=600&q=80',
+  body: 'A short, one-line description that adds context the title can’t carry.',
+};
+
+const sampleProjectData = {
+  id: 'preview',
+  title: 'SaaS Maker',
+  url: 'https://example.com',
+  description:
+    'A workflow tool for indie SaaS builders — context capture, AI-assisted decisions, and one-click publishing.',
+  imageUrl:
+    'https://images.unsplash.com/photo-1517089596392-fb9a9033e05b?w=600&q=80',
+};
+
+function VariantCard({
   id,
-  name,
-  description,
-  meta,
+  size,
+  budget,
+  bestFor,
+  requires,
   children,
 }: {
   id: string;
-  name: string;
-  description: string;
-  meta?: ReadonlyArray<string>;
+  size: string;
+  budget: string;
+  bestFor: string;
+  requires: ReadonlyArray<string>;
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid gap-6 lg:grid-cols-[280px_1fr] lg:gap-10">
-      <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-karte-text-4">
-          {id}
-        </p>
-        <h3 className="mt-1.5 text-[15px] font-semibold tracking-[-0.005em] text-karte-text">
-          {name}
-        </h3>
-        <p className="mt-2 text-[13px] leading-[1.55] text-karte-text-3">
-          {description}
-        </p>
-        {meta && meta.length > 0 && (
-          <ul className="mt-3 space-y-1">
-            {meta.map((line) => (
-              <li
-                key={line}
-                className="font-mono text-[11px] text-karte-text-4"
-              >
-                {line}
-              </li>
-            ))}
-          </ul>
-        )}
+    <div className="flex flex-col gap-4 rounded-2xl bg-white/[0.02] p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-karte-text-4">
+            {id}
+          </p>
+          <p className="mt-1 text-[13px] font-semibold capitalize text-karte-text">
+            {size} variant
+          </p>
+        </div>
+        <span
+          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium capitalize ${
+            budget === 'high'
+              ? 'bg-karte-accent/[0.10] text-karte-accent-soft'
+              : budget === 'medium'
+                ? 'bg-white/[0.06] text-karte-text-2'
+                : 'bg-white/[0.03] text-karte-text-4'
+          }`}
+        >
+          {budget} weight
+        </span>
       </div>
-      <div className="rounded-2xl bg-white/[0.02] p-6">{children}</div>
+      <p className="text-[12px] leading-[1.5] text-karte-text-3">{bestFor}</p>
+      <p className="font-mono text-[10px] text-karte-text-4">
+        needs: {requires.join(', ')}
+      </p>
+      <div className="mt-auto">{children}</div>
     </div>
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({
+  eyebrow,
+  children,
+  description,
+}: {
+  eyebrow: string;
+  children: React.ReactNode;
+  description?: string;
+}) {
   return (
-    <h2 className="mb-6 text-[11px] font-medium uppercase tracking-[0.24em] text-karte-text-2">
-      {children}
-    </h2>
-  );
-}
-
-function ColumnHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">
-      {children}
-    </p>
+    <div className="mb-6">
+      <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+        <span className="text-karte-accent/80">·</span> {eyebrow}
+      </p>
+      <h2 className="mt-2 text-xl font-semibold tracking-[-0.01em] text-karte-text">
+        {children}
+      </h2>
+      {description && (
+        <p className="mt-2 max-w-2xl text-[13px] leading-[1.55] text-karte-text-3">
+          {description}
+        </p>
+      )}
+    </div>
   );
 }
 
 export function WidgetGallery() {
-  const [toggle1, setToggle1] = useState(true);
-  const [toggle2, setToggle2] = useState(false);
-
-  const previewLink = {
-    id: 'preview',
-    title: 'Read the latest essay',
-    url: 'https://example.com',
-    icon: '✍️',
-    imageUrl: null,
-    body: 'A short, one-line description that adds context the title can’t carry.',
-  };
+  const ctx = { accentColor: '#67e8f9', slug: 'demo' };
 
   return (
-    <div className="space-y-16">
-      {/* ── INPUTS ───────────────────────────────────────────── */}
+    <div className="space-y-14">
+      {/* ── LINK VARIANTS ────────────────────────────────────── */}
       <section>
-        <SectionTitle>Inputs</SectionTitle>
-        <div className="space-y-10">
-          <GalleryRow
-            id="ui.Input"
-            name="Text input"
-            description="Single-line text. Used for slugs, titles, URLs, names."
-            meta={['props: ComponentPropsWithoutRef<input>']}
-          >
-            <FormField label="Display name" htmlFor="demo-input">
-              <Input
-                id="demo-input"
-                placeholder="e.g. Sarthak Agrawal"
-                defaultValue=""
-              />
-            </FormField>
-          </GalleryRow>
-
-          <GalleryRow
-            id="ui.Textarea"
-            name="Multi-line textarea"
-            description="Long-form content. Bio, system prompt, message body."
-            meta={['props: ComponentPropsWithoutRef<textarea>']}
-          >
-            <FormField
-              label="Bio"
-              htmlFor="demo-textarea"
-              description="A few sentences about you. Visible on your public profile."
-            >
-              <Textarea
-                id="demo-textarea"
-                rows={3}
-                placeholder="Engineer building AI-native tools…"
-              />
-            </FormField>
-          </GalleryRow>
-
-          <GalleryRow
-            id="ui.Select"
-            name="Dropdown select"
-            description="One-of-N choice from a fixed set. Section type, theme preset, language."
-            meta={['props: ComponentPropsWithoutRef<select>']}
-          >
-            <FormField label="Section type" htmlFor="demo-select">
-              <Select id="demo-select" defaultValue="text">
-                <option value="text">Text block</option>
-                <option value="cta">Call-to-action</option>
-                <option value="contact">Contact form</option>
-                <option value="blog">Blog entry</option>
-                <option value="social">Social links</option>
-              </Select>
-            </FormField>
-          </GalleryRow>
-
-          <GalleryRow
-            id="ui.Toggle"
-            name="Toggle switch"
-            description="Binary on/off. Publish, enable mode, opt-in."
-            meta={[
-              'props: { checked, onChange, disabled?, className? }',
-              'on-color: karte-accent',
-            ]}
-          >
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-6 rounded-xl bg-white/[0.025] px-4 py-3">
-                <div>
-                  <p className="text-[13px] font-medium text-karte-text">
-                    Encyclopedia mode
-                  </p>
-                  <p className="text-[12px] text-karte-text-3">
-                    Generate a Wikipedia-style page from your sources.
-                  </p>
-                </div>
-                <Toggle checked={toggle1} onChange={setToggle1} />
-              </div>
-              <div className="flex items-center justify-between gap-6 rounded-xl bg-white/[0.025] px-4 py-3">
-                <div>
-                  <p className="text-[13px] font-medium text-karte-text">
-                    Roast mode
-                  </p>
-                  <p className="text-[12px] text-karte-text-3">
-                    Generate a roast page (off by default).
-                  </p>
-                </div>
-                <Toggle checked={toggle2} onChange={setToggle2} />
-              </div>
-            </div>
-          </GalleryRow>
-        </div>
-      </section>
-
-      {/* ── BUTTONS ──────────────────────────────────────────── */}
-      <section>
-        <SectionTitle>Buttons</SectionTitle>
-        <GalleryRow
-          id="ui.Button"
-          name="Button"
-          description="4 variants × 3 sizes. Primary for the single canonical action per surface, secondary for siblings, ghost for tertiary, danger for destructive."
-          meta={[
-            "variant: 'primary' | 'secondary' | 'ghost' | 'danger'",
-            "size: 'sm' | 'md' | 'lg'",
-          ]}
+        <SectionTitle
+          eyebrow="Links"
+          description="The smallest unit on a profile — a stack of these is the link-in-bio's bread. Pick a size depending on how much weight a link should carry: line is scannable, hero is the marquee."
         >
-          <div className="space-y-6">
-            <div>
-              <ColumnHeader>Primary</ColumnHeader>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button size="sm">Small</Button>
-                <Button size="md">Medium</Button>
-                <Button size="lg">Large</Button>
-              </div>
-            </div>
-            <div>
-              <ColumnHeader>Secondary</ColumnHeader>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button variant="secondary" size="sm">
-                  Small
-                </Button>
-                <Button variant="secondary" size="md">
-                  Medium
-                </Button>
-                <Button variant="secondary" size="lg">
-                  Large
-                </Button>
-              </div>
-            </div>
-            <div>
-              <ColumnHeader>Ghost</ColumnHeader>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button variant="ghost" size="sm">
-                  Small
-                </Button>
-                <Button variant="ghost" size="md">
-                  Medium
-                </Button>
-                <Button variant="ghost" size="lg">
-                  Large
-                </Button>
-              </div>
-            </div>
-            <div>
-              <ColumnHeader>Danger</ColumnHeader>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button variant="danger" size="sm">
-                  Delete
-                </Button>
-                <Button variant="danger" size="md">
-                  Remove forever
-                </Button>
-                <Button variant="danger" size="lg">
-                  Destroy
-                </Button>
-              </div>
-            </div>
-          </div>
-        </GalleryRow>
-      </section>
-
-      {/* ── TAGS / LABELS / BADGES ───────────────────────────── */}
-      <section>
-        <SectionTitle>Tags &amp; labels</SectionTitle>
-        <div className="space-y-10">
-          <GalleryRow
-            id="ui.Label"
-            name="Field label"
-            description="The line that sits above a form control. Use FormField when paired with a description."
-          >
-            <Label>Display name</Label>
-            <Label className="mt-3">Bio</Label>
-            <Label className="mt-3">Slug</Label>
-          </GalleryRow>
-
-          <GalleryRow
-            id="ui.Badge"
-            name="Pill badge"
-            description="Inline tag for status, type, count. Optional onRemove for filter chips."
-          >
-            <div className="flex flex-wrap gap-2">
-              <Badge>Text block</Badge>
-              <Badge>Contact form</Badge>
-              <Badge>Enabled</Badge>
-              <Badge>v1</Badge>
-              <Badge onRemove={() => {}} removeLabel="Remove tag">
-                Filter chip
-              </Badge>
-            </div>
-          </GalleryRow>
+          Link widgets
+        </SectionTitle>
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {linkCardVariants.map((variant) => (
+            <VariantCard
+              key={variant.id}
+              id={variant.id}
+              size={variant.size}
+              budget={variant.budget}
+              bestFor={variant.bestFor}
+              requires={variant.requires as ReadonlyArray<string>}
+            >
+              {variant.render(sampleLinkData, ctx)}
+            </VariantCard>
+          ))}
         </div>
       </section>
 
-      {/* ── LINK CARD VARIANTS (Generative UI catalog) ───────── */}
+      {/* ── PROJECT VARIANTS ─────────────────────────────────── */}
       <section>
-        <SectionTitle>Link card widgets</SectionTitle>
-        <p className="mb-6 max-w-2xl text-[13px] leading-[1.55] text-karte-text-3">
-          The AI Revamp assistant picks one of these per link based on the
-          data available and the row&apos;s visual budget. Each variant is
-          named — those ids appear in stored layout plans.
-        </p>
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {linkCardVariants.map((variant) => {
-            // Square + hero look best when given a real image — synthesize
-            // an accent gradient as a stand-in for the catalog preview.
-            const hasImage = variant.requires.includes('imageUrl');
-            const data = {
-              ...previewLink,
-              imageUrl: hasImage
-                ? `https://images.unsplash.com/photo-1517089596392-fb9a9033e05b?w=600&q=80`
-                : null,
-            };
-            const ctx = { accentColor: '#67e8f9', slug: 'demo' };
-            return (
-              <div
-                key={variant.id}
-                className="flex flex-col gap-4 rounded-2xl bg-white/[0.02] p-5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-karte-text-4">
-                      {variant.id}
-                    </p>
-                    <p className="mt-1 text-[13px] font-semibold text-karte-text">
-                      {variant.size}
-                    </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                      variant.budget === 'high'
-                        ? 'bg-karte-accent/[0.10] text-karte-accent-soft'
-                        : variant.budget === 'medium'
-                          ? 'bg-white/[0.06] text-karte-text-2'
-                          : 'bg-white/[0.03] text-karte-text-4'
-                    }`}
-                  >
-                    {variant.budget}
-                  </span>
-                </div>
-                <p className="text-[12px] leading-[1.5] text-karte-text-3">
-                  {variant.bestFor}
-                </p>
-                <p className="font-mono text-[10px] text-karte-text-4">
-                  requires: {variant.requires.join(', ')}
-                </p>
-                <div className="mt-auto">{variant.render(data, ctx)}</div>
-              </div>
-            );
-          })}
+        <SectionTitle
+          eyebrow="Projects"
+          description="Portfolio entries. Use line when projects are similar and the list is the point; use hero for one marquee piece you want every visitor to see first."
+        >
+          Project widgets
+        </SectionTitle>
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {projectCardVariants.map((variant) => (
+            <VariantCard
+              key={variant.id}
+              id={variant.id}
+              size={variant.size}
+              budget={variant.budget}
+              bestFor={variant.bestFor}
+              requires={variant.requires as ReadonlyArray<string>}
+            >
+              {variant.render(sampleProjectData, ctx)}
+            </VariantCard>
+          ))}
         </div>
       </section>
 
-      {/* ── FUTURE WIDGETS ───────────────────────────────────── */}
+      {/* ── SECTION TYPES ────────────────────────────────────── */}
       <section>
-        <SectionTitle>Roadmap</SectionTitle>
+        <SectionTitle
+          eyebrow="Sections"
+          description="Heterogeneous content blocks. Each section type has a distinct visual treatment driven by its purpose. Size variants per type are on the roadmap — for now there's one canonical shape per type."
+        >
+          Section widgets
+        </SectionTitle>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {PAGE_SECTION_TYPES.map((type) => (
+            <div
+              key={type.value}
+              className="rounded-2xl bg-white/[0.02] p-5"
+            >
+              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-karte-text-4">
+                section.{type.value}
+              </p>
+              <p className="mt-1.5 text-[14px] font-semibold text-karte-text">
+                {type.label}
+              </p>
+              <p className="mt-2 text-[12px] leading-[1.55] text-karte-text-3">
+                {type.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── ROADMAP ──────────────────────────────────────────── */}
+      <section>
+        <SectionTitle eyebrow="Roadmap">Coming next</SectionTitle>
         <div className="rounded-2xl bg-white/[0.02] p-6">
-          <p className="text-[13px] leading-[1.55] text-karte-text-3">
-            Coming next, per{' '}
-            <span className="text-karte-text">docs/plans/generative-ui.md</span>
-            :
-          </p>
-          <ul className="mt-3 space-y-2 font-mono text-[12px] text-karte-text-3">
+          <ul className="space-y-2 font-mono text-[12px] text-karte-text-3">
             <li>
-              <span className="text-karte-text-2">project.*</span> — line /
-              square / wide / hero (image-bearing projects benefit from
-              larger shapes)
+              <span className="text-karte-text-2">section.*</span> — size
+              variants per section type (compact / standard / featured)
             </li>
             <li>
-              <span className="text-karte-text-2">section.*</span> — card /
-              wide / full (mostly text content, less visual variation)
+              <span className="text-karte-text-2">layoutPlan storage</span>{' '}
+              — Drizzle column on <code className="text-karte-text-2">pages</code> so AI Revamp output persists
             </li>
             <li>
-              <span className="text-karte-text-2">info-block.*</span> — chip
-              / card (small structured facts — location, role, languages)
+              <span className="text-karte-text-2">LayoutRenderer</span> —
+              swap the profile page&apos;s ad-hoc rendering for plan-driven output
+            </li>
+            <li>
+              <span className="text-karte-text-2">Drag-and-drop override</span>{' '}
+              — manual variant swap per item from the dashboard
             </li>
           </ul>
         </div>

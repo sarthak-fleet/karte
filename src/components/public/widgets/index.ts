@@ -11,9 +11,15 @@ import {
   linkCardVariants,
   linkCardVariantsById,
 } from './link-card-variants';
+import {
+  type ProjectCardData,
+  projectCardVariants,
+  projectCardVariantsById,
+} from './project-card-variants';
 
-export type { LinkCardData };
+export type { LinkCardData, ProjectCardData };
 export { linkCardVariants, linkCardVariantsById };
+export { projectCardVariants, projectCardVariantsById };
 
 /**
  * Full catalog of every variant the renderer knows about, flattened
@@ -24,7 +30,8 @@ export { linkCardVariants, linkCardVariantsById };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const allVariants: ReadonlyArray<WidgetVariant<any>> = [
   ...linkCardVariants,
-  // future: ...projectCardVariants, ...sectionCardVariants, ...infoBlockVariants
+  ...projectCardVariants,
+  // future: ...sectionCardVariants, ...infoBlockVariants
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
