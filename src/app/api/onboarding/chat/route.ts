@@ -6,10 +6,8 @@
 
 import { NextResponse } from 'next/server';
 
-import { resolveAiConfig } from '@/lib/ai-client';
+import { generateChat, resolveAiConfig } from '@/lib/ai-client';
 import { rateLimit } from '@/lib/rate-limit';
-
-export const runtime = 'edge';
 
 const SYSTEM_PROMPT = `You are the Karte onboarding assistant. Karte is a
 personal link-in-bio + AI chat product. Your one job is to have a short
@@ -163,45 +161,18 @@ export async function POST(req: Request) {
     });
   }
 
-  const aiMessages = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    {
-      role: 'system',
-      content: `Current draft state so you avoid asking again:\n${JSON.stringify(prevState)}`,
-    },
-    ...messages.map((m) => ({ role: m.role, content: m.content })),
-  ];
+  // System prompt + a hidden assistant note carrying current draft state so
+  // the model doesn't re-ask for fields it's already captured.
+  const fullSystem = `${SYSTEM_PROMPT}\n\nCurrent draft state (don't re-ask for these fields):\n${JSON.stringify(prevState)}`;
 
   let aiText = '';
   try {
-    const res = await fetch(`${ai.endpointUrl.replace(/\/$/, '')}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${ai.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: ai.model,
-        messages: aiMessages,
-        temperature: 0.6,
-        max_tokens: 500,
-        response_format: { type: 'json_object' },
-      }),
+    aiText = await generateChat(ai, {
+      system: fullSystem,
+      messages: messages.map((m) => ({ role: m.role, content: m.content })),
     });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
-      console.error('onboarding-chat upstream error', res.status, errText);
-      return NextResponse.json(
-        { error: 'AI service unavailable' },
-        { status: 502 },
-      );
-    }
-
-    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    aiText = data.choices?.[0]?.message?.content ?? '';
   } catch (err) {
-    console.error('onboarding-chat fetch error', err);
+    console.error('onboarding-chat ai error', err);
     return NextResponse.json({ error: 'AI request failed' }, { status: 502 });
   }
 

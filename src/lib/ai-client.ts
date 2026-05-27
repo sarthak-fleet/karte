@@ -75,6 +75,27 @@ export async function generate(
 }
 
 /**
+ * Generate a non-streaming completion from a message history. Same shape
+ * as `generate()` but for multi-turn conversations.
+ */
+export async function generateChat(
+  config: AiConfig,
+  opts: {
+    system: string;
+    messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>;
+  },
+): Promise<string> {
+  const provider = getProvider(config);
+  const { text } = await generateText({
+    model: provider.chatModel(config.model),
+    system: opts.system,
+    messages: opts.messages,
+    providerOptions: getProviderOptions(config),
+  });
+  return text;
+}
+
+/**
  * Stream a chat completion. Returns a Response with SSE text stream.
  */
 export function streamResponse(
