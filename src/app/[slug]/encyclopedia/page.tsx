@@ -23,6 +23,41 @@ export default async function EncyclopediaPage({
   const theme = resolveThemeConfig(page.themeConfig as any);
   const generatedPage = await getGeneratedPage(page.id, 'encyclopedia');
 
+  // Visitors see a generating-in-progress placeholder rather than 404 while
+  // background generation finishes.
+  if (
+    generatedPage?.status === 'generating' &&
+    !generatedPage.content
+  ) {
+    const session = await getSession().catch(() => null);
+    const isOwner = session?.user?.id === page.userId;
+    if (!isOwner) {
+      return (
+        <main className="grid min-h-screen place-items-center bg-[#f8f9fa] px-6 py-16 text-gray-800">
+          <div className="max-w-md text-center">
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-gray-500">
+              Generating
+            </p>
+            <h1 className="mt-4 font-serif text-3xl text-gray-900">
+              The encyclopedia entry is being written.
+            </h1>
+            <p className="mt-4 text-[15px] leading-[1.65] text-gray-600">
+              {page.displayName} just turned this surface on. The page will
+              appear here in a moment — usually under 30 seconds. Refresh to
+              check.
+            </p>
+            <Link
+              href={`/${slug}`}
+              className="mt-8 inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2 text-[13px] font-medium text-gray-700 transition-colors hover:bg-gray-100"
+            >
+              ← Back to profile
+            </Link>
+          </div>
+        </main>
+      );
+    }
+  }
+
   if (generatedPage?.status === 'ready' && generatedPage.content) {
     const content = normalizeEncyclopediaContent(generatedPage.content);
     if (!content) notFound();

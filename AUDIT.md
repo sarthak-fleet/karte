@@ -11,9 +11,9 @@
 
 ## High
 
-- [x] **AUTH_SECRET empty in .env.local**
-  - `src/lib/auth.ts` — NextAuth will use a weak fallback or fail silently.
-  - Fix: add startup validation that throws if AUTH_SECRET is not set.
+- [x] **Auth secret empty in .env.local**
+  - `src/lib/auth.ts` — better-auth needs a strong `BETTER_AUTH_SECRET`; `AUTH_SECRET` is accepted only as a compatibility fallback.
+  - Fix: add startup validation that throws if no auth secret is set.
 
 - [x] **SSRF in scraper — no private IP blocking**
   - `src/lib/scraper.ts:40` — `fetch(fullUrl)` will follow any URL, including `http://169.254.169.254` (cloud metadata), `http://127.0.0.1`, and private ranges.
