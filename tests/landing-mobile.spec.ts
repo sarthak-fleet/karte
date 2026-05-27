@@ -16,18 +16,21 @@ test.describe('landing page', () => {
   }) => {
     await page.goto('/');
 
+    // Hero manifesto headline (revamped landing)
     await expect(
-      page.getByRole('heading', { name: 'Profiles people can query', level: 1 }),
+      page.getByRole('heading', { name: /Your link-in-bio is a/i, level: 1 }),
     ).toBeVisible();
 
-    await expect(page.getByTestId('home-profile-demo')).toBeVisible();
+    await expect(page.getByTestId('landing-demo')).toBeVisible();
 
+    // A prompt button from the new demo
     await expect(
       page.getByRole('button', { name: 'What is Sarthak building?' }),
     ).toBeVisible();
 
+    // Primary CTAs exist and are large
     await expect(
-      page.getByRole('link', { name: /try live profile/i }).first(),
+      page.getByRole('link', { name: /See it live/i }).first(),
     ).toBeVisible();
 
     const overflow = await page.evaluate(
@@ -38,25 +41,27 @@ test.describe('landing page', () => {
     expect(overflow).toBe(false);
   });
 
-  test('demo prompts and mode tabs are interactive', async ({ page }) => {
+  test('demo mode tabs and prompts are interactive', async ({ page }) => {
     await page.goto('/');
 
-    const demo = page.getByTestId('home-profile-demo');
+    const demo = page.getByTestId('landing-demo');
     await expect(demo).toBeVisible();
 
+    // Switch to Encyclopedia mode
     await demo.getByRole('button', { name: 'Encyclopedia' }).click();
-    await expect(demo.getByText('Generated from profile memory')).toBeVisible();
+    await expect(demo.getByText(/citation-grade/i)).toBeVisible();
 
+    // Back to chat + click a prompt
     await demo.getByRole('button', { name: 'Chat' }).click();
-    await demo.getByRole('button', { name: 'Which project should I open first?' }).click();
-    await expect(
-      demo.getByText('Open LinkChat if you care about link-in-bio + AI profile modes.'),
-    ).toBeVisible();
+    await demo.getByRole('button', { name: 'Should I reach out?' }).click();
+
+    // The assistant answer area updates (contains grounded text)
+    await expect(demo.getByText(/Boundaries/i)).toBeVisible();
   });
 
   test('the primary CTA is a large enough touch target', async ({ page }) => {
     await page.goto('/');
-    const cta = page.getByRole('link', { name: /try live profile/i }).first();
+    const cta = page.getByRole('link', { name: /See it live/i }).first();
     const box = await cta.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.height).toBeGreaterThanOrEqual(44);

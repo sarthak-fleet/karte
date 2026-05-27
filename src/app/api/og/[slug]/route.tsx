@@ -52,12 +52,14 @@ export async function GET(
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'space-between',
           padding: 80,
           background: `linear-gradient(135deg, ${accent}22 0%, #0a0a0a 45%, #0a0a0a 70%, ${grad2}1a 100%)`,
           color: '#ededed',
           fontFamily: 'sans-serif',
         }}
       >
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
         {/* Top row: initials tile + identity */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <div
@@ -148,10 +150,11 @@ export async function GET(
           </div>
         </div>
 
+        </div>
+
         {/* Footer bar */}
         <div
           style={{
-            marginTop: 'auto',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',

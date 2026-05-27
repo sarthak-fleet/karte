@@ -104,6 +104,10 @@ export default function Home() {
             </Link>
           </div>
 
+          <p className="mt-4 text-[12px] text-karte-text-4">
+            Scroll to experience the four surfaces in action.
+          </p>
+
           <p className="mt-8 text-[13px] text-karte-text-4">
             Free · no card · public beta
           </p>
@@ -214,56 +218,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── 3. THE FLIP — asymmetric 2-col ──────────────────── */}
+      {/* ─── 3. THE FLIP — interactive surfaces (the heart of the revamp) ─ */}
       <section className="border-t border-karte-border">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-24 lg:grid-cols-[1.2fr_1fr] lg:gap-20 lg:py-32">
-          <div>
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
               <span className="text-karte-accent/80">·</span> The flip
             </p>
-            <h2 className="mt-8 text-3xl font-semibold leading-[1.05] tracking-[-0.025em] text-karte-text sm:text-5xl lg:text-[64px]">
-              So we built one that{' '}
+            <h2 className="mt-4 text-3xl font-semibold leading-[1.05] tracking-[-0.025em] text-karte-text sm:text-5xl">
+              One memory.{' '}
               <span
                 className={`${serif.className} font-normal text-karte-accent-soft`}
                 style={{ fontStyle: 'italic' }}
               >
-                doesn&apos;t.
+                Four living surfaces.
               </span>
             </h2>
-            <p className="mt-6 max-w-md text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3">
-              A profile that{' '}
-              <span className="text-karte-text">answers questions</span>,{' '}
-              <span className="text-karte-text">generates pages</span>, and{' '}
-              <span className="text-karte-text">gets shared back</span>. The same
-              memory powers all of it.
+            <p className="mt-4 text-[15px] leading-[1.65] text-karte-text-3">
+              Visitors don&apos;t scroll a list. They ask, read, screenshot, and share.
+              The same sources power every mode.
             </p>
           </div>
 
-          {/* Visible menu of questions — looks like a real prompt list */}
-          <div className="lg:pt-16">
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-600">
-              Try a question on the live profile →
-            </p>
-            <ul className="mt-5 divide-y divide-karte-border border-y border-karte-border">
-              {flipExamples.map((q) => (
-                <li key={q}>
-                  <Link
-                    href="/sarthak"
-                    className="group flex items-center justify-between gap-4 py-4 text-[16px] text-karte-text transition-colors duration-200 ease-[var(--karte-ease)] hover:text-karte-text"
-                  >
-                    <span
-                      className={`${serif.className} text-karte-text-2 group-hover:text-karte-text`}
-                      style={{ fontStyle: 'italic' }}
-                    >
-                      &ldquo;{q}&rdquo;
-                    </span>
-                    <span className="text-zinc-600 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-karte-accent">
-                      →
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* The beautiful interactive demo — shows the product promise immediately */}
+          <div className="mt-10">
+            <LandingDemo />
           </div>
         </div>
       </section>
@@ -315,21 +294,20 @@ export default function Home() {
       <section className="border-t border-karte-border">
         <div className="mx-auto max-w-6xl px-6 pb-10 pt-24 lg:pb-12 lg:pt-32">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-            <span className="text-karte-accent/80">·</span> Four surfaces · one memory
+            <span className="text-karte-accent/80">·</span> Deep dive
           </p>
           <h2 className="mt-8 max-w-3xl text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-karte-text sm:text-5xl">
-            One profile.{' '}
+            The same memory,{' '}
             <span
               className={`${serif.className} font-normal text-karte-text-3`}
               style={{ fontStyle: 'italic' }}
             >
-              Many
-            </span>{' '}
-            versions of you.
+              four polished outputs.
+            </span>
           </h2>
           <p className="mt-6 max-w-2xl text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3">
-            Every surface below is generated from the same memory you fed it
-            once.
+            Every surface is generated from the sources you already maintain.
+            No extra writing. No design work.
           </p>
         </div>
 
@@ -474,17 +452,17 @@ export default function Home() {
             <span className="text-karte-accent/80">·</span> P.S. — the bonus loop
           </p>
           <h2 className="mt-5 text-2xl font-medium leading-[1.35] tracking-[-0.01em] text-karte-text sm:text-3xl lg:text-[36px]">
-            Every chat gets a link.{' '}
+            Every answer creates a thread.{' '}
             <span
               className={`${serif.className} font-normal text-karte-text`}
               style={{ fontStyle: 'italic' }}
             >
-              Send it,
-            </span>{' '}
-            and anyone with it can read the thread and keep going.
+              Forward it.
+            </span>
           </h2>
           <p className="mt-5 max-w-2xl text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3">
-            No signup wall, no app store. The room URL is the invite.
+            The link is the invite. No signup wall. The conversation continues
+            wherever it&apos;s shared.
           </p>
           <Link
             href="/sarthak"
@@ -508,11 +486,11 @@ export default function Home() {
               className={`${serif.className} font-normal text-karte-accent-soft`}
               style={{ fontStyle: 'italic' }}
             >
-              they screenshot.
+              they talk to.
             </span>
           </h2>
           <p className="mt-6 max-w-2xl text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3">
-            Claim your username when you&apos;re ready. Free forever, no card.
+            One link. Four surfaces. Conversations that travel. Free forever.
           </p>
 
           <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
