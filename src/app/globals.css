@@ -56,6 +56,17 @@
   --color-karte-accent-soft: var(--karte-accent-soft);
 }
 
+/* Onyx-brand scope — applied on surfaces that should match the
+   landing-deck calling-card aesthetic (dashboard, /create, etc.).
+   Overrides the cyan accent to the gold ramp from the landing without
+   touching the underlying tokens used by per-page profile themes. */
+[data-onyx-brand],
+[data-onyx-brand] :where(*) {
+  --karte-accent: #c4a46b;
+  --karte-accent-soft: #f4ebd4;
+  --karte-accent-glow: rgb(196 164 107 / 0.10);
+}
+
 body {
   background: var(--karte-bg);
   color: var(--karte-text-2);
