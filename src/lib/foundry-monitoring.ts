@@ -35,6 +35,7 @@ type ErrorBoundaryScope =
   | "roast"
   | "newspaper"
   | "dashboard"
+  | "ai-component"
   | "unknown";
 
 /**

@@ -7,6 +7,11 @@ import { renderComponent } from '@/components/public/ai-components/registry';
 import { ChatEmailGate } from '@/components/public/chat-email-gate';
 import { ChatMessageBody } from '@/components/public/chat-message-body';
 import { ContactFormSection } from '@/components/public/contact-form-section';
+import {
+  createStreamParserState,
+  feedChunk,
+  finishStream,
+} from '@/lib/ai-components/stream-parser';
 import type { RenderableComponent } from '@/lib/ai-components/types';
 import type { DmMode } from '@/db/schema';
 import { trackEvent } from '@/lib/analytics';
@@ -353,29 +358,65 @@ export function ChatWidget({
         return;
       }
 
-      // Structured response now: { text, components? }. The server
-      // streamed text in the previous protocol; that changed when we
-      // added generative-UI components, since structured output and
-      // streaming don't compose without a marker protocol. We accept
-      // the latency hit on the chat reply (~1-2s) in exchange for
-      // the components alongside the answer.
-      const data = (await res.json().catch(() => null)) as {
-        text?: string;
-        components?: RenderableComponent[];
-      } | null;
-      const text =
-        typeof data?.text === 'string' && data.text.trim()
-          ? data.text
-          : "Sorry — couldn't compose a reply just now.";
-      const components = Array.isArray(data?.components) ? data.components : undefined;
+      // Streaming marker-protocol response:
+      //   <text> <<<COMPONENTS>>> [json array]
+      // The parser flushes plain text up until the marker boundary
+      // (handling cross-chunk splits), then buffers the JSON tail.
+      // Components materialize on stream-completion.
+      const reader = res.body?.getReader();
+      if (!reader) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: 'No response stream.' },
+        ]);
+        return;
+      }
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: text, components }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
 
-      if (text) {
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(cacheKey, text);
+      const decoder = new TextDecoder();
+      const parser = createStreamParserState();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        const flushed = feedChunk(parser, chunk);
+        if (flushed) {
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            if (last?.role === 'assistant') {
+              updated[updated.length - 1] = {
+                ...last,
+                content: last.content + flushed,
+              };
+            }
+            return updated;
+          });
         }
-        void saveMessage(convId, 'assistant', text);
+      }
+
+      const { flushedText, components } = finishStream(parser);
+      setMessages((prev) => {
+        const updated = [...prev];
+        const last = updated[updated.length - 1];
+        if (last?.role === 'assistant') {
+          updated[updated.length - 1] = {
+            ...last,
+            content: last.content + flushedText,
+            components: components.length ? components : undefined,
+          };
+        }
+        return updated;
+      });
+
+      const finalText = parser.text;
+      if (finalText) {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(cacheKey, finalText);
+        }
+        void saveMessage(convId, 'assistant', finalText);
       }
     } catch (err) {
       captureActionFailure(err, { action: 'chat_send' });

@@ -42,25 +42,24 @@ export function RoamingCharacter({
   const [lineIdx, setLineIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
   const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 });
-  // Track whether the avatar image loaded. When it fails we fall
-  // through to the initials-on-gradient fallback render — the pet
-  // still walks, just without the cartoon avatar. Better than hiding
-  // the whole character every time a third-party avatar host hiccups.
-  const [avatarOk, setAvatarOk] = useState<boolean>(false);
+  // Track whether the avatar image loaded. Pet only walks if we have
+  // a real cartoon image — a single letter walking across the screen
+  // looks broken, not friendly. Better to hide the pet entirely than
+  // ship a stand-in initial.
+  const [avatarReady, setAvatarReady] = useState<boolean | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Pre-load the avatar image just to track success/failure; whether
-  // it succeeds doesn't gate the pet's enabled state.
+  // Pre-load the avatar image to determine whether to enable the pet.
   useEffect(() => {
     if (!avatarUrl) {
-      setAvatarOk(false);
+      setAvatarReady(false);
       return;
     }
     let cancelled = false;
     const img = new window.Image();
-    img.onload = () => !cancelled && setAvatarOk(true);
-    img.onerror = () => !cancelled && setAvatarOk(false);
+    img.onload = () => !cancelled && setAvatarReady(true);
+    img.onerror = () => !cancelled && setAvatarReady(false);
     img.src = avatarUrl;
     return () => {
       cancelled = true;
@@ -69,14 +68,15 @@ export function RoamingCharacter({
     };
   }, [avatarUrl]);
 
-  // Initial enable — skip if reduced-motion or no lines. The avatar
-  // can fail to load and the pet still walks (initials fallback).
+  // Initial enable — skip if reduced-motion, no lines, or no working
+  // avatar image. No initials fallback; the pet is image-only.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (lines.length === 0) return;
+    if (avatarReady !== true) return;
     setEnabled(true);
-  }, [lines.length]);
+  }, [lines.length, avatarReady]);
 
   // Look at cursor — apply a small translate that makes the pet lean
   // toward the mouse. Throttled via requestAnimationFrame.
@@ -223,7 +223,9 @@ export function RoamingCharacter({
           filter: `drop-shadow(0 6px 14px ${accentColor}88) drop-shadow(0 2px 4px rgba(0,0,0,0.45))`,
         }}
       >
-        {avatarUrl && avatarOk ? (
+        {/* avatarUrl is guaranteed loaded at this point — the effect
+            above gates `enabled` on avatarReady=true. */}
+        {avatarUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={avatarUrl}
@@ -231,15 +233,6 @@ export function RoamingCharacter({
             className="relative h-20 w-20 object-contain"
             style={{ background: 'transparent' }}
           />
-        ) : (
-          <span
-            className="relative flex h-20 w-20 items-center justify-center rounded-full text-2xl font-semibold text-zinc-950"
-            style={{
-              background: `linear-gradient(135deg, ${accentColor}, ${accentColor}aa)`,
-            }}
-          >
-            {displayName[0]?.toUpperCase() ?? '·'}
-          </span>
         )}
       </button>
 
