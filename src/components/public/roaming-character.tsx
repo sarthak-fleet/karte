@@ -42,24 +42,25 @@ export function RoamingCharacter({
   const [lineIdx, setLineIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
   const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 });
-  // Track whether the avatar image actually loaded; if not we don't
-  // bother starting the walk loop. Prevents a broken-image pet from
-  // pacing across the bottom of the screen.
-  const [avatarReady, setAvatarReady] = useState<boolean | null>(null);
+  // Track whether the avatar image loaded. When it fails we fall
+  // through to the initials-on-gradient fallback render — the pet
+  // still walks, just without the cartoon avatar. Better than hiding
+  // the whole character every time a third-party avatar host hiccups.
+  const [avatarOk, setAvatarOk] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Pre-load the avatar image so we don't enable the pet at all if
-  // the source is unreachable.
+  // Pre-load the avatar image just to track success/failure; whether
+  // it succeeds doesn't gate the pet's enabled state.
   useEffect(() => {
     if (!avatarUrl) {
-      setAvatarReady(false);
+      setAvatarOk(false);
       return;
     }
     let cancelled = false;
     const img = new window.Image();
-    img.onload = () => !cancelled && setAvatarReady(true);
-    img.onerror = () => !cancelled && setAvatarReady(false);
+    img.onload = () => !cancelled && setAvatarOk(true);
+    img.onerror = () => !cancelled && setAvatarOk(false);
     img.src = avatarUrl;
     return () => {
       cancelled = true;
@@ -68,16 +69,14 @@ export function RoamingCharacter({
     };
   }, [avatarUrl]);
 
-  // Initial enable — skip if reduced-motion, no lines, or the avatar
-  // image failed to load.
+  // Initial enable — skip if reduced-motion or no lines. The avatar
+  // can fail to load and the pet still walks (initials fallback).
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (lines.length === 0) return;
-    if (avatarReady === false) return;
-    if (avatarReady === null) return; // still preloading
     setEnabled(true);
-  }, [lines.length, avatarReady]);
+  }, [lines.length]);
 
   // Look at cursor — apply a small translate that makes the pet lean
   // toward the mouse. Throttled via requestAnimationFrame.
@@ -224,7 +223,7 @@ export function RoamingCharacter({
           filter: `drop-shadow(0 6px 14px ${accentColor}88) drop-shadow(0 2px 4px rgba(0,0,0,0.45))`,
         }}
       >
-        {avatarUrl ? (
+        {avatarUrl && avatarOk ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={avatarUrl}
