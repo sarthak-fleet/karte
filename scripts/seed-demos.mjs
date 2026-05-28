@@ -44,8 +44,12 @@ function avatar(seed, bg) {
     "&backgroundColor=" +
     bg +
     "&backgroundType=gradientLinear,solid" +
+    // Valid micah option values. `upDown` is NOT a valid eyebrows
+    // value (only `up` and `down`); using it makes DiceBear 400 the
+    // whole URL, killing every avatar. Burned by that once — keep
+    // params strictly within the published schema.
     "&mouth=smile,laughing,smirk" +
-    "&eyebrows=up,upDown" +
+    "&eyebrows=up" +
     "&eyes=eyes,smiling"
   );
 }
