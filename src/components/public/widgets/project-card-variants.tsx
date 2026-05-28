@@ -157,9 +157,13 @@ const wideVariant: WidgetVariant<ProjectCardData> = {
 };
 
 /**
- * `project-hero` — full-bleed showcase. Use sparingly — at most one per
- * page, for the project the user wants visitors to land on. Requires
- * an image; falls back to an accent gradient if missing.
+ * `project-hero` — text-led showcase card. Title + description carry the
+ * visual weight; no full-bleed image since favicon-sized source images
+ * stretched poorly to 16:9. A discreet favicon chip sits in the corner
+ * when an image is available, otherwise an accent-tinted glyph.
+ *
+ * Use sparingly — at most one per page, for the project the user wants
+ * visitors to land on.
  */
 const heroVariant: WidgetVariant<ProjectCardData> = {
   id: 'project-hero',
@@ -167,59 +171,87 @@ const heroVariant: WidgetVariant<ProjectCardData> = {
   size: 'hero',
   budget: 'high',
   bestFor:
-    'A single marquee project — the one you want every visitor to see first. Use at most one per page. Image required for visual weight.',
-  requires: ['title', 'url', 'description', 'imageUrl'],
-  render: (data, ctx) => (
-    <a
-      href={data.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-track-type="project"
-      data-track-id={data.id || data.url}
-      data-track-label={data.title}
-      className="group relative flex aspect-[16/9] w-full flex-col justify-end overflow-hidden rounded-3xl border border-white/[0.06] transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18]"
-      style={ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined}
-    >
-      {data.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={data.imageUrl}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
-        />
-      ) : (
+    'A single marquee project — the one you want every visitor to see first. Use at most one per page. Title + description carry it; the image is a small chip, not a backdrop.',
+  requires: ['title', 'url', 'description'],
+  render: (data, ctx) => {
+    const accent = ctx.accentColor || '#67e8f9';
+    return (
+      <a
+        href={data.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track-type="project"
+        data-track-id={data.id || data.url}
+        data-track-label={data.title}
+        className="group relative flex w-full flex-col gap-5 overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.04] sm:p-7"
+        style={{ borderColor: `${accent}28` }}
+      >
+        {/* Soft accent wash in the top-right corner — no full image,
+            so no favicon stretching. */}
         <span
           aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg, ${ctx.accentColor || '#67e8f9'}30, transparent 60%)`,
-          }}
+          className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full blur-3xl"
+          style={{ backgroundColor: `${accent}1f` }}
         />
-      )}
-      <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-      <div className="relative flex items-end justify-between gap-4 p-6">
-        <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/70">
-            <span style={{ color: ctx.accentColor || '#67e8f9' }}>·</span>{' '}
-            Featured project
+
+        <div className="relative flex items-center justify-between gap-4">
+          <p className="text-[10.5px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+            <span style={{ color: accent }}>◆</span> Featured project
           </p>
-          <p className="mt-2 text-2xl font-semibold leading-tight text-white">
+          {data.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={data.imageUrl}
+              alt=""
+              className="h-7 w-7 rounded-md object-contain opacity-80"
+            />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-sm"
+              style={{
+                backgroundColor: `${accent}1a`,
+                color: accent,
+              }}
+            >
+              ◆
+            </span>
+          )}
+        </div>
+
+        <div className="relative">
+          <h3 className="text-[28px] font-semibold leading-[1.1] tracking-[-0.015em] text-karte-text sm:text-[32px]">
             {data.title}
-          </p>
-          <p className="mt-1.5 line-clamp-2 max-w-md text-[14px] leading-[1.5] text-white/80">
+          </h3>
+          <p className="mt-3 max-w-xl text-[15px] leading-[1.55] text-karte-text-3">
             {data.description}
           </p>
         </div>
-        <span
-          aria-hidden="true"
-          className="shrink-0 text-2xl text-white/80 transition-transform duration-200 group-hover:translate-x-0.5"
-        >
-          ↗
-        </span>
-      </div>
-    </a>
-  ),
+
+        <div className="relative mt-1 flex items-center gap-2 text-[12.5px] font-medium text-karte-text-4 transition-colors duration-200 group-hover:text-karte-text-2">
+          <span className="font-mono uppercase tracking-[0.12em]">
+            {hostnameOf(data.url)}
+          </span>
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
+            style={{ color: accent }}
+          >
+            ↗
+          </span>
+        </div>
+      </a>
+    );
+  },
 };
+
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
 
 export const projectCardVariants: ReadonlyArray<WidgetVariant<ProjectCardData>> = [
   lineVariant,

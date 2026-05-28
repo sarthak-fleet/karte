@@ -402,55 +402,61 @@ export function NewspaperFrontPage({
 
   return (
     <div className="mx-auto w-full max-w-6xl px-3 py-8 sm:px-5">
-      {/* Page navigation strip — only shown when there's more than one
-          page, so legacy single-page content looks unchanged. */}
+      {/* Page navigation strip — sticky to top of viewport so it
+          remains reachable while reading a long page. Only shown
+          when there's more than one page; legacy single-page
+          newspapers render unchanged. */}
       {pages.length > 1 && (
-        <div className="mb-4 flex items-center justify-between gap-3 px-1 text-[12px] uppercase tracking-[0.2em] text-stone-300">
-          <button
-            type="button"
-            onClick={() => goTo(currentPage - 1)}
-            disabled={!hasPrev}
-            className="inline-flex items-center gap-2 rounded-full border border-stone-600 bg-stone-950/40 px-4 py-1.5 transition hover:border-stone-400 hover:bg-stone-900/60 disabled:cursor-not-allowed disabled:opacity-30"
-            aria-label="Previous page"
-          >
-            <span aria-hidden="true">←</span>
-            <span>Prev</span>
-          </button>
+        <div className="sticky top-0 z-40 -mx-3 mb-4 border-y border-stone-900 bg-[#f7f1df]/95 px-3 py-2.5 backdrop-blur sm:-mx-5 sm:px-5">
+          <div className="flex items-center justify-between gap-3 text-[11px] font-bold uppercase tracking-[0.22em]">
+            <button
+              type="button"
+              onClick={() => goTo(currentPage - 1)}
+              disabled={!hasPrev}
+              className="inline-flex items-center gap-2 rounded-full border border-stone-900 bg-stone-950 px-3.5 py-1.5 text-[#f7f1df] transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:border-stone-400 disabled:bg-transparent disabled:text-stone-400"
+              aria-label="Previous page"
+            >
+              <span aria-hidden="true">←</span>
+              <span className="hidden sm:inline">Prev</span>
+            </button>
 
-          <div className="flex items-center gap-3">
-            {pages.map((p, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => goTo(i)}
-                className={`flex items-center gap-2 transition ${
-                  i === currentPage
-                    ? 'text-karte-text'
-                    : 'text-stone-500 hover:text-stone-300'
-                }`}
-                aria-label={`Go to ${p.sectionLabel ?? `page ${i + 1}`}`}
-              >
-                <span
-                  className={`h-2 w-2 rounded-full transition ${
-                    i === currentPage ? 'bg-karte-accent' : 'bg-stone-600'
+            <div className="flex items-center gap-3">
+              {pages.map((p, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  className={`flex items-center gap-2 transition ${
+                    i === currentPage
+                      ? 'text-stone-950'
+                      : 'text-stone-500 hover:text-stone-800'
                   }`}
-                  aria-hidden="true"
-                />
-                <span className="hidden sm:inline">{p.sectionLabel ?? `Page ${i + 1}`}</span>
-              </button>
-            ))}
-          </div>
+                  aria-label={`Go to ${p.sectionLabel ?? `page ${i + 1}`}`}
+                >
+                  <span
+                    className={`h-2 w-2 rounded-full transition ${
+                      i === currentPage ? 'bg-stone-950' : 'bg-stone-400'
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <span className="hidden md:inline">
+                    {p.sectionLabel ?? `Page ${i + 1}`}
+                  </span>
+                </button>
+              ))}
+            </div>
 
-          <button
-            type="button"
-            onClick={() => goTo(currentPage + 1)}
-            disabled={!hasNext}
-            className="inline-flex items-center gap-2 rounded-full border border-stone-600 bg-stone-950/40 px-4 py-1.5 transition hover:border-stone-400 hover:bg-stone-900/60 disabled:cursor-not-allowed disabled:opacity-30"
-            aria-label="Next page"
-          >
-            <span>Next</span>
-            <span aria-hidden="true">→</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => goTo(currentPage + 1)}
+              disabled={!hasNext}
+              className="inline-flex items-center gap-2 rounded-full border border-stone-900 bg-stone-950 px-3.5 py-1.5 text-[#f7f1df] transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:border-stone-400 disabled:bg-transparent disabled:text-stone-400"
+              aria-label="Next page"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
         </div>
       )}
 

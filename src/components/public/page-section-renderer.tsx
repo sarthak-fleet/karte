@@ -197,6 +197,64 @@ export function PageSectionRenderer({
     );
   }
 
+  if (section.type === 'experience') {
+    // Content format: one role per line, pipe-separated
+    //   Role | Company | Period | One-line description
+    // Example: Software Engineer | VaultWealth | Feb 2025 — Present | Backend + AI infra
+    const roles = (section.content ?? '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [role, company, period, description] = line
+          .split('|')
+          .map((part) => part.trim());
+        return { role, company, period, description };
+      })
+      .filter((r) => r.role && r.company);
+
+    return (
+      <GlassCard className="rounded-3xl p-6 sm:p-8">
+        <p
+          className="text-[11px] font-medium uppercase tracking-[0.28em]"
+          style={{ color: accentColor }}
+        >
+          {section.title || 'Experience'}
+        </p>
+        <ol className="mt-6 space-y-5 border-l-2 pl-5"
+            style={{ borderColor: `${accentColor}40` }}>
+          {roles.map((r, i) => (
+            <li key={i} className="relative">
+              <span
+                aria-hidden="true"
+                className="absolute -left-[1.45rem] top-1.5 h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: accentColor }}
+              />
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <p className="text-[16px] font-semibold leading-tight text-karte-text">
+                  {r.role}
+                  <span className="ml-2 font-normal text-karte-text-3">
+                    @ {r.company}
+                  </span>
+                </p>
+                {r.period && (
+                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-karte-text-4">
+                    {r.period}
+                  </p>
+                )}
+              </div>
+              {r.description && (
+                <p className="mt-1.5 text-[13.5px] leading-[1.55] text-karte-text-3">
+                  {r.description}
+                </p>
+              )}
+            </li>
+          ))}
+        </ol>
+      </GlassCard>
+    );
+  }
+
   if (section.type === 'cta') {
     return (
       <GlassCard className="rounded-3xl p-6 sm:p-8">
