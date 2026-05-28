@@ -1,6 +1,15 @@
 'use client';
 
+import posthog from 'posthog-js';
 import { useState } from 'react';
+
+function capture(event: string, props?: Record<string, unknown>) {
+  try {
+    posthog.capture(event, props);
+  } catch {
+    // best-effort
+  }
+}
 
 /**
  * Card IV — For the agents, too.
@@ -49,6 +58,7 @@ export function OnyxAgents() {
         message: 'You’re in. We’ll write when agent cards ship.',
         error: false,
       });
+      capture('landing_agents_waitlist_submitted', { domain: email.split('@')[1] });
     } catch (err) {
       setState({
         kind: 'open',
@@ -57,6 +67,7 @@ export function OnyxAgents() {
         message: err instanceof Error ? err.message : 'Something went wrong.',
         error: true,
       });
+      capture('landing_agents_waitlist_failed');
     }
   }
 
@@ -80,9 +91,16 @@ export function OnyxAgents() {
             <button
               type="button"
               className="onyx-btn-primary"
-              onClick={() =>
-                setState({ kind: 'open', email: '', submitting: false, message: '', error: false })
-              }
+              onClick={() => {
+                capture('landing_agents_waitlist_opened');
+                setState({
+                  kind: 'open',
+                  email: '',
+                  submitting: false,
+                  message: '',
+                  error: false,
+                });
+              }}
             >
               Coming soon — notify me <span aria-hidden="true">→</span>
             </button>

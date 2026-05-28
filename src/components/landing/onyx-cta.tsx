@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import { useState } from 'react';
 
 /**
@@ -18,6 +19,11 @@ export function OnyxCta() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = slug.trim();
+    try {
+      posthog.capture('landing_cta_claim_submitted', { hasSlug: !!trimmed });
+    } catch {
+      // best-effort
+    }
     if (trimmed) {
       router.push(`/create?slug=${encodeURIComponent(trimmed)}`);
     } else {

@@ -9,10 +9,27 @@ import { OnyxHero } from '@/components/landing/onyx-hero';
 import { OnyxHow } from '@/components/landing/onyx-how';
 import { OnyxSurfaces } from '@/components/landing/onyx-surfaces';
 
+const OG_LANDING = '/api/og/landing';
+
 export const metadata: Metadata = {
   title: 'Karte — Your link-in-bio, that answers back',
   description:
     'A single page for every link you carry. Karte is your digital calling card — and an AI that knows what you would say. German for card. This one talks back.',
+  openGraph: {
+    title: 'Karte — Your link-in-bio, that answers back',
+    description:
+      'A digital calling card with four AI surfaces: chat, encyclopedia, newspaper, roast. German for card. This one talks back.',
+    url: 'https://karte.cc',
+    siteName: 'Karte',
+    images: [{ url: OG_LANDING, width: 1200, height: 630, alt: 'Karte — Your link-in-bio, that answers back' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Karte — Your link-in-bio, that answers back',
+    description:
+      'A digital calling card with four AI surfaces. German for card. This one talks back.',
+    images: [OG_LANDING],
+  },
 };
 
 /**

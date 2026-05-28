@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
 import { useEffect, useRef, useState } from 'react';
 
@@ -86,11 +86,19 @@ export function PageSettings({
   loginHref = '/login?next=/dashboard/appearance',
 }: PageSettingsProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isEditing = !!page;
   const shouldClaimOnLogin = !page && requireAuthToCreate;
   const draftLoadedRef = useRef(false);
 
-  const [slug, setSlug] = useState(page?.slug ?? '');
+  // Slug can arrive pre-filled from the landing page (card V sends
+  // /create?slug=<value>). For brand-new (no `page`) flows only —
+  // we don't override an existing page's slug.
+  const initialSlugFromQuery = !page
+    ? sanitizeSlug(searchParams.get('slug') ?? '')
+    : '';
+
+  const [slug, setSlug] = useState(page?.slug ?? initialSlugFromQuery);
   const [displayName, setDisplayName] = useState(page?.displayName ?? '');
   const [bio, setBio] = useState(page?.bio ?? '');
   const [avatarUrl, setAvatarUrl] = useState(page?.avatarUrl ?? '');
@@ -182,7 +190,9 @@ export function PageSettings({
         themePresetId?: ThemePresetId;
       };
 
-      if (typeof draft.slug === 'string') {
+      // Don't overwrite a slug that came in via ?slug= — the URL is
+      // the most recent intent and overrides any older draft.
+      if (typeof draft.slug === 'string' && !initialSlugFromQuery) {
         setSlug(draft.slug);
       }
       if (typeof draft.displayName === 'string') {

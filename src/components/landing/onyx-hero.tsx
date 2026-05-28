@@ -1,13 +1,23 @@
+'use client';
+
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 /**
  * Card I — Hero.
  *
- * Carries the brand wordplay: kicker becomes the etymological label
- * ("KARTE · n. · GERMAN, CARD") and a small italic line under the H1
- * picks up the pun ("German for card. This one talks back.").
+ * Carries the brand wordplay: a small italic line under the H1 picks
+ * up the etymology + pun ("German for card. This one talks back.").
  */
 export function OnyxHero() {
+  function captureClick(event: string) {
+    try {
+      posthog.capture(event);
+    } catch {
+      // Analytics is best-effort — never block navigation.
+    }
+  }
+
   return (
     <div className="onyx-hero">
       <div className="onyx-eyebrow">
@@ -33,10 +43,18 @@ export function OnyxHero() {
       </p>
 
       <div className="onyx-hero-actions">
-        <Link href="/create" className="onyx-btn-primary">
+        <Link
+          href="/create"
+          className="onyx-btn-primary"
+          onClick={() => captureClick('landing_hero_claim_clicked')}
+        >
           Claim your name <span aria-hidden="true">→</span>
         </Link>
-        <Link href="/sarthak" className="onyx-btn-ghost">
+        <Link
+          href="/sarthak"
+          className="onyx-btn-ghost"
+          onClick={() => captureClick('landing_hero_demo_clicked')}
+        >
           See it live <span aria-hidden="true">↗</span>
         </Link>
       </div>
