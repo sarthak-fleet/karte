@@ -52,6 +52,12 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // DiceBear + Google s2/favicons return SVG; next/image refuses SVG
+    // by default for XSS reasons. We only proxy SVGs from a closed
+    // whitelist of trusted hosts below and serve them with a CSP that
+    // disables scripts/embeds, so the risk is minimal here.
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'pub-b339ffd5395643a28df3655ef3aa943d.r2.dev' },
