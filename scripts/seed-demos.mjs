@@ -4,8 +4,8 @@
 //      pnpm exec wrangler d1 execute linkchat-auth --remote --file=/tmp/demos.sql
 //
 // Avatars:
-//   - GitHub avatars for personas with active GH presence (karpathy, levelsio).
-//   - DiceBear "notionists-neutral" with persona-tinted backgrounds otherwise.
+//   - DiceBear "micah" style — colorful, Discord/illustration-quality
+//     portraits with persona-tinted backgrounds and varied seeds.
 //
 // Project images:
 //   - Google S2 favicon endpoint at sz=256 → real site logos. Stable,
@@ -33,13 +33,15 @@ function logo(domain) {
   return "https://www.google.com/s2/favicons?domain=" + domain + "&sz=256";
 }
 
-function notionists(seed, bg) {
+// Discord-style portrait avatars. `micah` is colorful and expressive
+// — looks closer to hand-illustrated than auto-generated initials.
+function avatar(seed, bg) {
   return (
-    "https://api.dicebear.com/9.x/notionists-neutral/svg?seed=" +
+    "https://api.dicebear.com/9.x/micah/svg?seed=" +
     encodeURIComponent(seed) +
     "&backgroundColor=" +
     bg +
-    "&radius=0"
+    "&backgroundType=gradientLinear,solid"
   );
 }
 
@@ -49,7 +51,7 @@ const personas = [
     displayName: "Naval Ravikant",
     bio: "Investor and writer. Co-founder of AngelList. Author of the Almanack. Writes one or two tweets every few months and they all get screenshotted.",
     location: "San Francisco",
-    avatarUrl: notionists("Naval Ravikant", "f2c879"),
+    avatarUrl: avatar("naval-zen-investor", "f2c879,fff5d6"),
     petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=naval-ravikant&backgroundColor=transparent",
     theme: { presetId: "paper" },
     accent: "#f2c879",
@@ -96,7 +98,7 @@ const personas = [
     displayName: "Pieter Levels",
     bio: "Indie hacker. Built 100+ startups, kept the ones that worked: Nomad List, RemoteOK, PhotoAI, InteriorAI. Public MRR. Solo by design. AI maximalist.",
     location: "Lisbon",
-    avatarUrl: "https://github.com/levelsio.png?size=400",
+    avatarUrl: avatar("levelsio-indie-hacker", "67e8f9,3b82f6"),
     petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=pieter-levels&backgroundColor=transparent",
     theme: { presetId: "aurora" },
     accent: "#67e8f9",
@@ -151,7 +153,7 @@ const personas = [
     displayName: "Paul Graham",
     bio: "Programmer, writer, investor. Co-founded Y Combinator. Wrote the essays. Still writing them — How to Do Great Work and Founder Mode are recent.",
     location: "Cambridge, MA",
-    avatarUrl: notionists("Paul Graham", "ededed"),
+    avatarUrl: avatar("paul-graham-essayist", "fef3c7,f5f5dc"),
     petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=paul-graham&backgroundColor=transparent",
     theme: { presetId: "paper" },
     accent: "#a8a29e",
@@ -202,13 +204,13 @@ const personas = [
   {
     slug: "karpathy",
     displayName: "Andrej Karpathy",
-    bio: "AI researcher, educator. Eureka Labs. Built nanoGPT, the Zero-to-Hero series, and micrograd. Coined 'vibe coding'. Previously OpenAI founding member, Director of AI at Tesla.",
+    bio: "AI researcher, educator. Back at OpenAI working on midtraining and synthetic data. Building Eureka Labs on the side. Built nanoGPT, Zero-to-Hero, micrograd. Coined 'vibe coding'. Previously Director of AI at Tesla.",
     location: "Stanford, CA",
-    avatarUrl: "https://github.com/karpathy.png?size=400",
+    avatarUrl: avatar("karpathy-ai-teacher", "a78bfa,7c3aed"),
     petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=andrej-karpathy&backgroundColor=transparent",
     theme: { presetId: "aurora" },
     accent: "#a78bfa",
-    chatPrompt: "You answer as Andrej Karpathy: AI researcher and educator. Founder of Eureka Labs. Creator of nanoGPT, micrograd, the Zero-to-Hero series. Voice: deeply technical but accessible, fond of analogies (the LLM as a compressed wikipedia, software 1.0 / 2.0 / 3.0, vibe coding, LLMs as the new OS). Patient teacher. If asked something speculative, mark it as a guess. Reference your YouTube videos when useful.",
+    chatPrompt: "You answer as Andrej Karpathy: AI researcher, currently back at OpenAI building a team on midtraining and synthetic data generation. Founder of Eureka Labs (AI + education) — running on the side. Creator of nanoGPT, micrograd, the Zero-to-Hero series. Voice: deeply technical but accessible, fond of analogies (LLM as a compressed wikipedia, software 1.0 / 2.0 / 3.0, vibe coding, LLMs as the new OS). Patient teacher. If asked something speculative, mark it as a guess.",
     links: [
       { title: "Twitter / X", url: "https://twitter.com/karpathy" },
       { title: "Personal site", url: "https://karpathy.ai" },
@@ -227,7 +229,7 @@ const personas = [
       {
         title: "nanoGPT",
         url: "https://github.com/karpathy/nanoGPT",
-        imageUrl: logo("github.com"),
+        imageUrl: null,
         description: "The simplest, fastest repo for training/finetuning medium-sized GPTs. ~300 lines of code that produce real models. Reproduces GPT-2 on a single node.",
       },
       {
@@ -239,7 +241,7 @@ const personas = [
       {
         title: "micrograd",
         url: "https://github.com/karpathy/micrograd",
-        imageUrl: logo("github.com"),
+        imageUrl: null,
         description: "A tiny scalar-valued autograd engine in ~100 lines of pure Python. The smallest possible thing that's still a neural network library.",
       },
     ],
