@@ -86,8 +86,9 @@ export default function Home() {
                 >
                   already knows
                 </span>{' '}
-                what you&rsquo;d say. Rates, availability, stack, hiring, &ldquo;is
-                this still active&rdquo; — answered in your voice, while you sleep.
+                what you&rsquo;d say. Rates, availability, stack, hiring —
+                answered in your voice,{' '}
+                <span className="text-karte-text">before they hit your inbox.</span>
               </p>
 
               <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
