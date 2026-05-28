@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { maybeReloadOnChunkError } from "@/lib/chunk-reload";
 import { captureError } from "@/lib/foundry-monitoring";
 
 export default function Error({
@@ -12,6 +13,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
+    if (maybeReloadOnChunkError(error)) return;
     // Full detail goes to the console + PostHog — never to the user.
     console.error(error);
     captureError(error, { scope: "root", digest: error.digest });

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { maybeReloadOnChunkError } from "@/lib/chunk-reload";
 import { captureError } from "@/lib/foundry-monitoring";
 
 export default function DashboardError({
@@ -12,6 +13,7 @@ export default function DashboardError({
   reset: () => void;
 }) {
   useEffect(() => {
+    if (maybeReloadOnChunkError(error)) return;
     console.error(error);
     captureError(error, { scope: "dashboard", digest: error.digest });
   }, [error]);

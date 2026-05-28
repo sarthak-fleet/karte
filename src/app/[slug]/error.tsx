@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 
+import { maybeReloadOnChunkError } from "@/lib/chunk-reload";
 import { captureError } from "@/lib/foundry-monitoring";
 
 export default function SlugError({
@@ -13,6 +14,7 @@ export default function SlugError({
   reset: () => void;
 }) {
   useEffect(() => {
+    if (maybeReloadOnChunkError(error)) return;
     console.error(error);
     captureError(error, { scope: "public-profile", digest: error.digest });
   }, [error]);

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { maybeReloadOnChunkError } from "@/lib/chunk-reload";
 import { captureError } from "@/lib/foundry-monitoring";
 
 /**
@@ -16,6 +17,9 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Stale-chunk reload preempts the fallback UI for the common
+    // post-deploy navigation crash.
+    if (maybeReloadOnChunkError(error)) return;
     console.error(error);
     captureError(error, { scope: "global", digest: error.digest });
   }, [error]);

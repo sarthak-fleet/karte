@@ -2,6 +2,8 @@
 
 import posthog from "posthog-js";
 
+import { maybeReloadOnChunkError } from "./chunk-reload";
+
 const PROJECT_SLUG = "linkchat";
 
 function route() {
@@ -83,8 +85,17 @@ export function captureActionFailure(
 export function installBrowserMonitoring() {
   if (typeof window === "undefined") return () => {};
 
-  const onError = (event: ErrorEvent) => capturePageCrash(event.error ?? event.message, "window_error");
-  const onUnhandledRejection = (event: PromiseRejectionEvent) => capturePageCrash(event.reason, "unhandled_rejection");
+  const onError = (event: ErrorEvent) => {
+    // Stale-chunk crashes get a silent reload before they ever reach
+    // PostHog or the React error boundary — the user is about to be
+    // sent to a fresh page, no need to surface UI or log a crash.
+    if (maybeReloadOnChunkError(event.error ?? event.message)) return;
+    capturePageCrash(event.error ?? event.message, "window_error");
+  };
+  const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+    if (maybeReloadOnChunkError(event.reason)) return;
+    capturePageCrash(event.reason, "unhandled_rejection");
+  };
 
   window.addEventListener("error", onError);
   window.addEventListener("unhandledrejection", onUnhandledRejection);
