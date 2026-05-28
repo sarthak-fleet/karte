@@ -212,6 +212,27 @@ export async function buildProfileMemory({
     });
   }
 
+  // Page-level quick-action fields. These power generative-UI
+  // components (BookCallSlot needs page.calendarUrl, LocationCard
+  // needs page.location, etc.) so the AI has the real URLs to put
+  // into props instead of inventing them or emitting empty objects.
+  const quickActions: string[] = [];
+  if (page.calendarUrl) quickActions.push(`Calendar booking link: ${page.calendarUrl}`);
+  if (page.newsletterUrl) quickActions.push(`Newsletter signup: ${page.newsletterUrl}`);
+  if (page.tipUrl) quickActions.push(`Tip / support link: ${page.tipUrl}`);
+  if (page.videoUrl) quickActions.push(`Video embed: ${page.videoUrl}`);
+  if (page.location) quickActions.push(`Based in: ${page.location}`);
+  if (quickActions.length > 0) {
+    sources.push({
+      id: `quick-actions:${page.id}`,
+      type: 'identity',
+      label: 'Contact / Where',
+      title: 'Quick actions',
+      content: quickActions.join('\n'),
+      priority: 97,
+    });
+  }
+
   for (const block of blocks) {
     sources.push({
       id: `memory:${block.id}`,

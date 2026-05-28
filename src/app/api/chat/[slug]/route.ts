@@ -190,6 +190,10 @@ function sanitizeComponents(value: unknown): RenderableComponent[] {
       r.props && typeof r.props === 'object'
         ? (r.props as Record<string, unknown>)
         : {};
+    // Drop components the AI emitted with empty props — those render
+    // as blank cards which look broken. Better to skip than to ship
+    // a half-baked card.
+    if (Object.keys(props).length === 0) continue;
     // Trust the discriminated-union check at render time — the
     // registry's switch handles bad shapes by returning null.
     out.push({ type, props } as unknown as RenderableComponent);
