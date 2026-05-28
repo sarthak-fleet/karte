@@ -39,6 +39,9 @@ interface PageSettingsProps {
   page: PageData | null;
   requireAuthToCreate?: boolean;
   loginHref?: string;
+  // Pre-filled slug for new pages — e.g. ?slug=foo from the landing
+  // card V claim form. Ignored when `page` is set (editing existing).
+  initialSlug?: string;
 }
 
 const PAGE_DRAFT_STORAGE_KEY = 'karte:page-draft';
@@ -84,6 +87,7 @@ export function PageSettings({
   page,
   requireAuthToCreate = false,
   loginHref = '/login?next=/dashboard/appearance',
+  initialSlug = '',
 }: PageSettingsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,11 +95,12 @@ export function PageSettings({
   const shouldClaimOnLogin = !page && requireAuthToCreate;
   const draftLoadedRef = useRef(false);
 
-  // Slug can arrive pre-filled from the landing page (card V sends
-  // /create?slug=<value>). For brand-new (no `page`) flows only —
-  // we don't override an existing page's slug.
+  // Slug can arrive pre-filled either from a server prop (preferred —
+  // /create reads ?slug= server-side so the initial render has the
+  // value baked in) or from the client search params as a fallback.
+  // For new (no `page`) flows only.
   const initialSlugFromQuery = !page
-    ? sanitizeSlug(searchParams.get('slug') ?? '')
+    ? sanitizeSlug(initialSlug || searchParams.get('slug') || '')
     : '';
 
   const [slug, setSlug] = useState(page?.slug ?? initialSlugFromQuery);
