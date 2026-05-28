@@ -61,8 +61,8 @@ export default function Home() {
             {/* Left — pitch + CTAs */}
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-                <span className="text-karte-accent/80">·</span> For people who get
-                inbound
+                <span className="text-karte-accent/80">·</span> Link-in-bio,{' '}
+                <span className="text-karte-text">that talks back</span>
               </p>
 
               <h1
@@ -87,9 +87,28 @@ export default function Home() {
                   already knows
                 </span>{' '}
                 what you&rsquo;d say. Rates, availability, stack, hiring —
-                answered in your voice,{' '}
+                answered for you,{' '}
                 <span className="text-karte-text">before they hit your inbox.</span>
               </p>
+
+              {/* What you feed it — the input side of the model. */}
+              <div className="mt-7 max-w-xl rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-4">
+                <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+                  <span className="text-karte-accent/80">·</span> Feed it your memory
+                </p>
+                <p className="mt-2 text-[13.5px] leading-[1.5] text-karte-text-3">
+                  <span className="text-karte-text">Links · projects · FAQs · boundaries.</span>{' '}
+                  The stuff you&rsquo;d say if asked. Karte does the talking.
+                </p>
+              </div>
+
+              {/* Vs-Linktree positioning — additive, not dismissive. */}
+              <div className="mt-5 max-w-xl text-[13px] leading-[1.55] text-karte-text-3">
+                A sharper{' '}
+                <span className="text-karte-text">link-in-bio</span> — brand
+                icons, project gallery, themes, dynamic OG cards — with a
+                chat that handles your inbound on top.
+              </div>
 
               <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                 <Link
@@ -132,6 +151,70 @@ export default function Home() {
             <div className="lg:pl-4">
               <HeroChatDemo />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── The link page itself ─────────────────────────────── */}
+      <section className="border-t border-karte-border">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+          <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+                <span className="text-karte-accent/80">·</span> Still a
+                link-in-bio
+              </p>
+              <h2 className="mt-6 text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-karte-text sm:text-4xl lg:text-[44px]">
+                Just a{' '}
+                <span
+                  className={`${serif.className} font-normal text-karte-accent-soft`}
+                  style={{ fontStyle: 'italic' }}
+                >
+                  much sharper one.
+                </span>
+              </h2>
+              <p className="mt-5 max-w-md text-[15px] leading-[1.65] text-karte-text-3">
+                Before any AI, your Karte page is already a better link page
+                than what you&rsquo;re used to. The chat is the bonus, not the
+                replacement.
+              </p>
+              <Link
+                href="/sarthak"
+                className="group mt-7 inline-flex items-center gap-2 rounded-full border border-white/[0.10] bg-transparent px-5 py-2.5 text-[14px] font-medium text-karte-text transition hover:border-white/20 hover:bg-white/[0.04]"
+              >
+                Open a live profile
+                <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                  ↗
+                </span>
+              </Link>
+            </div>
+
+            <ul className="grid gap-3 sm:grid-cols-2">
+              <FeatureRow
+                title="Brand-detected social icons"
+                body="GitHub, LinkedIn, X, Substack, YouTube — auto-iconified. Personal sites get a globe."
+              />
+              <FeatureRow
+                title="Project gallery"
+                body="Cards with thumbnails, hover transforms, and a render that picks a shape per project."
+              />
+              <FeatureRow
+                title="Theme presets"
+                body="Hand-tuned palettes and accents. Profile glows match your brand color."
+              />
+              <FeatureRow
+                title="Dynamic OG cards"
+                body="Every share unfurls with your current AI-written headline, not a stock thumbnail."
+              />
+              <FeatureRow
+                title="Sticky identity column"
+                body="Hero stays as visitors scroll. Right column is the content stream."
+              />
+              <FeatureRow
+                title="Edge-served, instant"
+                body="Static-rendered on Cloudflare. Loads before the thumb lifts off the link."
+              />
+            </ul>
           </div>
         </div>
       </section>
@@ -396,6 +479,17 @@ export default function Home() {
         </div>
       </footer>
     </main>
+  );
+}
+
+/* ─── FeatureRow — single cell in the "Still a link-in-bio" grid ── */
+
+function FeatureRow({ title, body }: { title: string; body: string }) {
+  return (
+    <li className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+      <p className="text-[13.5px] font-semibold text-karte-text">{title}</p>
+      <p className="mt-1 text-[12.5px] leading-[1.5] text-karte-text-3">{body}</p>
+    </li>
   );
 }
 
