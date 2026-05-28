@@ -1,3 +1,4 @@
+import { SafeImage } from '@/components/public/safe-image';
 import type { WidgetVariant } from '@/lib/widget-types';
 
 // Data shape consumed by every ProjectCard variant. Mirrors the columns
@@ -70,22 +71,20 @@ const squareVariant: WidgetVariant<ProjectCardData> = {
       className="group relative flex aspect-square w-full flex-col justify-end overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18]"
       style={ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined}
     >
-      {data.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={data.imageUrl}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
-        />
-      ) : (
-        <span
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg, ${ctx.accentColor || '#67e8f9'}33, transparent 70%)`,
-          }}
-        />
-      )}
+      <SafeImage
+        src={data.imageUrl}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+        fallback={
+          <span
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(135deg, ${ctx.accentColor || '#67e8f9'}33, transparent 70%)`,
+            }}
+          />
+        }
+      />
       <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
       <span className="relative truncate text-base font-semibold leading-tight text-white">
         {data.title}
@@ -117,27 +116,26 @@ const wideVariant: WidgetVariant<ProjectCardData> = {
       className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.04]"
       style={ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined}
     >
-      {data.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={data.imageUrl}
-          alt=""
-          className="h-16 w-16 shrink-0 rounded-xl object-cover transition-transform duration-300 ease-[var(--karte-ease)] group-hover:scale-[1.06]"
-        />
-      ) : (
-        <span
-          aria-hidden="true"
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl text-xl"
-          style={{
-            backgroundColor: ctx.accentColor
-              ? `${ctx.accentColor}1a`
-              : 'rgba(103,232,249,0.10)',
-            color: ctx.accentColor || '#67e8f9',
-          }}
-        >
-          ◆
-        </span>
-      )}
+      <SafeImage
+        src={data.imageUrl}
+        alt=""
+        className="h-16 w-16 shrink-0 rounded-xl object-cover transition-transform duration-300 ease-[var(--karte-ease)] group-hover:scale-[1.06]"
+        fallback={
+          <span
+            aria-hidden="true"
+            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl text-xl"
+            style={{
+              backgroundColor: ctx.accentColor
+                ? `${ctx.accentColor}1a`
+                : 'rgba(103,232,249,0.10)',
+              color: ctx.accentColor || '#67e8f9',
+            }}
+          >
+            ◆
+          </span>
+        }
+      />
+
       <div className="min-w-0 flex-1">
         <p className="truncate text-base font-semibold text-karte-text">
           {data.title}
@@ -198,25 +196,23 @@ const heroVariant: WidgetVariant<ProjectCardData> = {
           <p className="text-[10.5px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
             <span style={{ color: accent }}>◆</span> Featured project
           </p>
-          {data.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={data.imageUrl}
-              alt=""
-              className="h-7 w-7 rounded-md object-contain opacity-80"
-            />
-          ) : (
-            <span
-              aria-hidden="true"
-              className="flex h-7 w-7 items-center justify-center rounded-md text-sm"
-              style={{
-                backgroundColor: `${accent}1a`,
-                color: accent,
-              }}
-            >
-              ◆
-            </span>
-          )}
+          <SafeImage
+            src={data.imageUrl}
+            alt=""
+            className="h-7 w-7 rounded-md object-contain opacity-80"
+            fallback={
+              <span
+                aria-hidden="true"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-sm"
+                style={{
+                  backgroundColor: `${accent}1a`,
+                  color: accent,
+                }}
+              >
+                ◆
+              </span>
+            }
+          />
         </div>
 
         <div className="relative">

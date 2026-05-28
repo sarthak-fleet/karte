@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { SafeImage } from '@/components/public/safe-image';
+
 interface RoamingCharacterProps {
   avatarUrl: string | null;
   displayName: string;
@@ -40,16 +42,42 @@ export function RoamingCharacter({
   const [lineIdx, setLineIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
   const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 });
+  // Track whether the avatar image actually loaded; if not we don't
+  // bother starting the walk loop. Prevents a broken-image pet from
+  // pacing across the bottom of the screen.
+  const [avatarReady, setAvatarReady] = useState<boolean | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Initial enable — skip if reduced-motion or if the lines array is empty.
+  // Pre-load the avatar image so we don't enable the pet at all if
+  // the source is unreachable.
+  useEffect(() => {
+    if (!avatarUrl) {
+      setAvatarReady(false);
+      return;
+    }
+    let cancelled = false;
+    const img = new window.Image();
+    img.onload = () => !cancelled && setAvatarReady(true);
+    img.onerror = () => !cancelled && setAvatarReady(false);
+    img.src = avatarUrl;
+    return () => {
+      cancelled = true;
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [avatarUrl]);
+
+  // Initial enable — skip if reduced-motion, no lines, or the avatar
+  // image failed to load.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (lines.length === 0) return;
+    if (avatarReady === false) return;
+    if (avatarReady === null) return; // still preloading
     setEnabled(true);
-  }, [lines.length]);
+  }, [lines.length, avatarReady]);
 
   // Look at cursor — apply a small translate that makes the pet lean
   // toward the mouse. Throttled via requestAnimationFrame.
