@@ -125,4 +125,6 @@ function stringOrNull(value: unknown, maxLen: number): string | null {
   return trimmed.slice(0, maxLen);
 }
 
-export { VALID_STATUSES };
+// VALID_STATUSES kept local — Next.js route files can only export
+// HTTP handlers, so we don't re-export this constant here. The
+// [eventId]/route.ts file has its own copy.
