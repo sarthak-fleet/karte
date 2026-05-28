@@ -289,23 +289,6 @@ export default async function ProfilePage({ params }: Props) {
               </section>
             )}
 
-            {publicTimeline.length > 0 && (
-              <AnimatedReveal as="section">
-                <TimelineSection
-                  events={publicTimeline.map((t) => ({
-                    id: t.id,
-                    type: t.type,
-                    title: t.title,
-                    body: t.body,
-                    whereLabel: t.whereLabel,
-                    link: t.link,
-                    whenLabel: t.whenLabel,
-                  }))}
-                  accentColor={theme.accentColor}
-                />
-              </AnimatedReveal>
-            )}
-
             {enabledModeCards.length > 0 && (
               <AnimatedReveal as="section">
                 <div className="mb-5">
@@ -481,6 +464,26 @@ export default async function ProfilePage({ params }: Props) {
                   </AnimatedReveal>
                 ))}
               </section>
+            )}
+
+            {/* Timeline lives at the end of the content stream — long
+                reverse-chrono block belongs after the punchy AI surface
+                cards + custom sections, not before them. */}
+            {publicTimeline.length > 0 && (
+              <AnimatedReveal as="section">
+                <TimelineSection
+                  events={publicTimeline.map((t) => ({
+                    id: t.id,
+                    type: t.type,
+                    title: t.title,
+                    body: t.body,
+                    whereLabel: t.whereLabel,
+                    link: t.link,
+                    whenLabel: t.whenLabel,
+                  }))}
+                  accentColor={theme.accentColor}
+                />
+              </AnimatedReveal>
             )}
 
             <div className="mt-4 flex justify-center pt-8">
