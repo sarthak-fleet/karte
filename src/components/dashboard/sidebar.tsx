@@ -289,6 +289,8 @@ export function Sidebar({ slug }: { slug?: string }) {
 }
 
 function BrandMark() {
+  // Gold-foil diamond — matches the landing-deck corner ornament
+  // and the favicon. Same SVG geometry as src/app/icon.svg.
   return (
     <svg
       aria-hidden="true"
@@ -296,14 +298,26 @@ function BrandMark() {
       fill="none"
       className="h-[22px] w-[22px]"
     >
-      <rect width="32" height="32" rx="7" fill="#0a0a0a" />
-      <path
-        d="M8 7 h16 a4 4 0 0 1 4 4 v9 a4 4 0 0 1 -4 4 h-9 l-4 4 v-4 h-3 a4 4 0 0 1 -4 -4 v-9 a4 4 0 0 1 4 -4 Z"
-        fill="#67e8f9"
+      <defs>
+        <linearGradient id="brand-gold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f6e5b8" />
+          <stop offset="55%" stopColor="#c4a46b" />
+          <stop offset="100%" stopColor="#8a6b34" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="6" fill="#0a0805" />
+      <rect
+        x="2.5"
+        y="2.5"
+        width="27"
+        height="27"
+        rx="4"
+        fill="none"
+        stroke="#c4a46b"
+        strokeOpacity="0.35"
+        strokeWidth="0.6"
       />
-      <circle cx="13" cy="15.5" r="1.25" fill="#0a0a0a" />
-      <circle cx="16.5" cy="15.5" r="1.25" fill="#0a0a0a" />
-      <circle cx="20" cy="15.5" r="1.25" fill="#0a0a0a" />
+      <path d="M16 7 L25 16 L16 25 L7 16 Z" fill="url(#brand-gold)" />
     </svg>
   );
 }

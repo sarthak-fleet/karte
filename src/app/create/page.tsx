@@ -31,7 +31,10 @@ export default async function CreatePage({
   const initialSlug = sanitizeSlug(params.slug);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-karte-bg text-karte-text-2 antialiased">
+    <div
+      data-onyx-brand
+      className="relative min-h-screen overflow-hidden bg-karte-bg text-karte-text-2 antialiased"
+    >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_at_top,#000_25%,transparent_72%)]" />
         <div className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-karte-accent/10 blur-[160px]" />

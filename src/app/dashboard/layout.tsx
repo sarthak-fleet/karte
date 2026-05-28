@@ -48,7 +48,10 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-karte-text antialiased lg:flex">
+    <div
+      data-onyx-brand
+      className="min-h-screen bg-[#0a0a0a] text-karte-text antialiased lg:flex"
+    >
       <NavProgress />
       <DashboardTracker />
       <Sidebar slug={page?.slug} />
