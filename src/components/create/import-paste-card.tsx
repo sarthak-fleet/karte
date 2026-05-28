@@ -158,7 +158,7 @@ export function ImportPasteCard() {
       // ignore
     }
 
-    router.push('/login?next=/dashboard/appearance&imported=1');
+    router.push('/login?next=/welcome');
   }
 
   return (

@@ -1,6 +1,7 @@
 import { Geist, Instrument_Serif } from 'next/font/google';
 import Link from 'next/link';
 
+import { HeroChatDemo } from '@/components/public/hero-chat-demo';
 import { LandingDemo } from '@/components/public/landing-demo';
 import { PublicTopBar } from '@/components/public/public-top-bar';
 
@@ -55,62 +56,82 @@ export default function Home() {
           Karte
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-24 lg:pb-28 lg:pt-32">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-            <span className="text-karte-accent/80">·</span> Manifesto
-          </p>
+        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-16 sm:pt-20 lg:pb-24 lg:pt-24">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+            {/* Left — pitch + CTAs */}
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+                <span className="text-karte-accent/80">·</span> For people who get
+                inbound
+              </p>
 
-          <h1
-            className="mt-6 max-w-4xl text-[48px] font-semibold leading-[1.0] tracking-[-0.035em] text-karte-text sm:text-[72px] lg:text-[112px]"
-          >
-            Your link-in-bio<br />
-            is a{' '}
-            <span
-              className={`${serif.className} font-normal text-karte-accent-soft`}
-              style={{ fontStyle: 'italic' }}
-            >
-              dead end.
-            </span>
-          </h1>
+              <h1
+                className="mt-6 max-w-2xl text-[40px] font-semibold leading-[1.02] tracking-[-0.035em] text-karte-text sm:text-[56px] lg:text-[76px]"
+              >
+                Stop answering<br />
+                the same{' '}
+                <span
+                  className={`${serif.className} font-normal text-karte-accent-soft`}
+                  style={{ fontStyle: 'italic' }}
+                >
+                  DMs.
+                </span>
+              </h1>
 
-          {/* Dictionary-entry tagline */}
-          <div className="mt-10 max-w-2xl border-l border-white/[0.08] pl-5 text-[15px] leading-[1.7] tracking-[-0.005em] text-karte-text-3 sm:text-[17px] sm:leading-[1.65]">
-            <span className="font-medium text-karte-text">karte</span>{' '}
-            <span className="text-karte-text-4">/ˈkartə/</span>{' '}
-            <span
-              className={`${serif.className} text-karte-text-4`}
-              style={{ fontStyle: 'italic' }}
-            >
-              (n.)
-            </span>{' '}
-            <span className="text-karte-text-3">German for &ldquo;card.&rdquo;</span>{' '}
-            <span className="text-karte-text">This one talks back.</span>
+              <p className="mt-6 max-w-xl text-[16px] leading-[1.6] text-karte-text-3 sm:text-[18px]">
+                Your link in bio{' '}
+                <span
+                  className={`${serif.className} text-karte-text`}
+                  style={{ fontStyle: 'italic' }}
+                >
+                  already knows
+                </span>{' '}
+                what you&rsquo;d say. Rates, availability, stack, hiring, &ldquo;is
+                this still active&rdquo; — answered in your voice, while you sleep.
+              </p>
+
+              <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                <Link
+                  href="/create"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-medium text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:bg-zinc-100"
+                >
+                  Claim your name
+                  <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">→</span>
+                </Link>
+                <Link
+                  href="/sarthak"
+                  className="group inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-transparent px-6 py-3 text-[15px] font-medium text-karte-text transition-all duration-200 ease-[var(--karte-ease)] hover:border-white/20 hover:bg-white/[0.03]"
+                >
+                  See it live
+                  <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">↗</span>
+                </Link>
+              </div>
+
+              <p className="mt-5 text-[12.5px] text-karte-text-4">
+                Free · no card · 60-second import from Linktree, Beacons, or Bento.
+              </p>
+
+              {/* Showcase placeholder — filled in once the demo profiles ship */}
+              <div className="mt-10 max-w-md rounded-2xl border border-dashed border-white/[0.10] bg-white/[0.015] px-5 py-4">
+                <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-5">
+                  <span className="text-karte-accent/80">·</span> Coming this week
+                </p>
+                <p className="mt-2 text-[13px] leading-[1.5] text-karte-text-3">
+                  Demo profiles for{' '}
+                  <span className="text-karte-text">Naval</span>,{' '}
+                  <span className="text-karte-text">Pieter Levels</span>,{' '}
+                  <span className="text-karte-text">Paul Graham</span>, and others —
+                  built from their public writing. See how the chat would handle
+                  their inbound.
+                </p>
+              </div>
+            </div>
+
+            {/* Right — live conversation demo */}
+            <div className="lg:pl-4">
+              <HeroChatDemo />
+            </div>
           </div>
-
-          <div className="mt-12 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-            <Link
-              href="/create"
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-medium text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:bg-zinc-100"
-            >
-              Claim your name
-              <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">→</span>
-            </Link>
-            <Link
-              href="/sarthak"
-              className="group inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-transparent px-6 py-3 text-[15px] font-medium text-karte-text transition-all duration-200 ease-[var(--karte-ease)] hover:border-white/20 hover:bg-white/[0.03]"
-            >
-              See it live
-              <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">↗</span>
-            </Link>
-          </div>
-
-          <p className="mt-4 text-[12px] text-karte-text-4">
-            Scroll to experience the four surfaces in action.
-          </p>
-
-          <p className="mt-8 text-[13px] text-karte-text-4">
-            Free · no card · public beta
-          </p>
         </div>
       </section>
 
