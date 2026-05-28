@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Turn {
   // Who's "speaking" in the demo.
@@ -11,10 +11,9 @@ interface Turn {
 }
 
 // Scripted conversation a real visitor might have with a real profile.
-// Concrete, "I get this DM weekly"-feeling questions — not "what is
-// your favorite color." Each Karte reply implies a specific link or
-// resource the owner would have wired up: rates page, hiring link,
-// calendar.
+// Plays on a loop until someone takes over with the live input. Each
+// Karte reply implies a specific link or resource the owner would
+// have wired up: rates page, hiring link, calendar.
 const SCRIPT: ReadonlyArray<Turn> = [
   {
     side: 'visitor',
@@ -22,7 +21,7 @@ const SCRIPT: ReadonlyArray<Turn> = [
   },
   {
     side: 'karte',
-    text: '$18k for the standard 4-week. I have one slot open in June — rate card + bookings here: /sarthak/rates',
+    text: '$18k for the standard 4-week. One slot open in June — rate card + bookings at /sarthak/rates',
   },
   {
     side: 'visitor',
@@ -42,21 +41,37 @@ const SCRIPT: ReadonlyArray<Turn> = [
   },
 ];
 
+const SUGGESTED_PROMPTS: ReadonlyArray<string> = [
+  'are you hiring?',
+  'how much does Karte cost?',
+  'why should I switch from Linktree?',
+];
+
 const TYPE_MS = 18;
 const PAUSE_AFTER_TURN_MS = 900;
-const PAUSE_BETWEEN_SIDES_MS = 420;
 const RESTART_MS = 3200;
+
+type LiveTurn = Turn & { id: string };
 
 /**
  * The "your profile already knows what you'd say" demo. Self-typing
- * conversation between a visitor and a Karte profile shown above the
- * fold. Cycles indefinitely. Replaces a static screenshot with a
- * live performance of the value prop.
+ * conversation cycles on a loop until a visitor takes over: a real
+ * input at the bottom hits a seeded persona endpoint and the AI
+ * answers as Sarthak. Live mode persists for the rest of the session
+ * — no auto-cycle once you've taken the wheel.
  */
 export function HeroChatDemo() {
+  const [mode, setMode] = useState<'scripted' | 'live'>('scripted');
   const [turnIdx, setTurnIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  // Live mode state — visitor's own conversation
+  const [liveTurns, setLiveTurns] = useState<LiveTurn[]>([]);
+  const [pending, setPending] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [error, setError] = useState('');
+  const reelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -65,17 +80,15 @@ export function HeroChatDemo() {
     );
   }, []);
 
-  // Drive the typewriter. When the current line finishes, pause and
-  // advance to the next turn. When we run out of turns, hold a beat
-  // and restart from the top.
+  // Drive the scripted typewriter when nobody's interacted yet.
   useEffect(() => {
+    if (mode !== 'scripted') return;
     if (reducedMotion) return;
     const current = SCRIPT[turnIdx];
     if (!current) return;
 
     if (charIdx < current.text.length) {
       const next = current.text[charIdx];
-      // Type a touch slower on spaces — feels more natural.
       const delay = next === ' ' ? TYPE_MS * 1.6 : TYPE_MS;
       const id = setTimeout(() => setCharIdx((c) => c + 1), delay);
       return () => clearTimeout(id);
@@ -93,28 +106,100 @@ export function HeroChatDemo() {
       }
     }, wait);
     return () => clearTimeout(id);
-  }, [turnIdx, charIdx, reducedMotion]);
+  }, [mode, turnIdx, charIdx, reducedMotion]);
 
-  // Compose the visible transcript: every fully-typed prior turn,
-  // plus the currently-typing turn (or the whole thing if reduced
-  // motion is on).
-  const visibleTurns: Array<{ turn: Turn; partial: string; isActive: boolean }> = [];
-  for (let i = 0; i <= turnIdx; i++) {
-    const turn = SCRIPT[i];
-    if (!turn) continue;
-    const isActive = i === turnIdx && !reducedMotion;
-    visibleTurns.push({
+  // Auto-scroll the reel as content lands.
+  useEffect(() => {
+    const node = reelRef.current;
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
+  }, [liveTurns, mode, charIdx]);
+
+  async function handleSubmit(event?: React.FormEvent) {
+    if (event) event.preventDefault();
+    const text = draft.trim();
+    if (!text || pending) return;
+
+    setError('');
+    const userTurn: LiveTurn = {
+      id: crypto.randomUUID(),
+      side: 'visitor',
+      text,
+    };
+    setLiveTurns((prev) => [...prev, userTurn]);
+    setDraft('');
+    setMode('live');
+    setPending(true);
+
+    try {
+      const res = await fetch('/api/demo-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: text }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        answer?: string;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || 'Could not answer that — try again.');
+      }
+      const answer = (data.answer ?? '').trim();
+      if (!answer) {
+        throw new Error('Empty answer — try rephrasing.');
+      }
+      const reply: LiveTurn = {
+        id: crypto.randomUUID(),
+        side: 'karte',
+        text: answer,
+      };
+      setLiveTurns((prev) => [...prev, reply]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
+      setPending(false);
+    }
+  }
+
+  function handleSuggest(text: string) {
+    setDraft(text);
+    // Submit on next tick so React picks up the draft change first.
+    setTimeout(() => {
+      setDraft(text);
+      void handleSubmit();
+    }, 0);
+  }
+
+  // Build the visible reel. In scripted mode, show every fully-typed
+  // prior turn plus the currently-typing turn. In live mode, show
+  // the visitor's actual conversation.
+  let visibleTurns: Array<{ key: string; turn: Turn; partial: string; isActive: boolean }> = [];
+
+  if (mode === 'scripted') {
+    for (let i = 0; i <= turnIdx; i++) {
+      const turn = SCRIPT[i];
+      if (!turn) continue;
+      const isActive = i === turnIdx && !reducedMotion;
+      visibleTurns.push({
+        key: `s-${i}`,
+        turn,
+        partial: isActive ? turn.text.slice(0, charIdx) : turn.text,
+        isActive,
+      });
+    }
+  } else {
+    visibleTurns = liveTurns.map((turn) => ({
+      key: turn.id,
       turn,
-      partial: isActive ? turn.text.slice(0, charIdx) : turn.text,
-      isActive,
-    });
+      partial: turn.text,
+      isActive: false,
+    }));
   }
 
   return (
     <div className="relative w-full overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.02] p-5 backdrop-blur-xl sm:p-6">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
 
-      {/* Frame header — fake address bar suggesting this is a live page */}
       <div className="flex items-center gap-2 border-b border-white/[0.06] pb-4">
         <span className="h-2.5 w-2.5 rounded-full bg-white/[0.08]" />
         <span className="h-2.5 w-2.5 rounded-full bg-white/[0.08]" />
@@ -122,27 +207,107 @@ export function HeroChatDemo() {
         <div className="ml-3 flex-1 truncate rounded-md bg-white/[0.04] px-3 py-1 font-mono text-[11px] text-karte-text-4">
           karte.cc/sarthak <span className="text-karte-text-5">— chat</span>
         </div>
+        {mode === 'live' && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-karte-accent/15 px-2 py-1 text-[10px] font-medium text-karte-accent-soft">
+            <span
+              className="block h-1.5 w-1.5 rounded-full bg-karte-accent"
+              style={{ animation: 'karte-pulse-dot 1.4s ease-in-out infinite' }}
+            />
+            LIVE
+          </span>
+        )}
       </div>
 
-      {/* Conversation reel — fixed-ish height so the page doesn't jump */}
       <div
-        className="mt-4 flex flex-col gap-3 overflow-hidden text-[13.5px] leading-[1.55] sm:gap-3.5 sm:text-[14px]"
-        style={{ minHeight: '320px' }}
+        ref={reelRef}
+        className="mt-4 flex flex-col gap-3 overflow-y-auto pr-1 text-[13.5px] leading-[1.55] sm:gap-3.5 sm:text-[14px]"
+        style={{ height: '320px' }}
       >
-        {visibleTurns.map((entry, i) => (
-          <ChatLine key={i} entry={entry} />
-        ))}
+        {visibleTurns.length === 0 && mode === 'live' ? (
+          <div className="flex h-full items-center justify-center text-center text-[13px] text-karte-text-4">
+            <p>
+              Ask anything. The demo is wired to a seeded version of
+              Sarthak&rsquo;s profile.
+            </p>
+          </div>
+        ) : (
+          visibleTurns.map((entry) => <ChatLine key={entry.key} entry={entry} />)
+        )}
+        {pending && (
+          <div className="flex justify-start">
+            <TypingDots side="karte" />
+          </div>
+        )}
       </div>
 
-      {/* Footer hint — the demo is interactive on the real page */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3 text-[11px] text-karte-text-5">
-        <span>Live transcript from a real profile.</span>
-        <span className="text-karte-accent-soft">Try it →</span>
-      </div>
+      {/* Live input — the moment a visitor types, scripted demo pauses. */}
+      <form
+        onSubmit={handleSubmit}
+        className="mt-4 flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-black/30 px-3 py-2 focus-within:border-karte-accent/40 focus-within:bg-black/40"
+      >
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder={
+            mode === 'scripted'
+              ? 'Or ask your own — try it →'
+              : 'Ask another…'
+          }
+          maxLength={280}
+          disabled={pending}
+          className="min-w-0 flex-1 bg-transparent text-[14px] text-karte-text placeholder-karte-text-5 outline-none disabled:opacity-50"
+        />
+        <button
+          type="submit"
+          disabled={pending || !draft.trim()}
+          className="rounded-xl bg-karte-accent px-3 py-1.5 text-[12.5px] font-semibold text-zinc-950 transition hover:bg-karte-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {pending ? '…' : 'Ask'}
+        </button>
+      </form>
+
+      {error ? (
+        <p className="mt-2 text-[12px] text-rose-300/90">{error}</p>
+      ) : mode === 'scripted' ? (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {SUGGESTED_PROMPTS.map((prompt) => (
+            <button
+              key={prompt}
+              type="button"
+              onClick={() => handleSuggest(prompt)}
+              className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11.5px] text-karte-text-3 transition hover:border-karte-accent/30 hover:text-karte-text"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-3 flex items-center justify-between text-[11px] text-karte-text-5">
+          <span>Answers from a seeded demo. Real profiles tune their own voice.</span>
+          <button
+            type="button"
+            onClick={() => {
+              setMode('scripted');
+              setLiveTurns([]);
+              setTurnIdx(0);
+              setCharIdx(0);
+              setError('');
+            }}
+            className="text-karte-accent-soft hover:text-karte-accent"
+          >
+            Reset demo
+          </button>
+        </div>
+      )}
 
       <style>{`
         @keyframes karte-hero-cursor {
           50% { opacity: 0; }
+        }
+        @keyframes karte-pulse-dot {
+          0%, 100% { opacity: 0.5; transform: scale(0.85); }
+          50% { opacity: 1; transform: scale(1.1); }
         }
       `}</style>
     </div>
@@ -157,8 +322,6 @@ function ChatLine({
   const isVisitor = entry.turn.side === 'visitor';
 
   if (entry.partial.length === 0 && entry.isActive) {
-    // While we're between turns showing nothing yet, render a thin
-    // typing indicator on the side that's about to speak.
     return (
       <div className={`flex ${isVisitor ? 'justify-end' : 'justify-start'}`}>
         <TypingDots side={entry.turn.side} />
@@ -183,7 +346,7 @@ function ChatLine({
               }
         }
       >
-        <span>{entry.partial}</span>
+        <span style={{ whiteSpace: 'pre-wrap' }}>{entry.partial}</span>
         {entry.isActive && entry.partial.length < entry.turn.text.length && (
           <span
             aria-hidden="true"

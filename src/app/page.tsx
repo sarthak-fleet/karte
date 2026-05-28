@@ -136,111 +136,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── 2. SPEED — credibility flex ──────────────────────── */}
+      {/* ─── Speed — single-row credibility strip ─────────────── */}
       <section className="border-t border-karte-border">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-            <span className="text-karte-accent/80">·</span> Speed
-          </p>
-
-          <div className="mt-8 grid items-end gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-            <h2 className="text-3xl font-semibold leading-[1.05] tracking-[-0.025em] text-karte-text sm:text-5xl lg:text-[64px]">
-              Loads before they{' '}
-              <span
-                className={`${serif.className} font-normal text-karte-accent-soft`}
-                style={{ fontStyle: 'italic' }}
-              >
-                look away.
-              </span>
-            </h2>
-
-            <div>
-              <p
-                className={`${serif.className} text-[80px] font-normal leading-[0.9] tracking-[-0.045em] text-karte-text sm:text-[120px]`}
-                style={{ fontStyle: 'italic' }}
-              >
-                &lt;100ms
-              </p>
-              <p className="mt-3 text-[13px] leading-[1.55] text-karte-text-3">
-                Median time-to-first-byte for a published profile. Anywhere in
-                the world.
-              </p>
-            </div>
-          </div>
-
-          <p className="mt-12 max-w-2xl text-[15px] leading-[1.7] tracking-[-0.005em] text-karte-text-3 sm:text-[17px]">
-            Karte profiles are static-rendered and edge-cached at every
-            Cloudflare data center on Earth. By the time a visitor&apos;s thumb
-            lifts off the link, the page is already painted.
-          </p>
-
-          <dl className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-karte-border sm:grid-cols-3">
-            <div className="bg-karte-bg p-6">
-              <dt className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-karte-text-4">
-                TTFB
-              </dt>
-              <dd className="mt-2 font-mono text-[22px] font-semibold tracking-tight text-karte-text">
-                &lt; 100 ms
-              </dd>
-              <dd className="mt-1 text-[12px] text-karte-text-3">
-                cached at the edge
-              </dd>
-            </div>
-            <div className="bg-karte-bg p-6 sm:border-l sm:border-karte-border">
-              <dt className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-karte-text-4">
-                Spinners
-              </dt>
-              <dd className="mt-2 font-mono text-[22px] font-semibold tracking-tight text-karte-text">
-                0
-              </dd>
-              <dd className="mt-1 text-[12px] text-karte-text-3">
-                no client-JS to first paint
-              </dd>
-            </div>
-            <div className="bg-karte-bg p-6 sm:border-l sm:border-karte-border">
-              <dt className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-karte-text-4">
-                PoPs
-              </dt>
-              <dd className="mt-2 font-mono text-[22px] font-semibold tracking-tight text-karte-text">
-                330+
-              </dd>
-              <dd className="mt-1 text-[12px] text-karte-text-3">
-                worldwide, serving from CF
-              </dd>
-            </div>
+        <div className="mx-auto max-w-6xl px-6 py-14 lg:py-16">
+          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-karte-border sm:grid-cols-4">
+            <Stat eyebrow="TTFB" value="< 100 ms" caption="cached at the edge" />
+            <Stat eyebrow="To first paint" value="0 JS" caption="static-rendered" />
+            <Stat eyebrow="Edge PoPs" value="330+" caption="Cloudflare global" />
+            <Stat eyebrow="Time to import" value="60 s" caption="from Linktree / Beacons" />
           </dl>
-
-          <p className="mt-8 text-[13px] text-karte-text-4">
-            A link-in-bio that lags is a link-in-bio that doesn&apos;t get
-            clicked.
-          </p>
         </div>
       </section>
 
-      {/* ─── 3. THE PROBLEM — manifesto-scale display ─────────── */}
-      <section className="border-t border-karte-border">
-        <div className="mx-auto max-w-6xl px-6 py-24 lg:py-32">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-            <span className="text-karte-accent/80">·</span> The problem
-          </p>
-          <div className="mt-10 max-w-5xl space-y-3 text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] text-karte-text sm:text-[56px] lg:text-[72px]">
-            <p>Visitors land.</p>
-            <p className="text-zinc-600">They scroll past dead links.</p>
-            <p>
-              They{' '}
-              <span
-                className={`${serif.className} font-normal text-karte-text-3`}
-                style={{ fontStyle: 'italic' }}
-              >
-                forget you
-              </span>{' '}
-              by tomorrow.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 3. THE FLIP — interactive surfaces (the heart of the revamp) ─ */}
+      {/* ─── 2. THE FLIP — interactive surfaces (the heart of the revamp) ─ */}
       <section className="border-t border-karte-border">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
           <div className="mx-auto max-w-2xl text-center">
@@ -467,36 +375,7 @@ export default function Home() {
         </SurfaceBlock>
       </section>
 
-      {/* ─── 6. INVITE LOOP — aside, narrower + lighter tone ── */}
-      <section className="border-t border-karte-border bg-karte-surface">
-        <div className="mx-auto max-w-4xl px-6 py-24 lg:py-28">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-            <span className="text-karte-accent/80">·</span> P.S. — the bonus loop
-          </p>
-          <h2 className="mt-5 text-2xl font-medium leading-[1.35] tracking-[-0.01em] text-karte-text sm:text-3xl lg:text-[36px]">
-            Every answer creates a thread.{' '}
-            <span
-              className={`${serif.className} font-normal text-karte-text`}
-              style={{ fontStyle: 'italic' }}
-            >
-              Forward it.
-            </span>
-          </h2>
-          <p className="mt-5 max-w-2xl text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3">
-            The link is the invite. No signup wall. The conversation continues
-            wherever it&apos;s shared.
-          </p>
-          <Link
-            href="/sarthak"
-            className="group mt-8 inline-flex items-center gap-2 text-[14px] font-medium text-karte-text transition-colors duration-200 ease-[var(--karte-ease)] hover:text-karte-text"
-          >
-            Start a shareable chat
-            <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">→</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* ─── 7. FINAL CTA ────────────────────────────────────── */}
+      {/* ─── 6. FINAL CTA ────────────────────────────────────── */}
       <section className="border-t border-karte-border">
         <div className="mx-auto max-w-6xl px-6 py-28 lg:py-40">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
@@ -545,6 +424,30 @@ export default function Home() {
         </div>
       </footer>
     </main>
+  );
+}
+
+/* ─── Stat — single cell in the credibility strip ────────── */
+
+function Stat({
+  eyebrow,
+  value,
+  caption,
+}: {
+  eyebrow: string;
+  value: string;
+  caption: string;
+}) {
+  return (
+    <div className="bg-karte-bg p-5 sm:border-l sm:border-karte-border sm:first:border-l-0">
+      <dt className="font-mono text-[10.5px] font-medium uppercase tracking-[0.18em] text-karte-text-4">
+        {eyebrow}
+      </dt>
+      <dd className="mt-2 font-mono text-[20px] font-semibold tracking-tight text-karte-text">
+        {value}
+      </dd>
+      <dd className="mt-1 text-[12px] text-karte-text-3">{caption}</dd>
+    </div>
   );
 }
 
