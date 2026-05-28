@@ -2,8 +2,7 @@ import { and,eq } from 'drizzle-orm';
 
 import { db, ensureProjectsTable } from '@/db';
 import { conversations, pages, users } from '@/db/schema';
-import type { ChatResponse, RenderableComponent } from '@/lib/ai-components/types';
-import { generate, resolveAiConfig } from '@/lib/ai-client';
+import { resolveAiConfig, streamResponse } from '@/lib/ai-client';
 import { CHAT_RESPONSE_ENVELOPE_PROMPT } from '@/lib/ai-prompts';
 import { buildProfileMemory } from '@/lib/profile-memory';
 import { rateLimit } from '@/lib/rate-limit';
@@ -123,6 +122,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     const baseSystemPrompt = page.chatSystemPrompt
       || `You are a helpful assistant that answers questions about ${page.displayName}.`;
 
+    // Visitor-intent ranking: the page can declare a preferred posture
+    // (explore / ask / reach / vibe) in pageSettings.visitorIntent. We
+    // translate that into a component-picking hint so the AI surfaces
+    // the right kind of help. Default (no hint) keeps the AI free to
+    // pick whatever fits.
+    const visitorIntent = (page.pageSettings as { visitorIntent?: string } | null)
+      ?.visitorIntent;
+    const intentHint = buildIntentHint(visitorIntent);
+
     const systemPrompt = [
       baseSystemPrompt,
       'Use the Profile Memory source cards as the primary truth. Do not invent facts, dates, credentials, employers, or personal details that are not present in the sources.',
@@ -130,18 +138,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       `Profile Memory:\n${memory.promptContext}`,
       retrievedContext ? `Optional external index matches:\n${retrievedContext}` : '',
       CHAT_RESPONSE_ENVELOPE_PROMPT,
+      intentHint,
     ].filter(Boolean).join('\n\n');
 
-    const raw = await generate(aiConfig, {
+    // Stream the response — text appears word-by-word client-side.
+    // Components live in a JSON tail after the <<<COMPONENTS>>> marker;
+    // the client splits on the marker and renders components when the
+    // stream completes.
+    return streamResponse(aiConfig, {
       system: systemPrompt,
       prompt: query,
       reasoningLevel: 'fast',
-    });
-
-    const parsed = parseChatResponse(raw);
-    return new Response(JSON.stringify(parsed), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
     });
   } catch {
     return new Response(JSON.stringify({ error: 'Chat service unavailable' }), {
@@ -151,52 +158,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   }
 }
 
-// ── Response parsing ────────────────────────────────────────────────
-// AI is told to emit { text, components }. In practice we sometimes
-// get markdown fences or stray prose around the JSON. Strip + validate.
-const ALLOWED_TYPES: ReadonlySet<RenderableComponent['type']> = new Set([
-  'AskAgain', 'AvailabilityChip', 'BookCallSlot', 'EssayLink', 'HiringStatus',
-  'LocationCard', 'MetricCard', 'ProjectMini', 'QuoteBlock', 'RateCard',
-  'StackList', 'TimelineSlice',
-]);
-
-function parseChatResponse(raw: string): ChatResponse {
-  // First try: extract the first JSON object in the string.
-  const match = raw.match(/\{[\s\S]*\}/);
-  if (match) {
-    try {
-      const obj = JSON.parse(match[0]) as Record<string, unknown>;
-      const text = typeof obj.text === 'string' ? obj.text : '';
-      const components = sanitizeComponents(obj.components);
-      if (text) return { text, components: components.length ? components : undefined };
-    } catch {
-      // fall through
-    }
+// ── Visitor-intent ranking ──────────────────────────────────────────
+// PageSettings.visitorIntent expresses what the owner wants visitors
+// to do first. Each intent maps to a soft 'favor these components'
+// hint added to the system prompt — never overrides what the visitor
+// is actually asking, just nudges the component picks.
+function buildIntentHint(intent: string | undefined): string {
+  switch (intent) {
+    case 'reach':
+      return 'VISITOR INTENT: this page wants visitors to reach out. When a visitor question even loosely touches availability, contact, calls, or hiring — strongly favor BookCallSlot + AvailabilityChip + HiringStatus components.';
+    case 'explore':
+      return 'VISITOR INTENT: this page wants visitors to explore the owner\'s work. Strongly favor TimelineSlice, ProjectMini, MetricCard, and EssayLink when relevant.';
+    case 'ask':
+      return 'VISITOR INTENT: this page is built for ask-anything chat. Lean into prose answers; use components sparingly — only when they materially help a follow-up action.';
+    case 'vibe':
+      return 'VISITOR INTENT: this page is curated for vibe / taste. Favor QuoteBlock, EssayLink, LocationCard, and AskAgain that surface personality over transactions.';
+    default:
+      return '';
   }
-  // Fallback: whatever the model returned, render as plain text. Keeps
-  // the chat working even when the JSON contract fails on a given turn.
-  return { text: raw.trim() || 'Sorry — I lost the thread on that one. Try rephrasing?' };
-}
-
-function sanitizeComponents(value: unknown): RenderableComponent[] {
-  if (!Array.isArray(value)) return [];
-  const out: RenderableComponent[] = [];
-  for (const item of value) {
-    if (!item || typeof item !== 'object') continue;
-    const r = item as Record<string, unknown>;
-    const type = typeof r.type === 'string' ? r.type : '';
-    if (!ALLOWED_TYPES.has(type as RenderableComponent['type'])) continue;
-    const props =
-      r.props && typeof r.props === 'object'
-        ? (r.props as Record<string, unknown>)
-        : {};
-    // Drop components the AI emitted with empty props — those render
-    // as blank cards which look broken. Better to skip than to ship
-    // a half-baked card.
-    if (Object.keys(props).length === 0) continue;
-    // Trust the discriminated-union check at render time — the
-    // registry's switch handles bad shapes by returning null.
-    out.push({ type, props } as unknown as RenderableComponent);
-  }
-  return out;
 }

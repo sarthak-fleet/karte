@@ -1,15 +1,23 @@
-// Chat structured-output system prompt. Appended to the per-page
-// chatSystemPrompt by the chat route so the AI knows it can return
-// components alongside text. The AI MUST reply in the JSON envelope.
+// Chat streaming response protocol. The AI streams the answer text
+// first (so the visitor sees prose appearing word-by-word), then
+// emits a marker followed by a JSON array of components. The client
+// renders text live and materializes components at stream-end.
+//
+// Why streaming + markers instead of structured JSON output: token
+// streaming + structured JSON don't compose without a delimited
+// protocol like this one. Visitor perceived-speed is restored to
+// ~immediate first-word; components arrive after the answer settles.
 export const CHAT_RESPONSE_ENVELOPE_PROMPT = `RESPONSE FORMAT (mandatory)
 
-You MUST respond with a single JSON object — no prose, no code fences, no extra text. Exact shape:
-{
-  "text": "Your conversational answer in 1-3 short paragraphs. Use markdown sparingly (bold, links).",
-  "components": [ ... optional, see below ... ]
-}
+Stream your answer as plain text first — 1-3 short paragraphs, markdown OK (bold, links). Then, IF and only if components would help the visitor act, emit the marker line and a JSON array:
 
-If a component would help the visitor act faster, include it. Components are PICKED FROM THE CATALOG BELOW — never invent component types.
+<your text answer here>
+<<<COMPONENTS>>>
+[ {"type": "...", "props": { ... }}, ... ]
+
+If you have no components to add, end the response after your text answer — DO NOT emit the marker. The visitor receives prose-only and that's fine.
+
+Components are PICKED FROM THE CATALOG BELOW — never invent component types.
 
 CATALOG (use exact "type" values):
 
@@ -36,39 +44,39 @@ PICKING RULES:
 
 EXAMPLE 1 — Visitor asks: "When are you free for a call?"
 Response (assuming Profile Memory has 'Calendar booking link: https://cal.com/sarthak'):
-{
-  "text": "I run 20-30 minute calls — async over email is fine too if you'd rather not coordinate timezones.",
-  "components": [
-    { "type": "BookCallSlot", "props": { "url": "https://cal.com/sarthak", "label": "Book a 20-min intro", "duration": "20 min" } },
-    { "type": "AskAgain", "props": { "suggestions": ["Async over email instead?", "What should I bring?"] } }
-  ]
-}
+
+I run 20-30 minute calls — async over email is fine too if you'd rather not coordinate timezones.
+<<<COMPONENTS>>>
+[
+  {"type":"BookCallSlot","props":{"url":"https://cal.com/sarthak","label":"Book a 20-min intro","duration":"20 min"}},
+  {"type":"AskAgain","props":{"suggestions":["Async over email instead?","What should I bring?"]}}
+]
 
 EXAMPLE 2 — Visitor asks: "What have you been shipping?"
-Response (assuming Profile Memory timeline has recent dated events):
-{
-  "text": "Last few months have been a sprint on the AI infra side — Karte itself plus the free-ai gateway powering it, and TinyGPT for the educational angle.",
-  "components": [
-    { "type": "TimelineSlice", "props": { "heading": "Recent ships", "events": [
-        { "when": "May 2026", "title": "Released TinyGPT" },
-        { "when": "Feb 2026", "title": "Shipped free-ai", "where": "CF Workers" },
-        { "when": "Nov 2025", "title": "Built CodeVetter" }
-      ] } },
-    { "type": "AskAgain", "props": { "suggestions": ["What's TinyGPT?", "Why CF Workers?"] } }
-  ]
-}
+Response:
+
+The last few months have been a sprint on the AI infra side — Karte itself plus the free-ai gateway powering it, and TinyGPT for the educational angle.
+<<<COMPONENTS>>>
+[
+  {"type":"TimelineSlice","props":{"heading":"Recent ships","events":[{"when":"May 2026","title":"Released TinyGPT"},{"when":"Feb 2026","title":"Shipped free-ai","where":"CF Workers"},{"when":"Nov 2025","title":"Built CodeVetter"}]}},
+  {"type":"AskAgain","props":{"suggestions":["What's TinyGPT?","Why CF Workers?"]}}
+]
 
 EXAMPLE 3 — Visitor asks: "Are you hiring?"
 Response:
-{
-  "text": "Not full-time roles for the next 6 months. Open to fractional + advising arrangements.",
-  "components": [
-    { "type": "HiringStatus", "props": { "status": "fractional-only" } },
-    { "type": "AskAgain", "props": { "suggestions": ["What does fractional look like?", "Past clients?"] } }
-  ]
-}
 
-Respond ONLY with the JSON object.`;
+Not full-time roles for the next 6 months. Open to fractional + advising arrangements.
+<<<COMPONENTS>>>
+[
+  {"type":"HiringStatus","props":{"status":"fractional-only"}},
+  {"type":"AskAgain","props":{"suggestions":["What does fractional look like?","Past clients?"]}}
+]
+
+EXAMPLE 4 — Visitor asks a simple factual question with no components needed:
+
+Yes, I lived in Bangalore until February. Currently in San Francisco.
+
+(no marker, no JSON — just the text answer)`;
 
 export const TIMELINE_IMPORT_SYSTEM_PROMPT = `You parse free-form career / timeline text into a structured list of events. The text may be pasted from LinkedIn, a resume, a personal website, or anywhere else.
 

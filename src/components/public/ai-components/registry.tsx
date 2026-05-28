@@ -8,8 +8,10 @@
 // per-component CSS.
 
 import Link from 'next/link';
-import type { ReactElement } from 'react';
+import posthog from 'posthog-js';
+import { useEffect, type ReactElement } from 'react';
 
+import { ComponentBoundary } from '@/components/public/ai-components/component-boundary';
 import { SafeImage } from '@/components/public/safe-image';
 import type {
   AskAgainProps,
@@ -74,10 +76,12 @@ function ArrowLink({
   href,
   children,
   external = true,
+  trackAs,
 }: {
   href: string;
   children: React.ReactNode;
   external?: boolean;
+  trackAs?: { component: string; value?: string };
 }) {
   const Tag = external ? 'a' : Link;
   const extProps = external
@@ -87,6 +91,15 @@ function ArrowLink({
     <Tag
       href={href}
       {...extProps}
+      onClick={() => {
+        if (trackAs) {
+          try {
+            posthog.capture('genui_component_clicked', trackAs);
+          } catch {
+            // best-effort
+          }
+        }
+      }}
       className="group/al inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.14em] transition"
       style={{
         background:
@@ -102,6 +115,14 @@ function ArrowLink({
   );
 }
 
+function trackClick(component: string, value?: string) {
+  try {
+    posthog.capture('genui_component_clicked', { component, ...(value ? { value } : {}) });
+  } catch {
+    // best-effort
+  }
+}
+
 // ── 1. AskAgain ─────────────────────────────────────────────────────
 // Suggested follow-up question chips. Clicking submits the chip text
 // as the next chat message via a CustomEvent the widget listens for.
@@ -115,6 +136,14 @@ function AskAgain({ suggestions }: AskAgainProps) {
           key={i}
           type="button"
           onClick={() => {
+            try {
+              posthog.capture('genui_component_clicked', {
+                component: 'AskAgain',
+                value: s,
+              });
+            } catch {
+              // best-effort
+            }
             window.dispatchEvent(
               new CustomEvent('karte:ask-again', { detail: { question: s } }),
             );
@@ -171,7 +200,9 @@ function BookCallSlot({ url, label, duration }: BookCallSlotProps) {
             </p>
           )}
         </div>
-        <ArrowLink href={url}>Pick a time</ArrowLink>
+        <ArrowLink href={url} trackAs={{ component: 'BookCallSlot' }}>
+          Pick a time
+        </ArrowLink>
       </ComponentCard>
     </div>
   );
@@ -189,6 +220,7 @@ function EssayLink({ title, url, excerpt, year }: EssayLinkProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="hover:underline"
+            onClick={() => trackClick('EssayLink', title)}
           >
             {title}
           </a>
@@ -321,6 +353,7 @@ function ProjectMini({ title, url, description, imageUrl }: ProjectMiniProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="block"
+            onClick={() => trackClick('ProjectMini', title)}
           >
             {inner}
           </a>
@@ -381,7 +414,9 @@ function RateCard({ tier, price, slots, cta, url }: RateCardProps) {
         )}
         {url && (
           <div className="mt-3 flex justify-end">
-            <ArrowLink href={url}>{cta || 'Book this slot'}</ArrowLink>
+            <ArrowLink href={url} trackAs={{ component: 'RateCard', value: tier }}>
+              {cta || 'Book this slot'}
+            </ArrowLink>
           </div>
         )}
       </ComponentCard>
@@ -454,36 +489,68 @@ function TimelineSlice({ events, heading }: TimelineSliceProps) {
   );
 }
 
+// ── Tracked + boundary-wrapped wrapper ──────────────────────────────
+// Every component goes through this: it fires a one-time PostHog
+// 'genui_component_rendered' event on mount AND lives inside an error
+// boundary so one bad component doesn't kill the chat bubble.
+function TrackedComponent({
+  type,
+  children,
+}: {
+  type: RenderableComponent['type'];
+  children: ReactElement;
+}) {
+  useEffect(() => {
+    try {
+      posthog.capture('genui_component_rendered', { component: type });
+    } catch {
+      // Analytics is best-effort.
+    }
+    // Fire once per mount; React compiler handles re-renders.
+  }, [type]);
+  return <ComponentBoundary componentType={type}>{children}</ComponentBoundary>;
+}
+
 // ── Registry ────────────────────────────────────────────────────────
 // Discriminated dispatch — the chat widget calls renderComponent on
 // each entry in the server's components[] array. Unknown types return
 // null so an AI-invented component name doesn't crash the bubble.
 export function renderComponent(c: RenderableComponent, key: number | string): ReactElement | null {
+  const child = pickComponent(c);
+  if (!child) return null;
+  return (
+    <TrackedComponent key={key} type={c.type}>
+      {child}
+    </TrackedComponent>
+  );
+}
+
+function pickComponent(c: RenderableComponent): ReactElement | null {
   switch (c.type) {
     case 'AskAgain':
-      return <AskAgain key={key} {...c.props} />;
+      return <AskAgain {...c.props} />;
     case 'AvailabilityChip':
-      return <AvailabilityChip key={key} {...c.props} />;
+      return <AvailabilityChip {...c.props} />;
     case 'BookCallSlot':
-      return <BookCallSlot key={key} {...c.props} />;
+      return <BookCallSlot {...c.props} />;
     case 'EssayLink':
-      return <EssayLink key={key} {...c.props} />;
+      return <EssayLink {...c.props} />;
     case 'HiringStatus':
-      return <HiringStatus key={key} {...c.props} />;
+      return <HiringStatus {...c.props} />;
     case 'LocationCard':
-      return <LocationCard key={key} {...c.props} />;
+      return <LocationCard {...c.props} />;
     case 'MetricCard':
-      return <MetricCard key={key} {...c.props} />;
+      return <MetricCard {...c.props} />;
     case 'ProjectMini':
-      return <ProjectMini key={key} {...c.props} />;
+      return <ProjectMini {...c.props} />;
     case 'QuoteBlock':
-      return <QuoteBlock key={key} {...c.props} />;
+      return <QuoteBlock {...c.props} />;
     case 'RateCard':
-      return <RateCard key={key} {...c.props} />;
+      return <RateCard {...c.props} />;
     case 'StackList':
-      return <StackList key={key} {...c.props} />;
+      return <StackList {...c.props} />;
     case 'TimelineSlice':
-      return <TimelineSlice key={key} {...c.props} />;
+      return <TimelineSlice {...c.props} />;
     default:
       return null;
   }
