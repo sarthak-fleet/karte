@@ -35,13 +35,18 @@ function logo(domain) {
 
 // Discord-style portrait avatars. `micah` is colorful and expressive
 // — looks closer to hand-illustrated than auto-generated initials.
+// Force a smiling / pleased expression so every persona reads warm
+// regardless of seed: smile mouth + raised eyebrows.
 function avatar(seed, bg) {
   return (
     "https://api.dicebear.com/9.x/micah/svg?seed=" +
     encodeURIComponent(seed) +
     "&backgroundColor=" +
     bg +
-    "&backgroundType=gradientLinear,solid"
+    "&backgroundType=gradientLinear,solid" +
+    "&mouth=smile,laughing,smirk" +
+    "&eyebrows=up,upDown" +
+    "&eyes=eyes,smiling"
   );
 }
 
