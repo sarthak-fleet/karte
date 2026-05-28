@@ -241,138 +241,110 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Surface 01 — Chat (output: a pull-quote answer) */}
-        <SurfaceBlock
-          numeral="01"
-          eyebrow="Surface 01 — Chat"
-          title="Your AI version, on-call."
-          body="Visitors ask. The page answers — in your voice, from your memory. No hallucinated facts, no awkward DM-me walls."
-          ctaLabel="Try the chat"
-          ctaHref="/sarthak"
-        >
-          <figure>
-            <blockquote
-              className={`${serif.className} max-w-2xl text-[28px] font-normal leading-[1.3] tracking-[-0.01em] text-karte-text sm:text-[36px]`}
-              style={{ fontStyle: 'italic' }}
+        <div className="mx-auto max-w-6xl px-6 pb-24 pt-2 lg:pb-32">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Chat — pull-quote answer */}
+            <SurfaceCard
+              eyebrow="Chat"
+              title="Your AI version, on-call."
+              body="Visitors ask. Your page answers — in your voice, from your memory."
+              ctaLabel="Try the chat"
+              ctaHref="/sarthak"
             >
-              &ldquo;Karte is the main bet — digital cards with chat,
-              Encyclopedia, Newspaper, and Roast modes grounded in your
-              memory.&rdquo;
-            </blockquote>
-            <figcaption className="mt-5 text-[13px] tracking-[-0.005em] text-karte-text-4">
-              — chat answer from karte.cc/sarthak, grounded in Projects + Bio
-            </figcaption>
-          </figure>
-        </SurfaceBlock>
+              <figure>
+                <blockquote
+                  className={`${serif.className} text-[17px] leading-[1.4] tracking-[-0.005em] text-karte-text sm:text-[19px]`}
+                  style={{ fontStyle: 'italic' }}
+                >
+                  &ldquo;Karte is the main bet — digital cards with chat,
+                  Encyclopedia, Newspaper, and Roast modes grounded in your
+                  memory.&rdquo;
+                </blockquote>
+                <figcaption className="mt-3 text-[11.5px] text-karte-text-4">
+                  — chat answer from karte.cc/sarthak
+                </figcaption>
+              </figure>
+            </SurfaceCard>
 
-        {/* Surface 02 — Encyclopedia (output: a styled wiki paragraph) */}
-        <SurfaceBlock
-          numeral="02"
-          flipNumeral
-          eyebrow="Surface 02 — Encyclopedia"
-          title="The official record."
-          body="A Wikipedia-style identity page generated from your sources. Citation-grade, screenshot-able, editable section by section."
-          ctaLabel="Read the wiki"
-          ctaHref="/sarthak/encyclopedia"
-        >
-          <article className="max-w-2xl border-l border-white/[0.08] pl-6 font-serif text-[17px] leading-[1.7] text-karte-text">
-            <p>
-              <strong className="text-karte-text">Sarthak Agrawal</strong> is a
-              builder and product person whose work spans AI tooling and the
-              open-web profile category. Since 2024 he has shipped{' '}
-              <a className="underline decoration-cyan-300/40 underline-offset-4">
-                Karte
-              </a>{' '}
-              — a digital card platform where visitors query a
-              memory-backed profile instead of scrolling static links.
-            </p>
-          </article>
-        </SurfaceBlock>
+            {/* Encyclopedia — wiki paragraph */}
+            <SurfaceCard
+              eyebrow="Encyclopedia"
+              title="The official record."
+              body="A Wikipedia-style identity page, generated from your sources. Editable section by section."
+              ctaLabel="Read the wiki"
+              ctaHref="/sarthak/encyclopedia"
+            >
+              <article className="border-l border-white/[0.08] pl-4 font-serif text-[14px] leading-[1.65] text-karte-text">
+                <p>
+                  <strong className="text-karte-text">Sarthak Agrawal</strong>{' '}
+                  is a builder whose work spans AI tooling and the open-web
+                  profile category. Since 2024 he has shipped{' '}
+                  <span className="underline decoration-cyan-300/40 underline-offset-4">
+                    Karte
+                  </span>
+                  &nbsp;— a digital-card platform where visitors query a
+                  memory-backed profile instead of scrolling static links.
+                </p>
+              </article>
+            </SurfaceCard>
 
-        {/* Surface 03 — Newspaper (output: a serif front-page headline) */}
-        <SurfaceBlock
-          numeral="03"
-          eyebrow="Surface 03 — Newspaper"
-          title="Above the fold."
-          body="A front-page treatment generated from the same memory. Built for screenshots and group chats."
-          ctaLabel="Read the front page"
-          ctaHref="/sarthak/newspaper"
-        >
-          <div className="max-w-3xl">
-            <div className="flex items-baseline gap-3 border-b border-karte-border pb-2 text-[11px] font-medium uppercase tracking-[0.22em] text-zinc-600">
-              <span>The Profile Times</span>
-              <span className="text-zinc-700">·</span>
-              <span>Builder Edition</span>
-              <span className="text-zinc-700">·</span>
-              <span>Vol. 1</span>
-            </div>
-            <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-              Lead story
-            </p>
-            <h4
-              className={`${serif.className} mt-2 text-[32px] font-normal leading-[1.05] tracking-[-0.01em] text-karte-text sm:text-[44px]`}
-              style={{ fontStyle: 'normal' }}
+            {/* Newspaper — masthead + headline */}
+            <SurfaceCard
+              eyebrow="Newspaper"
+              title="Above the fold."
+              body="A front-page treatment of you, generated daily. Built for screenshots and group chats."
+              ctaLabel="Read the front page"
+              ctaHref="/sarthak/newspaper"
             >
-              Karte turns your bio into a card people actually talk to.
-            </h4>
-            <p
-              className={`${serif.className} mt-4 text-[14px] uppercase tracking-[0.18em] text-karte-text-4`}
-              style={{ fontStyle: 'italic' }}
+              <div>
+                <div className="flex items-baseline gap-2 border-b border-karte-border pb-2 text-[9.5px] font-medium uppercase tracking-[0.22em] text-zinc-600">
+                  <span>The Profile Times</span>
+                  <span className="text-zinc-700">·</span>
+                  <span>Vol. 1</span>
+                </div>
+                <h4
+                  className={`${serif.className} mt-3 text-[22px] font-normal leading-[1.1] tracking-[-0.005em] text-karte-text sm:text-[26px]`}
+                >
+                  Karte turns your bio into a card people talk to.
+                </h4>
+                <p
+                  className={`${serif.className} mt-2 text-[10.5px] uppercase tracking-[0.18em] text-karte-text-4`}
+                  style={{ fontStyle: 'italic' }}
+                >
+                  By the Memory · Filed from karte.cc/sarthak
+                </p>
+              </div>
+            </SurfaceCard>
+
+            {/* Roast — pull quote + score */}
+            <SurfaceCard
+              eyebrow="Roast"
+              title="Built for screenshots."
+              body="A specific, very-online roast read of your profile. Same sources, different tone."
+              ctaLabel="Get roasted"
+              ctaHref="/sarthak/roast"
             >
-              By the Memory · Filed from karte.cc/sarthak
-            </p>
-            <div
-              className={`${serif.className} mt-6 grid gap-6 text-[15px] leading-[1.65] text-karte-text-2 sm:grid-cols-2`}
-              style={{ fontStyle: 'normal' }}
-            >
-              <p>
-                A new wave of personal profiles is replacing the static link
-                page. They answer questions in their owners&apos; voice,
-                generate encyclopedia entries, and roast themselves for sport
-                — all from a single memory pool the owner edits once.
-              </p>
-              <p>
-                The Newspaper edition extracts the headline read. Same
-                sources as the wiki and the chat, recomposed as a front page —
-                main story, columns, byline. Built for screenshots and group
-                chats, no design work required.
-              </p>
-            </div>
+              <figure>
+                <blockquote
+                  className={`${serif.className} text-[17px] leading-[1.4] tracking-[-0.005em] text-karte-text sm:text-[19px]`}
+                  style={{ fontStyle: 'italic' }}
+                >
+                  &ldquo;Built an AI link-in-bio, a personal Wikipedia, a
+                  tabloid, and a roast comic — somehow still fewer features
+                  than a Notion doc with delusions of grandeur.&rdquo;
+                </blockquote>
+                <figcaption className="mt-3 flex items-baseline gap-3 text-[11.5px] text-karte-text-4">
+                  <span className="font-medium uppercase tracking-[0.22em]">
+                    Roast score
+                  </span>
+                  <span className="text-[20px] font-semibold tabular-nums tracking-[-0.01em] text-karte-text">
+                    87
+                  </span>
+                </figcaption>
+              </figure>
+            </SurfaceCard>
           </div>
-        </SurfaceBlock>
-
-        {/* Surface 04 — Roast (output: a roast pull-quote + score) */}
-        <SurfaceBlock
-          numeral="04"
-          flipNumeral
-          eyebrow="Surface 04 — Roast"
-          title="Built for screenshots."
-          body="A specific, very-online roast read of your profile. Same sources, different tone of voice."
-          ctaLabel="Get roasted"
-          ctaHref="/sarthak/roast"
-          isLast
-        >
-          <figure>
-            <blockquote
-              className={`${serif.className} max-w-2xl text-[28px] font-normal leading-[1.3] tracking-[-0.01em] text-karte-text sm:text-[36px]`}
-              style={{ fontStyle: 'italic' }}
-            >
-              &ldquo;Built an AI link-in-bio, a personal Wikipedia, a tabloid,
-              and a roast comic — somehow still fewer features than a Notion
-              doc with delusions of grandeur.&rdquo;
-            </blockquote>
-            <figcaption className="mt-5 flex items-baseline gap-4 text-[13px] tracking-[-0.005em] text-karte-text-4">
-              <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-                Roast score
-              </span>
-              <span
-                className="text-2xl font-semibold tabular-nums tracking-[-0.01em] text-karte-text"
-              >
-                87
-              </span>
-            </figcaption>
-          </figure>
-        </SurfaceBlock>
+        </div>
       </section>
 
       {/* ─── 6. FINAL CTA ────────────────────────────────────── */}
@@ -451,66 +423,46 @@ function Stat({
   );
 }
 
-/* ─── SurfaceBlock — type-led, no UI mocks ────────────────── */
+/* ─── SurfaceCard — one cell in the 2×2 surfaces grid ─────── */
 
-function SurfaceBlock({
-  numeral,
-  flipNumeral = false,
+function SurfaceCard({
   eyebrow,
   title,
   body,
   ctaLabel,
   ctaHref,
-  isLast = false,
   children,
 }: {
-  numeral: string;
-  flipNumeral?: boolean;
   eyebrow: string;
   title: string;
   body: string;
   ctaLabel: string;
   ctaHref: string;
-  isLast?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={`relative overflow-hidden border-t border-karte-border ${isLast ? 'border-b-0' : ''}`}
+    <Link
+      href={ctaHref}
+      className="group flex flex-col rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-xl transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-karte-accent/25 hover:bg-white/[0.04] sm:p-7"
     >
-      <div className="relative mx-auto max-w-6xl px-6 py-16 lg:py-20">
-        {/* Big serif numeral — anchored to content area, not full block */}
-        <div
-          aria-hidden="true"
-          className={`${serif.className} pointer-events-none absolute top-0 select-none text-[140px] leading-[0.85] tracking-[-0.04em] text-karte-text/[0.025] sm:text-[200px] lg:text-[280px] ${
-            flipNumeral
-              ? '-left-4 sm:-left-8 lg:-left-12'
-              : '-right-4 sm:-right-8 lg:-right-12'
-          }`}
-          style={{ fontStyle: 'italic' }}
-        >
-          {numeral}
-        </div>
-        <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-          <span className="text-karte-accent/80">·</span> {eyebrow}
-        </p>
-        <h3 className="mt-6 max-w-3xl text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-karte-text sm:text-4xl">
-          {title}
-        </h3>
-        <p className="mt-5 max-w-2xl text-[15px] leading-[1.65] tracking-[-0.005em] text-karte-text-3">
-          {body}
-        </p>
+      <p className="text-[10.5px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+        <span className="text-karte-accent">·</span> {eyebrow}
+      </p>
+      <h3 className="mt-3 text-[20px] font-semibold leading-[1.2] tracking-[-0.01em] text-karte-text sm:text-[22px]">
+        {title}
+      </h3>
+      <p className="mt-2 text-[13.5px] leading-[1.55] text-karte-text-3">{body}</p>
 
-        <div className="mt-12">{children}</div>
-
-        <Link
-          href={ctaHref}
-          className="group mt-12 inline-flex items-center gap-2 text-[14px] font-medium text-karte-text transition-colors duration-200 ease-[var(--karte-ease)] hover:text-karte-text"
-        >
-          {ctaLabel}
-          <span className="transition-transform duration-200 ease-[var(--karte-ease)] group-hover:translate-x-0.5">→</span>
-        </Link>
+      <div className="mt-5 rounded-2xl border border-white/[0.06] bg-black/20 p-4 sm:p-5">
+        {children}
       </div>
-    </div>
+
+      <span className="mt-5 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-karte-accent-soft transition-colors duration-200 group-hover:text-karte-accent">
+        {ctaLabel}
+        <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+          →
+        </span>
+      </span>
+    </Link>
   );
 }
