@@ -323,6 +323,49 @@ export const messages = sqliteTable('messages', {
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
+// ── Timeline Events ──────────────────────────────────────────────
+// Per docs/plans/timeline-block.md. Dated events feed every AI
+// surface and render on the public profile as a vertical timeline.
+export type TimelineEventType =
+  | 'joined-company'
+  | 'shipped-project'
+  | 'launched-product'
+  | 'wrote-essay'
+  | 'spoke-at'
+  | 'shipped-release'
+  | 'moved-to'
+  | 'life-event'
+  | 'agent-deployed'
+  | 'agent-capability-added'
+  | 'agent-ownership-changed'
+  | 'custom';
+
+export type TimelineEventSource = 'manual' | 'github' | 'rss' | 'x' | 'substack';
+export type TimelineEventStatus = 'published' | 'pending-review' | 'hidden';
+
+export const timelineEvents = sqliteTable('timelineEvents', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
+  type: text('type').$type<TimelineEventType>().notNull(),
+  title: text('title').notNull(),
+  body: text('body'),
+  whereLabel: text('whereLabel'),
+  link: text('link'),
+  imageUrl: text('imageUrl'),
+  whenLabel: text('whenLabel').notNull(),
+  sortDate: integer('sortDate', { mode: 'timestamp' }).notNull(),
+  source: text('source').$type<TimelineEventSource>().notNull().default('manual'),
+  status: text('status').$type<TimelineEventStatus>().notNull().default('published'),
+  externalId: text('externalId'),
+  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
+});
+
 // ── Agent Waitlist ────────────────────────────────────────────────
 // Captured from card IV of the landing page until the agent subtype
 // ships (see docs/plans/agent-subtype-spec.md). One email per signup;

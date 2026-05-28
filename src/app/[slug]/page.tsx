@@ -9,6 +9,7 @@ import { LayoutRenderer } from '@/components/public/layout-renderer';
 import { PageSectionRenderer } from '@/components/public/page-section-renderer';
 import { ProfileHero } from '@/components/public/profile-hero';
 import { RoamingCharacter } from '@/components/public/roaming-character';
+import { TimelineSection } from '@/components/public/timeline-section';
 import { TrackableSection } from '@/components/public/trackable-section';
 import { TypedText } from '@/components/public/typed-text';
 import { VideoEmbed } from '@/components/public/video-embed';
@@ -96,6 +97,7 @@ export default async function ProfilePage({ params }: Props) {
     links: pageLinks,
     projects: pageProjects,
     sections: publicSections,
+    timeline: publicTimeline,
     readyPages,
     modePreviews,
     modeContent,
@@ -285,6 +287,23 @@ export default async function ProfilePage({ params }: Props) {
                   slug={slug}
                 />
               </section>
+            )}
+
+            {publicTimeline.length > 0 && (
+              <AnimatedReveal as="section">
+                <TimelineSection
+                  events={publicTimeline.map((t) => ({
+                    id: t.id,
+                    type: t.type,
+                    title: t.title,
+                    body: t.body,
+                    whereLabel: t.whereLabel,
+                    link: t.link,
+                    whenLabel: t.whenLabel,
+                  }))}
+                  accentColor={theme.accentColor}
+                />
+              </AnimatedReveal>
             )}
 
             {enabledModeCards.length > 0 && (

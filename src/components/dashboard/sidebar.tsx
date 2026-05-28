@@ -23,6 +23,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: 'Links', href: '/dashboard/links' },
       { label: 'Projects', href: '/dashboard/projects' },
+      { label: 'Timeline', href: '/dashboard/timeline' },
       { label: 'Sections', href: '/dashboard/sections' },
       { label: 'Memory', href: '/dashboard/memory' },
     ],

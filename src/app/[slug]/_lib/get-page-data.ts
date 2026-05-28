@@ -1,8 +1,8 @@
-import { and, asc,eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import { cache } from 'react';
 
 import { db, ensureProjectsTable } from '@/db';
-import { generatedPages,infoBlocks, links, pages, pageSections, projects, users } from '@/db/schema';
+import { generatedPages,infoBlocks, links, pages, pageSections, projects, timelineEvents, users } from '@/db/schema';
 
 /**
  * Single query to load everything needed for a public profile page.
@@ -27,8 +27,8 @@ export const getFullPageData = cache(async (slug: string) => {
   const page = row.pages;
   const user = row.user;
 
-  // 2. Fetch remaining data in parallel (3 queries instead of 5)
-  const [pageLinks, pageProjects, publicSections, readyGeneratedPages] = await Promise.all([
+  // 2. Fetch remaining data in parallel
+  const [pageLinks, pageProjects, publicSections, readyGeneratedPages, publicTimeline] = await Promise.all([
     db.select().from(links)
       .where(and(eq(links.pageId, page.id), eq(links.enabled, true)))
       .orderBy(asc(links.sortOrder)),
@@ -41,6 +41,11 @@ export const getFullPageData = cache(async (slug: string) => {
     db.select({ type: generatedPages.type, content: generatedPages.content })
       .from(generatedPages)
       .where(and(eq(generatedPages.pageId, page.id), eq(generatedPages.status, 'ready'))),
+    // Only 'published' timeline events render publicly. 'hidden' still
+    // feeds AI memory (separate query in buildProfileMemory).
+    db.select().from(timelineEvents)
+      .where(and(eq(timelineEvents.pageId, page.id), eq(timelineEvents.status, 'published')))
+      .orderBy(desc(timelineEvents.sortDate)),
   ]);
 
   // Pre-extract typed previews for each ready mode. The profile page
@@ -62,6 +67,7 @@ export const getFullPageData = cache(async (slug: string) => {
     links: pageLinks,
     projects: pageProjects,
     sections: publicSections,
+    timeline: publicTimeline,
     readyPages: new Set(readyGeneratedPages.map((r) => r.type)),
     modePreviews,
     modeContent,

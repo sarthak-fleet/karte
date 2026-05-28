@@ -1,8 +1,9 @@
-import { asc, eq } from 'drizzle-orm';
+import { asc, desc, eq } from 'drizzle-orm';
 
 import { db } from '@/db';
 import type { pages} from '@/db/schema';
-import { infoBlocks, links, type PageSettings,projects } from '@/db/schema';
+import { infoBlocks, links, type PageSettings, projects, timelineEvents } from '@/db/schema';
+import { TIMELINE_TYPE_LABELS } from '@/lib/timeline';
 import { getScrapedContext } from '@/lib/scrape-page-content';
 
 type PageRecord = typeof pages.$inferSelect;
@@ -11,7 +12,15 @@ export type ProfileMemoryMode = 'chat' | 'encyclopedia' | 'newspaper' | 'roast';
 
 export type ProfileMemorySource = {
   id: string;
-  type: 'identity' | 'intent' | 'memory' | 'link' | 'project' | 'scraped' | 'instruction';
+  type:
+    | 'identity'
+    | 'intent'
+    | 'memory'
+    | 'link'
+    | 'project'
+    | 'scraped'
+    | 'instruction'
+    | 'timeline';
   label: string;
   title: string;
   content: string;
@@ -165,10 +174,19 @@ export async function buildProfileMemory({
   query?: string;
 }): Promise<ProfileMemory> {
   const settings = page.pageSettings as PageSettings | null | undefined;
-  const [pageLinks, pageProjects, blocks, scrapedContext] = await Promise.all([
+  const [pageLinks, pageProjects, blocks, timeline, scrapedContext] = await Promise.all([
     db.select().from(links).where(eq(links.pageId, page.id)).orderBy(asc(links.sortOrder)),
     db.select().from(projects).where(eq(projects.pageId, page.id)).orderBy(asc(projects.sortOrder)),
     db.select().from(infoBlocks).where(eq(infoBlocks.pageId, page.id)).orderBy(asc(infoBlocks.sortOrder)),
+    // Timeline events feed every AI surface with dated context.
+    // Includes 'hidden' (in-memory but not on the public timeline)
+    // so the chat can still answer "when did you join X?" even when
+    // the user doesn't want a public pin. Excludes pending-review.
+    db
+      .select()
+      .from(timelineEvents)
+      .where(eq(timelineEvents.pageId, page.id))
+      .orderBy(desc(timelineEvents.sortDate)),
     getScrapedContext(page.id, page),
   ]);
 
@@ -202,6 +220,27 @@ export async function buildProfileMemory({
       title: block.title || labelForType(block.type),
       content: cleanText(block.content),
       priority: block.type === 'faq' ? 92 : block.type === 'resume' ? 90 : 88,
+    });
+  }
+
+  // Timeline events — feed each as its own source so the AI can cite
+  // specifics. Skip pending-review; include hidden so chat can still
+  // answer "when did you..." even when the user opted them off the
+  // public timeline render.
+  for (const event of timeline.filter((t) => t.status !== 'pending-review')) {
+    const verb = TIMELINE_TYPE_LABELS[event.type] || 'Note';
+    const where = event.whereLabel ? ` — ${event.whereLabel}` : '';
+    const body = event.body ? `\n${event.body}` : '';
+    sources.push({
+      id: `timeline:${event.id}`,
+      type: 'timeline',
+      label: 'Timeline',
+      title: `${event.whenLabel}: ${verb} ${event.title}`,
+      content: `${event.whenLabel} · ${verb}: ${event.title}${where}${body}`,
+      url: event.link ?? undefined,
+      // Just below memory/faq so dated context surfaces alongside
+      // explicit FAQs but doesn't drown them out.
+      priority: 86,
     });
   }
 
