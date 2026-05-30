@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import {
   Geist,
   Geist_Mono,
-  Inter,
   Instrument_Serif,
+  Inter,
   JetBrains_Mono,
   Playfair_Display,
 } from "next/font/google";

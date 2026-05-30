@@ -10,7 +10,7 @@
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import posthog from 'posthog-js';
-import { useEffect, type ReactElement } from 'react';
+import { type ReactElement,useEffect } from 'react';
 
 import { ComponentBoundary } from '@/components/public/ai-components/component-boundary';
 import { SafeImage } from '@/components/public/safe-image';
