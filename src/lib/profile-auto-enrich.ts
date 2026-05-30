@@ -356,84 +356,88 @@ export async function applyProfileEnrichmentPlan(
     memoryBlocksUpserted: 0,
   };
 
-  await db.transaction(async (tx) => {
-    if (options.updateBio && plan.bio) {
-      await tx.update(pages).set({ bio: plan.bio, updatedAt: new Date() }).where(eq(pages.id, pageId));
-      applied.bioUpdated = true;
-    }
+  // D1 rejects drizzle's BEGIN/COMMIT transactions. This is a
+  // background enrichment with branching + counter updates that
+  // doesn't map cleanly to db.batch(), so we run the ops sequentially
+  // without atomicity. A mid-run failure leaves partial state — that's
+  // acceptable here because the function re-runs on the next enrich
+  // cycle and individual operations are idempotent (onConflictDoUpdate).
+  if (options.updateBio && plan.bio) {
+    await db.update(pages).set({ bio: plan.bio, updatedAt: new Date() }).where(eq(pages.id, pageId));
+    applied.bioUpdated = true;
+  }
 
-    for (const project of plan.projects) {
-      const existing = existingByUrl.get(normalizeUrl(project.url));
-      if (existing) {
-        if (options.replaceExisting) {
-          await tx
-            .update(projects)
-            .set({
-              title: project.title,
-              description: project.description,
-              enabled: true,
-            })
-            .where(and(eq(projects.id, existing.id), eq(projects.pageId, pageId)));
-          applied.projectsUpdated += 1;
-        }
-        continue;
+  for (const project of plan.projects) {
+    const existing = existingByUrl.get(normalizeUrl(project.url));
+    if (existing) {
+      if (options.replaceExisting) {
+        await db
+          .update(projects)
+          .set({
+            title: project.title,
+            description: project.description,
+            enabled: true,
+          })
+          .where(and(eq(projects.id, existing.id), eq(projects.pageId, pageId)));
+        applied.projectsUpdated += 1;
       }
-
-      await tx.insert(projects).values({
-        id: `auto-project-${stableIdForUrl(`${pageId}:${project.url}`)}`,
-        pageId,
-        title: project.title,
-        url: project.url,
-        description: project.description,
-        sortOrder: nextProjectOrder,
-        enabled: true,
-      }).onConflictDoUpdate({
-        target: projects.id,
-        set: {
-          title: project.title,
-          description: project.description,
-          enabled: true,
-        },
-      });
-      nextProjectOrder += 1;
-      applied.projectsInserted += 1;
+      continue;
     }
 
-    for (const block of plan.memoryBlocks) {
-      const idBase = block.id.startsWith(AUTO_INFO_PREFIX)
-        ? block.id
-        : `${AUTO_INFO_PREFIX}-${stableIdForUrl(block.title)}`;
-      const id = `${idBase}-${stableIdForUrl(pageId)}`;
-      await tx.insert(infoBlocks).values({
-        id,
-        pageId,
+    await db.insert(projects).values({
+      id: `auto-project-${stableIdForUrl(`${pageId}:${project.url}`)}`,
+      pageId,
+      title: project.title,
+      url: project.url,
+      description: project.description,
+      sortOrder: nextProjectOrder,
+      enabled: true,
+    }).onConflictDoUpdate({
+      target: projects.id,
+      set: {
+        title: project.title,
+        description: project.description,
+        enabled: true,
+      },
+    });
+    nextProjectOrder += 1;
+    applied.projectsInserted += 1;
+  }
+
+  for (const block of plan.memoryBlocks) {
+    const idBase = block.id.startsWith(AUTO_INFO_PREFIX)
+      ? block.id
+      : `${AUTO_INFO_PREFIX}-${stableIdForUrl(block.title)}`;
+    const id = `${idBase}-${stableIdForUrl(pageId)}`;
+    await db.insert(infoBlocks).values({
+      id,
+      pageId,
+      type: block.type,
+      title: block.title,
+      content: block.content,
+      sortOrder: nextBlockOrder,
+    }).onConflictDoUpdate({
+      target: infoBlocks.id,
+      set: {
         type: block.type,
         title: block.title,
         content: block.content,
-        sortOrder: nextBlockOrder,
-      }).onConflictDoUpdate({
-        target: infoBlocks.id,
-        set: {
-          type: block.type,
-          title: block.title,
-          content: block.content,
-        },
-      });
-      nextBlockOrder += 1;
-      applied.memoryBlocksUpserted += 1;
-    }
+      },
+    });
+    nextBlockOrder += 1;
+    applied.memoryBlocksUpserted += 1;
+  }
 
-    await tx
-      .update(pages)
-      .set({
-        scrapedContent: {
-          data: [],
-          scrapedAt: Date.now(),
-        },
-        updatedAt: new Date(),
-      })
-      .where(eq(pages.id, pageId));
-  });
+  await db
+    .update(pages)
+    .set({
+      scrapedContent: {
+        data: [],
+        scrapedAt: Date.now(),
+      },
+      updatedAt: new Date(),
+    })
+    .where(eq(pages.id, pageId));
 
   return applied;
 }

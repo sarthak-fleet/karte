@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, like } from 'drizzle-orm';
+import { and, asc, desc, eq, like, notLike } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
@@ -260,8 +260,29 @@ Do not suggest deleting user content. Prefer adding clarifying blocks and changi
 // quality dominates UX. Added directly to the generate() call.
 
 async function applyPlan(pageId: string, plan: RevampPlan) {
-  await db.transaction(async (tx) => {
-    await tx
+  // D1 rejects drizzle's BEGIN/COMMIT transactions. We instead:
+  //   1. Read the max sortOrder of NON-revamp sections up front
+  //      (the old revamp rows are about to be deleted anyway).
+  //   2. Run the UPDATE + DELETE + INSERTs as a single atomic batch.
+  // The pre-batch read is the trade-off — a concurrent insert between
+  // the read and the batch could collide on sortOrder, but revamp is
+  // a per-page, per-user action so contention is effectively zero.
+  const [maxSection] = await db
+    .select({ sortOrder: pageSections.sortOrder })
+    .from(pageSections)
+    .where(
+      and(
+        eq(pageSections.pageId, pageId),
+        notLike(pageSections.title, `${REVAMP_TITLE_PREFIX}%`),
+      ),
+    )
+    .orderBy(desc(pageSections.sortOrder))
+    .limit(1);
+
+  const startOrder = (maxSection?.sortOrder ?? -1) + 1;
+
+  const writes = [
+    db
       .update(pages)
       .set({
         themeConfig: resolveThemeConfig({
@@ -270,24 +291,17 @@ async function applyPlan(pageId: string, plan: RevampPlan) {
         }),
         updatedAt: new Date(),
       })
-      .where(eq(pages.id, pageId));
-
-    await tx
+      .where(eq(pages.id, pageId)),
+    db
       .delete(pageSections)
-      .where(and(eq(pageSections.pageId, pageId), like(pageSections.title, `${REVAMP_TITLE_PREFIX}%`)));
-
-    const [maxSection] = await tx
-      .select({ sortOrder: pageSections.sortOrder })
-      .from(pageSections)
-      .where(eq(pageSections.pageId, pageId))
-      .orderBy(desc(pageSections.sortOrder))
-      .limit(1);
-
-    const startOrder = (maxSection?.sortOrder ?? -1) + 1;
-
-    for (let index = 0; index < plan.blocks.length; index += 1) {
-      const block = plan.blocks[index];
-      await tx.insert(pageSections).values({
+      .where(
+        and(
+          eq(pageSections.pageId, pageId),
+          like(pageSections.title, `${REVAMP_TITLE_PREFIX}%`),
+        ),
+      ),
+    ...plan.blocks.map((block, index) =>
+      db.insert(pageSections).values({
         pageId,
         type: block.type,
         title: block.title,
@@ -296,9 +310,11 @@ async function applyPlan(pageId: string, plan: RevampPlan) {
         buttonUrl: block.type === 'cta' ? block.buttonUrl ?? null : null,
         sortOrder: startOrder + index,
         enabled: true,
-      });
-    }
-  });
+      }),
+    ),
+  ];
+
+  await db.batch(writes as [(typeof writes)[number], ...typeof writes]);
 }
 
 export async function POST(

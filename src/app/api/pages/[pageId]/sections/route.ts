@@ -195,19 +195,17 @@ export async function PATCH(
     );
   }
 
-  await db.transaction(async (tx) => {
-    for (let index = 0; index < orderedSectionIds.length; index += 1) {
-      await tx
-        .update(pageSections)
-        .set({ sortOrder: index })
-        .where(
-          and(
-            eq(pageSections.pageId, pageId),
-            eq(pageSections.id, orderedSectionIds[index]),
-          ),
-        );
-    }
-  });
+  // D1 doesn't support drizzle's BEGIN/COMMIT-style transactions, so
+  // run the per-row UPDATEs as a single atomic batch instead.
+  const updates = orderedSectionIds.map((id: string, index: number) =>
+    db
+      .update(pageSections)
+      .set({ sortOrder: index })
+      .where(and(eq(pageSections.pageId, pageId), eq(pageSections.id, id))),
+  );
+  if (updates.length > 0) {
+    await db.batch(updates as [(typeof updates)[number], ...typeof updates]);
+  }
 
   const sections = await db
     .select()
