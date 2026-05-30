@@ -141,7 +141,10 @@ export function PageSettings({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: aiPrompt, apply: true }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        plan?: { themePresetId?: string };
+      };
       if (!res.ok) throw new Error(data.error || 'Failed to generate theme');
       const nextPresetId = data?.plan?.themePresetId;
       if (typeof nextPresetId === 'string') {

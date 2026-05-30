@@ -35,6 +35,15 @@ import type {
 // stay consistent across the catalog. accentColor falls back to the
 // CSS var so a profile's theme overrides cleanly.
 
+// Visitor-driven sizing knob shared by Project/Essay/Timeline/Metric.
+// Translates 'sm'|'md'|'lg' to padding, gap, and typography tokens.
+type Size = 'sm' | 'md' | 'lg';
+const SIZE_PADDING: Record<Size, string> = {
+  sm: 'p-2.5',
+  md: 'p-4',
+  lg: 'p-5',
+};
+
 function ComponentCard({
   children,
   className = '',
@@ -42,9 +51,12 @@ function ComponentCard({
   children: React.ReactNode;
   className?: string;
 }) {
+  // Padding is controlled by callers via className when a size is set.
+  // The default `p-4` only applies when no padding utility is present.
+  const hasPadding = /(^|\s)p-/.test(className);
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-[color:var(--karte-accent,#c4a46b)]/25 bg-black/30 p-4 backdrop-blur-sm ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-[color:var(--karte-accent,#c4a46b)]/25 bg-black/30 ${hasPadding ? '' : 'p-4'} backdrop-blur-sm ${className}`}
       style={{
         // Subtle inner glow + bottom-edge gold rule via background
         backgroundImage: `radial-gradient(140% 100% at 50% 0%, color-mix(in srgb, var(--karte-accent, #c4a46b) 6%, transparent) 0%, transparent 55%)`,
@@ -210,12 +222,17 @@ function BookCallSlot({ url, label, duration }: BookCallSlotProps) {
 }
 
 // ── 4. EssayLink ────────────────────────────────────────────────────
-function EssayLink({ title, url, excerpt, year }: EssayLinkProps) {
+function EssayLink({ title, url, excerpt, year, size = 'md' }: EssayLinkProps) {
+  // Smaller essays are list-row-feeling; larger essays get more breathing
+  // room and a richer excerpt presentation.
+  const titleSize = size === 'sm' ? 'text-[13.5px]' : size === 'lg' ? 'text-[17.5px]' : 'text-[15px]';
+  const excerptSize = size === 'sm' ? 'text-[12px]' : size === 'lg' ? 'text-[14px]' : 'text-[13px]';
+  const showExcerpt = size !== 'sm' && excerpt;
   return (
     <div className="my-3">
-      <ComponentCard>
+      <ComponentCard className={SIZE_PADDING[size]}>
         <Eyebrow>Essay {year ? `· ${year}` : ''}</Eyebrow>
-        <p className="mt-2 text-[15px] font-semibold leading-tight text-white">
+        <p className={`mt-2 ${titleSize} font-semibold leading-tight text-white`}>
           <a
             href={url}
             target="_blank"
@@ -226,8 +243,8 @@ function EssayLink({ title, url, excerpt, year }: EssayLinkProps) {
             {title}
           </a>
         </p>
-        {excerpt && (
-          <p className="mt-1.5 text-[13px] leading-[1.5] text-white/65 italic">
+        {showExcerpt && (
+          <p className={`mt-1.5 ${excerptSize} leading-[1.5] text-white/65 italic`}>
             {excerpt}
           </p>
         )}
@@ -281,13 +298,14 @@ function LocationCard({ city, timezone, travelStatus }: LocationCardProps) {
 }
 
 // ── 7. MetricCard ───────────────────────────────────────────────────
-function MetricCard({ value, label, context }: MetricCardProps) {
+function MetricCard({ value, label, context, size = 'md' }: MetricCardProps) {
+  const valueSize = size === 'sm' ? 'text-[24px]' : size === 'lg' ? 'text-[56px]' : 'text-[40px]';
   return (
     <div className="my-3">
-      <ComponentCard>
+      <ComponentCard className={SIZE_PADDING[size]}>
         <Eyebrow>{label}</Eyebrow>
         <p
-          className="mt-2 text-[40px] font-semibold leading-none tracking-[-0.02em]"
+          className={`mt-2 ${valueSize} font-semibold leading-none tracking-[-0.02em]`}
           style={{
             background:
               'linear-gradient(180deg, color-mix(in srgb, var(--karte-accent, #c4a46b) 30%, white 70%) 0%, var(--karte-accent, #c4a46b) 100%)',
@@ -298,7 +316,7 @@ function MetricCard({ value, label, context }: MetricCardProps) {
         >
           {value}
         </p>
-        {context && (
+        {context && size !== 'sm' && (
           <p className="mt-1 text-[12px] italic text-white/55">{context}</p>
         )}
       </ComponentCard>
@@ -307,17 +325,26 @@ function MetricCard({ value, label, context }: MetricCardProps) {
 }
 
 // ── 8. ProjectMini ──────────────────────────────────────────────────
-function ProjectMini({ title, url, description, imageUrl }: ProjectMiniProps) {
+function ProjectMini({ title, url, description, imageUrl, size = 'md' }: ProjectMiniProps) {
+  // sm — list row · md — default card · lg — hero card with bigger
+  // thumbnail and roomier typography.
+  const thumb = size === 'sm' ? 'h-7 w-7' : size === 'lg' ? 'h-14 w-14' : 'h-10 w-10';
+  const thumbText = size === 'sm' ? 'text-[14px]' : size === 'lg' ? 'text-[24px]' : 'text-[18px]';
+  const titleSize = size === 'sm' ? 'text-[13px]' : size === 'lg' ? 'text-[17px]' : 'text-[14.5px]';
+  const descSize = size === 'sm' ? 'text-[11.5px]' : size === 'lg' ? 'text-[14px]' : 'text-[12.5px]';
+  const descLines = size === 'sm' ? 'line-clamp-1' : size === 'lg' ? 'line-clamp-3' : 'line-clamp-2';
+  const gap = size === 'sm' ? 'gap-2' : size === 'lg' ? 'gap-4' : 'gap-3';
+
   const inner = (
-    <div className="flex items-start gap-3">
+    <div className={`flex items-start ${gap}`}>
       <SafeImage
         src={imageUrl ?? null}
         alt=""
-        className="h-10 w-10 shrink-0 rounded-lg object-contain"
+        className={`${thumb} shrink-0 rounded-lg object-contain`}
         fallback={
           <span
             aria-hidden="true"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[18px]"
+            className={`flex ${thumb} shrink-0 items-center justify-center rounded-lg ${thumbText}`}
             style={{
               backgroundColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 12%, transparent)',
               color: 'var(--karte-accent, #c4a46b)',
@@ -328,11 +355,11 @@ function ProjectMini({ title, url, description, imageUrl }: ProjectMiniProps) {
         }
       />
       <div className="min-w-0 flex-1">
-        <p className="text-[14.5px] font-semibold leading-tight text-white">
+        <p className={`${titleSize} font-semibold leading-tight text-white`}>
           {title}
         </p>
         {description && (
-          <p className="mt-1 line-clamp-2 text-[12.5px] leading-[1.5] text-white/65">
+          <p className={`mt-1 ${descLines} ${descSize} leading-[1.5] text-white/65`}>
             {description}
           </p>
         )}
@@ -347,7 +374,7 @@ function ProjectMini({ title, url, description, imageUrl }: ProjectMiniProps) {
 
   return (
     <div className="my-3">
-      <ComponentCard className="group">
+      <ComponentCard className={`group ${SIZE_PADDING[size]}`}>
         {url ? (
           <a
             href={url}
@@ -453,15 +480,19 @@ function StackList({ items, label }: StackListProps) {
 }
 
 // ── 12. TimelineSlice ───────────────────────────────────────────────
-function TimelineSlice({ events, heading }: TimelineSliceProps) {
-  const items = (events ?? []).slice(0, 5);
+function TimelineSlice({ events, heading, size = 'md' }: TimelineSliceProps) {
+  const maxEvents = size === 'sm' ? 3 : size === 'lg' ? 6 : 5;
+  const items = (events ?? []).slice(0, maxEvents);
   if (items.length === 0) return null;
+  const rowSpacing = size === 'sm' ? 'space-y-1.5' : size === 'lg' ? 'space-y-4' : 'space-y-2.5';
+  const titleSize = size === 'sm' ? 'text-[12.5px]' : size === 'lg' ? 'text-[15.5px]' : 'text-[13.5px]';
+  const whereSize = size === 'sm' ? 'text-[11px]' : 'text-[12px]';
   return (
     <div className="my-3">
-      <ComponentCard>
+      <ComponentCard className={SIZE_PADDING[size]}>
         <Eyebrow>{heading || 'Recent'}</Eyebrow>
         <ol
-          className="mt-3 space-y-2.5 border-l pl-4"
+          className={`mt-3 ${rowSpacing} border-l pl-4`}
           style={{ borderColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 25%, transparent)' }}
         >
           {items.map((e, i) => (
@@ -474,10 +505,10 @@ function TimelineSlice({ events, heading }: TimelineSliceProps) {
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
                 {e.when}
               </p>
-              <p className="mt-0.5 text-[13.5px] font-medium leading-tight text-white">
+              <p className={`mt-0.5 ${titleSize} font-medium leading-tight text-white`}>
                 {e.title}
                 {e.where && (
-                  <span className="ml-1.5 text-[12px] font-normal text-white/55">
+                  <span className={`ml-1.5 ${whereSize} font-normal text-white/55`}>
                     @ {e.where}
                   </span>
                 )}

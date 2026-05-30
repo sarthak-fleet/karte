@@ -12,6 +12,11 @@ const httpUrl = z.string().url().refine((u) => /^https?:\/\//i.test(u), {
   message: 'Must be http(s) URL',
 });
 
+// Visitor / AI layout intent. Cards that visitors most naturally ask
+// to resize (projects, essays, timelines, metrics) accept this prop.
+// 'md' is the default rendered size when absent.
+const sizeProp = z.enum(['sm', 'md', 'lg']).optional();
+
 export const askAgainSchema = z.object({
   suggestions: z.array(z.string().min(1).max(120)).min(1).max(4),
 });
@@ -32,6 +37,7 @@ export const essayLinkSchema = z.object({
   url: httpUrl,
   excerpt: z.string().max(400).optional(),
   year: z.string().max(16).optional(),
+  size: sizeProp,
 });
 
 export const hiringStatusSchema = z.object({
@@ -49,6 +55,7 @@ export const metricCardSchema = z.object({
   value: z.string().min(1).max(40),
   label: z.string().min(1).max(120),
   context: z.string().max(140).optional(),
+  size: sizeProp,
 });
 
 export const projectMiniSchema = z.object({
@@ -56,6 +63,7 @@ export const projectMiniSchema = z.object({
   url: httpUrl.optional(),
   description: z.string().max(280).optional(),
   imageUrl: z.string().url().nullable().optional(),
+  size: sizeProp,
 });
 
 export const quoteBlockSchema = z.object({
@@ -88,6 +96,28 @@ export const timelineSliceSchema = z.object({
     .min(1)
     .max(8),
   heading: z.string().max(80).optional(),
+  size: sizeProp,
+});
+
+// Top-level layout directives the AI may emit after the components
+// array. Applied to the AI's reply as a whole (this message only —
+// the page itself is not mutated). Every field is optional; an empty
+// or missing block means "use defaults."
+export const layoutDirectivesSchema = z.object({
+  // Visual density of the rendered components.
+  density: z.enum(['compact', 'comfortable', 'magazine']).optional(),
+  // Reorder the emitted components by an intent. 'recency' / 'impact'
+  // are interpreted by the client based on prop content (year, value);
+  // 'alphabetical' sorts by title-ish text.
+  order: z.enum(['recency', 'impact', 'alphabetical']).optional(),
+  // Soft text filter — components whose textual props don't match
+  // (substring, case-insensitive) are dropped.
+  filter: z.string().max(120).optional(),
+  // Component types to drop from this reply (e.g. ['TimelineSlice']).
+  hide: z.array(z.string().min(1).max(40)).max(12).optional(),
+  // Visual mood — affects the wrapper's CSS variables only. Scoped to
+  // the message; never mutates the page.
+  mood: z.enum(['serious', 'playful', 'minimal', 'dark']).optional(),
 });
 
 // Discriminated union — pass any { type, props } and Zod validates

@@ -7,12 +7,13 @@ import { renderComponent } from '@/components/public/ai-components/registry';
 import { ChatEmailGate } from '@/components/public/chat-email-gate';
 import { ChatMessageBody } from '@/components/public/chat-message-body';
 import { ContactFormSection } from '@/components/public/contact-form-section';
+import { applyLayoutDirectives } from '@/lib/ai-components/layout';
 import {
   createStreamParserState,
   feedChunk,
   finishStream,
 } from '@/lib/ai-components/stream-parser';
-import type { RenderableComponent } from '@/lib/ai-components/types';
+import type { LayoutDirectives, RenderableComponent } from '@/lib/ai-components/types';
 import type { DmMode } from '@/db/schema';
 import { trackEvent } from '@/lib/analytics';
 import {
@@ -30,6 +31,10 @@ interface Message {
   // Optional generative-UI components emitted by the assistant
   // alongside the text response. Rendered inline beneath content.
   components?: RenderableComponent[];
+  // Optional layout directives that apply to this reply's components
+  // (density/order/filter/hide/mood). Scoped to the message — the
+  // page itself is never mutated by a layout directive.
+  layout?: LayoutDirectives;
 }
 
 type ChatPosition = 'bottom-right' | 'bottom-left';
@@ -397,7 +402,7 @@ export function ChatWidget({
         }
       }
 
-      const { flushedText, components } = finishStream(parser);
+      const { flushedText, components, layout } = finishStream(parser);
       setMessages((prev) => {
         const updated = [...prev];
         const last = updated[updated.length - 1];
@@ -406,6 +411,7 @@ export function ChatWidget({
             ...last,
             content: last.content + flushedText,
             components: components.length ? components : undefined,
+            layout: layout ?? undefined,
           };
         }
         return updated;
@@ -694,11 +700,22 @@ export function ChatWidget({
                       ) : msg.role === 'assistant' ? (
                         <>
                           <ChatMessageBody content={msg.content} />
-                          {msg.components && msg.components.length > 0 && (
-                            <div className="mt-2">
-                              {msg.components.map((c, i) => renderComponent(c, i, i))}
-                            </div>
-                          )}
+                          {msg.components && msg.components.length > 0 && (() => {
+                            const { components: ordered, density, moodStyle } =
+                              applyLayoutDirectives(msg.components, msg.layout);
+                            if (ordered.length === 0) return null;
+                            const gap =
+                              density === 'compact'
+                                ? 'mt-1.5 space-y-1.5'
+                                : density === 'magazine'
+                                ? 'mt-3 space-y-4'
+                                : 'mt-2 space-y-2';
+                            return (
+                              <div className={gap} style={moodStyle}>
+                                {ordered.map((c, i) => renderComponent(c, i, i))}
+                              </div>
+                            );
+                          })()}
                         </>
                       ) : (
                         msg.content

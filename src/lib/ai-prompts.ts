@@ -9,13 +9,15 @@
 // ~immediate first-word; components arrive after the answer settles.
 export const CHAT_RESPONSE_ENVELOPE_PROMPT = `RESPONSE FORMAT (mandatory)
 
-Stream your answer as plain text first — 1-3 short paragraphs, markdown OK (bold, links). Then, IF and only if components would help the visitor act, emit the marker line and a JSON array:
+Stream your answer as plain text first — 1-3 short paragraphs, markdown OK (bold, links). Then, IF and only if components would help the visitor act, emit the marker line and a JSON array. You MAY optionally follow that with a <<<LAYOUT>>> block to honor visitor layout intent:
 
 <your text answer here>
 <<<COMPONENTS>>>
 [ {"type": "...", "props": { ... }}, ... ]
+<<<LAYOUT>>>
+{ "density": "magazine", "hide": ["TimelineSlice"] }
 
-If you have no components to add, end the response after your text answer — DO NOT emit the marker. The visitor receives prose-only and that's fine.
+If you have no components to add, end the response after your text answer — DO NOT emit any marker. The visitor receives prose-only and that's fine.
 
 Components are PICKED FROM THE CATALOG BELOW — never invent component types.
 
@@ -24,15 +26,32 @@ CATALOG (use exact "type" values):
 - AskAgain { suggestions: string[] } — 2-4 short follow-up question chips. Use most replies.
 - AvailabilityChip { status: "open" | "limited" | "closed", label?: string } — small status pill. Use when visitor asks about availability / current load.
 - BookCallSlot { url: string, label?: string, duration?: string } — calendar booking CTA. Use when visitor asks about meetings / time / chat. URL must come from page memory (calendar link).
-- EssayLink { title: string, url: string, excerpt?: string, year?: string } — when citing or recommending a specific essay / blog post.
+- EssayLink { title: string, url: string, excerpt?: string, year?: string, size?: "sm" | "md" | "lg" } — when citing or recommending a specific essay / blog post. Use size to express visitor sizing intent.
 - HiringStatus { status: "open" | "fractional-only" | "advising-only" | "closed", label?: string } — when visitor asks about roles, hiring, or what owner is open to.
 - LocationCard { city: string, timezone?: string, travelStatus?: string } — when visitor asks where owner is based.
-- MetricCard { value: string, label: string, context?: string } — when there is a single specific number worth pulling out (revenue, scale, etc.).
-- ProjectMini { title: string, url?: string, description?: string, imageUrl?: string } — when surfacing one specific project. Use when visitor asks "what are you building" / "show me a project."
+- MetricCard { value: string, label: string, context?: string, size?: "sm" | "md" | "lg" } — when there is a single specific number worth pulling out (revenue, scale, etc.).
+- ProjectMini { title: string, url?: string, description?: string, imageUrl?: string, size?: "sm" | "md" | "lg" } — when surfacing one specific project. Use size to express visitor sizing intent (e.g. "show me a big project card" → "lg").
 - QuoteBlock { quote: string, attribution?: string } — when an aphorism or signature line from the owner's voice answers the question.
 - RateCard { tier: string, price: string, slots?: string, cta?: string, url?: string } — pricing / engagement. Only when the owner has stated rates in memory. Never invent prices.
 - StackList { items: string[], label?: string } — when visitor asks about tech / tools / stack. Items are short tokens ('Go', 'PostgreSQL').
-- TimelineSlice { events: Array<{when, title, where?}>, heading?: string } — when visitor asks "what have you shipped" / "recent work" / career arc. Use 3-5 events from the profile's timeline.
+- TimelineSlice { events: Array<{when, title, where?}>, heading?: string, size?: "sm" | "md" | "lg" } — when visitor asks "what have you shipped" / "recent work" / career arc. Use 3-5 events from the profile's timeline.
+
+LAYOUT INTENT — when the visitor's message expresses how they want the answer SHAPED (not what content), honor it via two channels:
+
+1) Per-component "size" (only on Essay/Project/Timeline/Metric): when the visitor says "bigger projects, smaller blogs," set ProjectMini size: "lg" and EssayLink size: "sm" inline.
+2) Top-level <<<LAYOUT>>> directives (apply to the whole reply):
+   - density: "compact" | "comfortable" | "magazine" — tighten or open up the spacing.
+   - order: "recency" | "impact" | "alphabetical" — reorder components.
+   - filter: short string — only keep components whose text mentions it (e.g. "AI", "design"). Use this when the visitor scopes the answer to a topic.
+   - hide: array of component type names (e.g. ["TimelineSlice"]) — drop those types from this reply.
+   - mood: "serious" | "playful" | "minimal" | "dark" — repaints the accent color of this reply only.
+
+Layout directives are optional, scoped to this reply, and NEVER mutate the underlying page. Examples of visitor language → directive:
+- "make this minimalist" → { "density": "compact", "mood": "minimal" }
+- "only show AI work" → { "filter": "AI" }
+- "skip the timeline" → { "hide": ["TimelineSlice"] }
+- "sort by recency" → { "order": "recency" }
+- "magazine layout" → { "density": "magazine" }
 
 PICKING RULES:
 - 0 components is fine. Most replies should have 1-3 components plus AskAgain.

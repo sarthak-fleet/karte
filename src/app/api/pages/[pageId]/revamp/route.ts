@@ -324,28 +324,43 @@ export async function POST(
   const prompt = clampText(body.prompt, 'Make my profile clearer and more commercially polished.', 1200);
   const shouldApply = Boolean(body.apply);
 
-  const [pageLinks, pageProjects, sections, memoryBlocks, user] = await Promise.all([
-    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
-    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
-    db.select().from(pageSections).where(eq(pageSections.pageId, pageId)).orderBy(asc(pageSections.sortOrder)),
-    db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)).orderBy(asc(infoBlocks.sortOrder)),
-    db.query.users.findFirst({ where: eq(users.id, session.user.id) }),
-  ]);
+  try {
+    const [pageLinks, pageProjects, sections, memoryBlocks, user] = await Promise.all([
+      db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
+      db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
+      db.select().from(pageSections).where(eq(pageSections.pageId, pageId)).orderBy(asc(pageSections.sortOrder)),
+      db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)).orderBy(asc(infoBlocks.sortOrder)),
+      db.query.users.findFirst({ where: eq(users.id, session.user.id) }),
+    ]);
 
-  const incomingPlan = body.plan ? normalizePlan(body.plan) : null;
-  const plan = incomingPlan ?? await generatePlan({
-    prompt,
-    page,
-    pageLinks,
-    pageProjects,
-    sections,
-    memoryBlocks,
-    aiConfig: resolveAiConfig(user),
-  });
+    const incomingPlan = body.plan ? normalizePlan(body.plan) : null;
+    const plan = incomingPlan ?? await generatePlan({
+      prompt,
+      page,
+      pageLinks,
+      pageProjects,
+      sections,
+      memoryBlocks,
+      aiConfig: resolveAiConfig(user),
+    });
 
-  if (shouldApply) {
-    await applyPlan(pageId, plan);
+    if (shouldApply) {
+      await applyPlan(pageId, plan);
+    }
+
+    return NextResponse.json({ plan, applied: shouldApply });
+  } catch (error) {
+    // Any throw from generate(), applyPlan(), or the DB reads above
+    // would otherwise become a framework-default 500 with an empty
+    // body on Cloudflare Workers — the client then errors on
+    // `await res.json()` with "Unexpected end of JSON input".
+    console.error('revamp_failed', {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : undefined,
+    });
+    return NextResponse.json(
+      { error: 'Could not generate a revamp right now. Try a shorter prompt or try again.' },
+      { status: 502 },
+    );
   }
-
-  return NextResponse.json({ plan, applied: shouldApply });
 }

@@ -24,6 +24,12 @@ export type AIComponentType =
 
 // Per-component prop shapes. Keep these JSON-serializable since the AI
 // emits them as part of its response payload.
+
+// Visitor-driven sizing knob. Cards visitors most naturally ask to
+// resize (Project, Essay, Timeline, Metric) accept this. 'md' is the
+// rendered default when absent.
+export type ComponentSize = 'sm' | 'md' | 'lg';
+
 export interface AskAgainProps {
   suggestions: string[]; // 2-4 short follow-up questions
 }
@@ -44,6 +50,7 @@ export interface EssayLinkProps {
   url: string;
   excerpt?: string; // first sentence or pull quote
   year?: string;
+  size?: ComponentSize;
 }
 
 export interface HiringStatusProps {
@@ -61,6 +68,7 @@ export interface MetricCardProps {
   value: string; // e.g. '$420k/mo', '200k DAU'
   label: string; // e.g. 'Combined MRR', 'Peak users'
   context?: string; // e.g. 'Sept 2024', 'Front.Page era'
+  size?: ComponentSize;
 }
 
 export interface ProjectMiniProps {
@@ -68,6 +76,7 @@ export interface ProjectMiniProps {
   url?: string;
   description?: string;
   imageUrl?: string | null; // SafeImage handles failures
+  size?: ComponentSize;
 }
 
 export interface QuoteBlockProps {
@@ -95,6 +104,18 @@ export interface TimelineSliceProps {
     where?: string;
   }>;
   heading?: string; // e.g. 'Recent ships'
+  size?: ComponentSize;
+}
+
+// Top-level layout directives. Scoped to a single AI reply — applied
+// when rendering that message's components. The page itself is not
+// mutated. See schemas.ts for the runtime validator.
+export interface LayoutDirectives {
+  density?: 'compact' | 'comfortable' | 'magazine';
+  order?: 'recency' | 'impact' | 'alphabetical';
+  filter?: string;
+  hide?: string[];
+  mood?: 'serious' | 'playful' | 'minimal' | 'dark';
 }
 
 // Discriminated union the registry consumes.
