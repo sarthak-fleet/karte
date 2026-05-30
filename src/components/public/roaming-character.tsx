@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { SafeImage } from '@/components/public/safe-image';
+import { useReducedMotion } from '@/lib/use-reduced-motion';
 
 interface RoamingCharacterProps {
   avatarUrl: string | null;
@@ -34,7 +34,6 @@ export function RoamingCharacter({
   lines,
   accentColor,
 }: RoamingCharacterProps) {
-  const [enabled, setEnabled] = useState(false);
   const [pos, setPos] = useState(20);
   const [dir, setDir] = useState<1 | -1>(1);
   const [bobUp, setBobUp] = useState(false);
@@ -42,41 +41,44 @@ export function RoamingCharacter({
   const [lineIdx, setLineIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
   const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 });
-  // Track whether the avatar image loaded. Pet only walks if we have
-  // a real cartoon image — a single letter walking across the screen
-  // looks broken, not friendly. Better to hide the pet entirely than
-  // ship a stand-in initial.
-  const [avatarReady, setAvatarReady] = useState<boolean | null>(null);
+  // Pet only walks if we have a real cartoon image — a single letter
+  // walking across the screen looks broken, not friendly. Better to
+  // hide the pet entirely than ship a stand-in initial.
+  // Key by url so changing avatarUrl doesn't require a sync setState
+  // reset inside the effect.
+  const [avatarOutcomes, setAvatarOutcomes] = useState<Record<string, 'loaded' | 'error'>>({});
+  const avatarReady: boolean | null = !avatarUrl
+    ? false
+    : avatarOutcomes[avatarUrl] === 'loaded'
+      ? true
+      : avatarOutcomes[avatarUrl] === 'error'
+        ? false
+        : null;
+  const reducedMotion = useReducedMotion();
+  // Derived from preconditions — no sync setState-in-effect needed.
+  const enabled = !reducedMotion && lines.length > 0 && avatarReady === true;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   // Pre-load the avatar image to determine whether to enable the pet.
   useEffect(() => {
-    if (!avatarUrl) {
-      setAvatarReady(false);
-      return;
-    }
+    if (!avatarUrl) return;
+    if (avatarOutcomes[avatarUrl]) return;
     let cancelled = false;
     const img = new window.Image();
-    img.onload = () => !cancelled && setAvatarReady(true);
-    img.onerror = () => !cancelled && setAvatarReady(false);
+    img.onload = () => {
+      if (!cancelled) setAvatarOutcomes((prev) => ({ ...prev, [avatarUrl]: 'loaded' }));
+    };
+    img.onerror = () => {
+      if (!cancelled) setAvatarOutcomes((prev) => ({ ...prev, [avatarUrl]: 'error' }));
+    };
     img.src = avatarUrl;
     return () => {
       cancelled = true;
       img.onload = null;
       img.onerror = null;
     };
-  }, [avatarUrl]);
-
-  // Initial enable — skip if reduced-motion, no lines, or no working
-  // avatar image. No initials fallback; the pet is image-only.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (lines.length === 0) return;
-    if (avatarReady !== true) return;
-    setEnabled(true);
-  }, [lines.length, avatarReady]);
+  }, [avatarUrl, avatarOutcomes]);
 
   // Look at cursor — apply a small translate that makes the pet lean
   // toward the mouse. Throttled via requestAnimationFrame.

@@ -2,6 +2,8 @@
 
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react';
 
+import { useReducedMotion } from '@/lib/use-reduced-motion';
+
 /**
  * Wraps children in a one-shot fade-up animation triggered when the
  * element enters the viewport. CSS-only animation, IntersectionObserver
@@ -23,21 +25,22 @@ export function AnimatedReveal({
   as?: 'div' | 'section' | 'article';
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const [intersected, setIntersected] = useState(false);
+  // Reduced-motion users skip the observer and render fully visible
+  // from the start — derived at render so the effect doesn't have to
+  // setState synchronously to handle that branch.
+  const visible = reducedMotion || intersected;
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setVisible(true);
-      return;
-    }
+    if (reducedMotion) return;
     const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setVisible(true);
+            setIntersected(true);
             observer.disconnect();
             return;
           }
@@ -47,7 +50,7 @@ export function AnimatedReveal({
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [reducedMotion]);
 
   const style: CSSProperties = {
     transition:

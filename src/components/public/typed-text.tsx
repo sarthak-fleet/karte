@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { useReducedMotion } from '@/lib/use-reduced-motion';
+
 interface TypedTextProps {
   text: string;
   /** ms per character */
@@ -32,26 +34,26 @@ export function TypedText({
   cursorColor,
 }: TypedTextProps) {
   const ref = useRef<HTMLSpanElement | null>(null);
-  const [started, setStarted] = useState(false);
-  const [done, setDone] = useState(false);
+  const reduced = useReducedMotion();
+  // Reduced-motion users skip the observer + typing loop entirely and
+  // see the final text immediately — derived at render so no setState
+  // is needed inside an effect to handle that branch.
+  const [intersected, setIntersected] = useState(false);
   const [idx, setIdx] = useState(0);
-  const [reduced, setReduced] = useState(false);
+  const started = reduced || intersected;
+  // Typing reaches done when the index catches up. Derived rather
+  // than stored so we don't have to setState in the typing effect.
+  const done = reduced || idx >= text.length;
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setReduced(true);
-      setStarted(true);
-      setDone(true);
-      return;
-    }
+    if (reduced) return;
     const node = ref.current;
     if (!node) return;
     const obs = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setTimeout(() => setStarted(true), startDelay);
+            setTimeout(() => setIntersected(true), startDelay);
             obs.disconnect();
             return;
           }
@@ -61,15 +63,12 @@ export function TypedText({
     );
     obs.observe(node);
     return () => obs.disconnect();
-  }, [startDelay]);
+  }, [startDelay, reduced]);
 
   useEffect(() => {
     if (!started || reduced || done) return;
-    if (idx < text.length) {
-      const t = setTimeout(() => setIdx((i) => i + 1), speed);
-      return () => clearTimeout(t);
-    }
-    setDone(true);
+    const t = setTimeout(() => setIdx((i) => i + 1), speed);
+    return () => clearTimeout(t);
   }, [started, idx, text, speed, reduced, done]);
 
   return (

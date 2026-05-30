@@ -10,6 +10,8 @@ interface ProfileAvatarProps {
   accentColor: string;
 }
 
+type Outcome = 'pending' | 'loaded' | 'error';
+
 /**
  * Hero-sized profile avatar with a graceful fallback to gradient +
  * initials when the source URL fails to load.
@@ -30,24 +32,27 @@ export function ProfileAvatar({
   initials,
   accentColor,
 }: ProfileAvatarProps) {
-  // Status starts at 'loading' so the gradient placeholder renders
-  // immediately (server + client first paint). Image swaps in once
-  // the off-DOM preload succeeds.
-  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>(
-    src ? 'loading' : 'error',
-  );
+  // Key outcomes by src so changing the avatar URL doesn't require a
+  // synchronous setState-in-effect reset (which trips
+  // react-hooks/set-state-in-effect). Status is fully derived from
+  // the current src plus its recorded load outcome.
+  const [outcomes, setOutcomes] = useState<Record<string, Outcome>>({});
+  const outcome: Outcome = src ? outcomes[src] ?? 'pending' : 'error';
+  const status: 'loading' | 'loaded' | 'error' =
+    outcome === 'loaded' ? 'loaded' : outcome === 'error' ? 'error' : 'loading';
 
   useEffect(() => {
-    if (!src) {
-      setStatus('error');
-      return;
-    }
-    setStatus('loading');
+    if (!src) return;
+    if (outcomes[src]) return; // already resolved
 
     let cancelled = false;
     const img = new window.Image();
-    img.onload = () => !cancelled && setStatus('loaded');
-    img.onerror = () => !cancelled && setStatus('error');
+    img.onload = () => {
+      if (!cancelled) setOutcomes((prev) => ({ ...prev, [src]: 'loaded' }));
+    };
+    img.onerror = () => {
+      if (!cancelled) setOutcomes((prev) => ({ ...prev, [src]: 'error' }));
+    };
     img.src = src;
 
     return () => {
@@ -55,7 +60,7 @@ export function ProfileAvatar({
       img.onload = null;
       img.onerror = null;
     };
-  }, [src]);
+  }, [src, outcomes]);
 
   if (status === 'loaded' && src) {
     return (

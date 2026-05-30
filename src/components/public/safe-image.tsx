@@ -14,6 +14,7 @@ interface SafeImageProps {
 }
 
 type Status = 'loading' | 'loaded' | 'error';
+type Outcome = 'loaded' | 'error';
 
 /**
  * Image with built-in preload + load/error state. Renders the
@@ -39,24 +40,28 @@ export function SafeImage({
   loading = null,
   fallback = null,
 }: SafeImageProps) {
-  const [status, setStatus] = useState<Status>(src ? 'loading' : 'error');
+  // Key outcomes by src so a changing src doesn't require a sync
+  // setState-in-effect reset. Status is derived: no src → 'error';
+  // src present but no recorded outcome → 'loading'; otherwise the
+  // recorded outcome.
+  const [outcomes, setOutcomes] = useState<Record<string, Outcome>>({});
+  const status: Status = !src
+    ? 'error'
+    : ((outcomes[src] as Outcome | undefined) ?? 'loading');
 
   useEffect(() => {
-    if (!src) {
-      setStatus('error');
-      return;
-    }
-    setStatus('loading');
+    if (!src) return;
+    if (outcomes[src]) return; // already resolved
 
     // Off-DOM preload — never causes flicker because the real <img>
     // is only mounted once we know it succeeds.
     const img = new window.Image();
     let cancelled = false;
     img.onload = () => {
-      if (!cancelled) setStatus('loaded');
+      if (!cancelled) setOutcomes((prev) => ({ ...prev, [src]: 'loaded' }));
     };
     img.onerror = () => {
-      if (!cancelled) setStatus('error');
+      if (!cancelled) setOutcomes((prev) => ({ ...prev, [src]: 'error' }));
     };
     img.src = src;
 
@@ -65,7 +70,7 @@ export function SafeImage({
       img.onload = null;
       img.onerror = null;
     };
-  }, [src]);
+  }, [src, outcomes]);
 
   // While loading we show the loading prop if given, otherwise the
   // fallback. This avoids a Flash Of No Content during preload — the

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { useReducedMotion } from '@/lib/use-reduced-motion';
+
 const TYPE_MS = 28; // per character
 const HOLD_MS = 2600; // pause once a line completes
 const FADE_MS = 320;
@@ -22,21 +24,20 @@ export function TypewriterBubble({
   lines: ReadonlyArray<string>;
   accentColor: string;
 }) {
-  const [lineIdx, setLineIdx] = useState(0);
-  const [charIdx, setCharIdx] = useState(0);
+  const reducedMotion = useReducedMotion();
+  // Reduced-motion: jump to the final line, fully typed, no cycling.
+  // The 'reduced' branch is implemented purely in render via these
+  // initializers; the typing effect is skipped below.
+  const [lineIdx, setLineIdx] = useState(() => (reducedMotion ? lines.length - 1 : 0));
+  const [charIdx, setCharIdx] = useState(() =>
+    reducedMotion ? lines[lines.length - 1]?.length ?? 0 : 0,
+  );
   const [phase, setPhase] = useState<'typing' | 'holding' | 'fading'>('typing');
   const [visible, setVisible] = useState(true);
-  const [reducedMotion, setReducedMotion] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setReducedMotion(true);
-      setLineIdx(lines.length - 1);
-      setCharIdx(lines[lines.length - 1]?.length ?? 0);
-    }
-  }, [lines]);
-
+  // 'holding' is a transient phase that immediately flips to 'fading';
+  // we run the flip inside a 0ms timer so the setState happens in a
+  // callback rather than synchronously during the effect run.
   useEffect(() => {
     if (reducedMotion) return;
     if (lines.length === 0) return;
@@ -54,19 +55,25 @@ export function TypewriterBubble({
     }
 
     if (phase === 'holding') {
-      setPhase('fading');
-      return;
+      const t = setTimeout(() => setPhase('fading'), 0);
+      return () => clearTimeout(t);
     }
 
     if (phase === 'fading') {
-      setVisible(false);
-      const t = setTimeout(() => {
+      // Both the immediate fade-out and the delayed reset run inside
+      // setTimeouts so neither is a synchronous setState during the
+      // effect run.
+      const hideT = setTimeout(() => setVisible(false), 0);
+      const cycleT = setTimeout(() => {
         setLineIdx((i) => i + 1);
         setCharIdx(0);
         setVisible(true);
         setPhase('typing');
       }, FADE_MS);
-      return () => clearTimeout(t);
+      return () => {
+        clearTimeout(hideT);
+        clearTimeout(cycleT);
+      };
     }
   }, [phase, charIdx, lineIdx, lines, reducedMotion]);
 

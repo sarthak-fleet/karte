@@ -62,7 +62,12 @@ function clearPendingImport() {
 
 export function WelcomeFlow() {
   const router = useRouter();
-  const [phase, setPhase] = useState<Phase>('preparing');
+  // We always transition to 'generating' immediately, so lazy-init
+  // there rather than setState('generating') inside the effect (which
+  // trips react-hooks/set-state-in-effect). The earlier 'preparing'
+  // beat had no distinct UX value — both phases render the same
+  // LoadingState shape.
+  const [phase, setPhase] = useState<Phase>('generating');
   const [result, setResult] = useState<WelcomeResult | null>(null);
   const [error, setError] = useState('');
   const startedRef = useRef(false);
@@ -72,7 +77,6 @@ export function WelcomeFlow() {
     startedRef.current = true;
 
     const pending = readPendingImport();
-    setPhase('generating');
 
     fetch('/api/welcome', {
       method: 'POST',
