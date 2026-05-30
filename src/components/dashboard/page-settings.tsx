@@ -17,6 +17,23 @@ import {
   type ThemePresetId,
 } from '@/lib/themes';
 
+// Mirrors the server-side RevampPlan shape from /api/pages/[id]/revamp.
+// Kept inline since the route handler can't export non-handler symbols.
+interface RevampPlan {
+  themePresetId: string;
+  customColors?: { gradientFrom: string; gradientTo: string; accentColor: string };
+  headline: string;
+  rationale: string;
+  emphasis: string[];
+  blocks: Array<{
+    type: string;
+    title: string;
+    content: string;
+    buttonLabel?: string | null;
+    buttonUrl?: string | null;
+  }>;
+}
+
 interface PageData {
   id: string;
   slug: string;
@@ -123,41 +140,81 @@ export function PageSettings({
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiRunning, setAiRunning] = useState(false);
   const [aiMessage, setAiMessage] = useState('');
+  // Two-step revamp flow: previewAiTheme generates a plan without
+  // mutating; applyPendingPlan commits the previewed plan. Lets the
+  // user inspect (and discard) before any DB write or theme swap.
+  const [pendingPlan, setPendingPlan] = useState<RevampPlan | null>(null);
   // Bumped on every successful save to force the live-preview iframe to
   // reload with fresh content. Cheap way to keep the preview honest
   // without manually wiring a postMessage channel.
   const [previewRefreshKey, setPreviewRefreshKey] = useState(0);
 
-  async function applyAiTheme() {
+  async function previewAiTheme() {
     if (!page || !aiPrompt.trim()) {
       setAiMessage('Describe the vibe you want first.');
       return;
     }
     setAiRunning(true);
     setAiMessage('');
+    setPendingPlan(null);
     try {
       const res = await fetch(`/api/pages/${page.id}/revamp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt, apply: true }),
+        body: JSON.stringify({ prompt: aiPrompt, apply: false }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         error?: string;
-        plan?: { themePresetId?: string };
+        plan?: RevampPlan;
       };
-      if (!res.ok) throw new Error(data.error || 'Failed to generate theme');
-      const nextPresetId = data?.plan?.themePresetId;
-      if (typeof nextPresetId === 'string') {
-        setThemePresetId(nextPresetId as ThemePresetId);
+      if (!res.ok || !data.plan) {
+        throw new Error(data.error || 'Failed to generate theme');
       }
-      setAiMessage('Theme updated.');
-      setPreviewRefreshKey((n) => n + 1);
-      router.refresh();
+      setPendingPlan(data.plan);
+      setAiMessage('Preview ready — review below, then Apply when you are happy.');
     } catch (error) {
       setAiMessage(error instanceof Error ? error.message : 'Failed to generate theme');
     } finally {
       setAiRunning(false);
     }
+  }
+
+  async function applyPendingPlan() {
+    if (!page || !pendingPlan) return;
+    setAiRunning(true);
+    setAiMessage('');
+    try {
+      // Send the cached plan back so the server skips the AI call and
+      // just commits — no second LLM round-trip.
+      const res = await fetch(`/api/pages/${page.id}/revamp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: pendingPlan, apply: true }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        plan?: RevampPlan;
+      };
+      if (!res.ok) throw new Error(data.error || 'Failed to apply theme');
+      const nextPresetId = data?.plan?.themePresetId ?? pendingPlan.themePresetId;
+      if (typeof nextPresetId === 'string') {
+        setThemePresetId(nextPresetId as ThemePresetId);
+      }
+      setAiMessage('Theme applied.');
+      setPendingPlan(null);
+      setAiPrompt('');
+      setPreviewRefreshKey((n) => n + 1);
+      router.refresh();
+    } catch (error) {
+      setAiMessage(error instanceof Error ? error.message : 'Failed to apply theme');
+    } finally {
+      setAiRunning(false);
+    }
+  }
+
+  function discardPendingPlan() {
+    setPendingPlan(null);
+    setAiMessage('');
   }
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -346,15 +403,16 @@ export function PageSettings({
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
               placeholder="e.g. dark editorial with warm gold accents"
-              className="min-w-0 flex-1 rounded-xl bg-white/[0.045] px-4 py-2.5 text-[14px] text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
+              disabled={aiRunning || !!pendingPlan}
+              className="min-w-0 flex-1 rounded-xl bg-white/[0.045] px-4 py-2.5 text-[14px] text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35 disabled:opacity-50"
             />
             <button
               type="button"
-              onClick={applyAiTheme}
-              disabled={aiRunning || !aiPrompt.trim()}
+              onClick={previewAiTheme}
+              disabled={aiRunning || !aiPrompt.trim() || !!pendingPlan}
               className="shrink-0 rounded-xl bg-karte-accent px-5 py-2.5 text-[14px] font-semibold text-zinc-950 transition hover:bg-karte-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {aiRunning ? 'Generating…' : 'Generate'}
+              {aiRunning && !pendingPlan ? 'Generating…' : 'Preview'}
             </button>
           </div>
           {aiMessage && (
@@ -363,6 +421,15 @@ export function PageSettings({
             >
               {aiMessage}
             </p>
+          )}
+
+          {pendingPlan && (
+            <RevampPreview
+              plan={pendingPlan}
+              applying={aiRunning}
+              onApply={applyPendingPlan}
+              onDiscard={discardPendingPlan}
+            />
           )}
         </div>
       )}
@@ -754,6 +821,120 @@ export function PageSettings({
             claim the username and save the page.
           </p>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── Revamp preview panel ────────────────────────────────────────────
+// Renders the AI-generated plan in a non-destructive preview so the
+// owner can read the headline, rationale, theme target, and the
+// blocks that would be added before any DB write happens.
+function RevampPreview({
+  plan,
+  applying,
+  onApply,
+  onDiscard,
+}: {
+  plan: RevampPlan;
+  applying: boolean;
+  onApply: () => void;
+  onDiscard: () => void;
+}) {
+  const themeLabel =
+    THEME_PRESETS.find((t) => t.id === plan.themePresetId)?.id ?? plan.themePresetId;
+  const swatch = plan.customColors?.accentColor;
+  return (
+    <div className="mt-5 rounded-xl border border-karte-accent/30 bg-black/30 p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-karte-accent-soft">
+          · Preview
+        </p>
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-karte-text-4">
+          Nothing saved yet
+        </p>
+      </div>
+      <h3 className="mt-2 text-[15px] font-semibold leading-tight text-karte-text">
+        {plan.headline}
+      </h3>
+      <p className="mt-1.5 text-[12.5px] leading-[1.55] text-karte-text-3">
+        {plan.rationale}
+      </p>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-[11.5px]">
+        <span className="rounded-full border border-white/[0.10] bg-white/[0.04] px-2.5 py-0.5 font-mono uppercase tracking-[0.14em] text-karte-text-3">
+          Theme · {themeLabel}
+        </span>
+        {swatch && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.10] bg-white/[0.04] px-2.5 py-0.5 font-mono uppercase tracking-[0.14em] text-karte-text-3">
+            <span
+              aria-hidden="true"
+              className="block h-2.5 w-2.5 rounded-full ring-1 ring-white/20"
+              style={{ backgroundColor: swatch }}
+            />
+            {swatch}
+          </span>
+        )}
+        {plan.emphasis.slice(0, 3).map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full border border-white/[0.10] bg-white/[0.02] px-2.5 py-0.5 text-karte-text-4"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      {plan.blocks.length > 0 && (
+        <div className="mt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-karte-text-4">
+            {plan.blocks.length} new {plan.blocks.length === 1 ? 'block' : 'blocks'}
+          </p>
+          <ul className="mt-2 space-y-2">
+            {plan.blocks.map((block, i) => (
+              <li
+                key={i}
+                className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-3"
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-[13px] font-medium text-karte-text">
+                    {block.title}
+                  </p>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-karte-text-4">
+                    {block.type}
+                  </span>
+                </div>
+                <p className="mt-1 line-clamp-3 text-[12px] leading-[1.5] text-karte-text-3">
+                  {block.content}
+                </p>
+                {block.type === 'cta' && block.buttonUrl && (
+                  <p className="mt-2 truncate font-mono text-[11px] text-karte-accent-soft">
+                    → {block.buttonLabel} · {block.buttonUrl}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={onDiscard}
+          disabled={applying}
+          className="rounded-xl border border-white/[0.12] px-4 py-2 text-[13px] font-medium text-karte-text-3 transition hover:bg-white/[0.04] hover:text-karte-text disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Discard
+        </button>
+        <button
+          type="button"
+          onClick={onApply}
+          disabled={applying}
+          className="rounded-xl bg-karte-accent px-5 py-2 text-[13px] font-semibold text-zinc-950 transition hover:bg-karte-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {applying ? 'Applying…' : 'Apply'}
+        </button>
       </div>
     </div>
   );
