@@ -6,8 +6,8 @@
 // so the dashboard can show a preview, let the user edit/uncheck, and
 // then call the regular POST /timeline endpoint to commit the keepers.
 
-import { NextResponse } from 'next/server';
 import { and, eq } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import type { TimelineEventType } from '@/db/schema';

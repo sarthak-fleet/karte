@@ -3,8 +3,8 @@ import { asc, desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import type { pages} from '@/db/schema';
 import { infoBlocks, links, type PageSettings, projects, timelineEvents } from '@/db/schema';
-import { TIMELINE_TYPE_LABELS } from '@/lib/timeline';
 import { getScrapedContext } from '@/lib/scrape-page-content';
+import { TIMELINE_TYPE_LABELS } from '@/lib/timeline';
 
 type PageRecord = typeof pages.$inferSelect;
 

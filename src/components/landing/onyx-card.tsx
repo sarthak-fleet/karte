@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, type CSSProperties } from 'react';
+import { type CSSProperties,useCallback, useRef } from 'react';
 
 interface OnyxCardProps {
   idx: string;         // e.g. "i", "ii", "iii" — appears as "card i / v" indicator

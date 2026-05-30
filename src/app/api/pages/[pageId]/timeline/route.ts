@@ -2,8 +2,8 @@ import { and, desc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import { pages, timelineEvents } from '@/db/schema';
 import type { TimelineEventStatus, TimelineEventType } from '@/db/schema';
+import { pages, timelineEvents } from '@/db/schema';
 import { getSession } from '@/lib/auth-server';
 import { parseWhenLabel } from '@/lib/timeline';
 

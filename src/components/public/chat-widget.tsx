@@ -7,6 +7,7 @@ import { renderComponent } from '@/components/public/ai-components/registry';
 import { ChatEmailGate } from '@/components/public/chat-email-gate';
 import { ChatMessageBody } from '@/components/public/chat-message-body';
 import { ContactFormSection } from '@/components/public/contact-form-section';
+import type { DmMode } from '@/db/schema';
 import { applyLayoutDirectives } from '@/lib/ai-components/layout';
 import {
   createStreamParserState,
@@ -14,7 +15,6 @@ import {
   finishStream,
 } from '@/lib/ai-components/stream-parser';
 import type { LayoutDirectives, RenderableComponent } from '@/lib/ai-components/types';
-import type { DmMode } from '@/db/schema';
 import { trackEvent } from '@/lib/analytics';
 import {
   buildRoomShareUrl,
