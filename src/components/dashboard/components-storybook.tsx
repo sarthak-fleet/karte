@@ -157,7 +157,7 @@ export function ComponentsStorybook() {
           <ProjectMini
             title="TinyGPT"
             description="0.8M-param transformer that trains and runs in the browser via PyTorch → WebAssembly + WebGPU."
-            url="https://github.com/sarthakagrawal927/tinygpt"
+            url="https://github.com/sarthak-fleet/tinygpt"
             imageUrl={null}
           />
         </Story>
@@ -222,7 +222,7 @@ function SizeVariantStories() {
               <ProjectMini
                 title="TinyGPT"
                 description="0.8M-param transformer in the browser via PyTorch → WASM + WebGPU."
-                url="https://github.com/sarthakagrawal927/tinygpt"
+                url="https://github.com/sarthak-fleet/tinygpt"
                 imageUrl={null}
                 size={s}
               />
@@ -295,7 +295,7 @@ const SANDBOX_COMPONENTS: RenderableComponent[] = [
     props: {
       title: 'TinyGPT',
       description: 'AI in the browser — 0.8M-param transformer, WASM + WebGPU.',
-      url: 'https://github.com/sarthakagrawal927/tinygpt',
+      url: 'https://github.com/sarthak-fleet/tinygpt',
       imageUrl: null,
     },
   },
