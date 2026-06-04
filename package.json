@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack && node scripts/inline-critical-css.mjs",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -14,7 +14,7 @@
     "backfill:aggregates": "node scripts/backfill-aggregates.mjs",
     "enrich:profile": "node scripts/enrich-profile-from-links.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:build": "opennextjs-cloudflare build",
+    "cf:build": "next build --webpack && node scripts/inline-critical-css.mjs && opennextjs-cloudflare build",
     "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload:cf": "opennextjs-cloudflare build && opennextjs-cloudflare upload"
   },
