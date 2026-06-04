@@ -14,7 +14,7 @@
     "backfill:aggregates": "node scripts/backfill-aggregates.mjs",
     "enrich:profile": "node scripts/enrich-profile-from-links.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:build": "next build --webpack && node scripts/inline-critical-css.mjs && opennextjs-cloudflare build --skipNextBuild",
+    "cf:build": "next build --webpack && node scripts/inline-critical-css.mjs && opennextjs-cloudflare build --skipNextBuild && opennextjs-cloudflare populateCache local",
     "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload:cf": "opennextjs-cloudflare build && opennextjs-cloudflare upload"
   },
