@@ -4,11 +4,70 @@ import { cache } from 'react';
 import { db, ensureProjectsTable } from '@/db';
 import { generatedPages,infoBlocks, links, pages, pageSections, projects, timelineEvents, users } from '@/db/schema';
 
+// CF Edge cache for resolved profile data. Owner edits propagate in
+// ~60s — short enough to feel live, long enough to absorb the bulk of
+// repeat traffic to a popular slug. Bump suffix to invalidate after
+// schema / shape changes.
+const PROFILE_CACHE_TTL_SECONDS = 60;
+const profileCacheUrl = (slug: string) =>
+  `https://internal-cache/profile/${encodeURIComponent(slug)}:v1`;
+
+// JSON.stringify drops `Set` instances. We round-trip ready page types
+// as an array and reconstruct the Set on read.
+type CachedPageData = Omit<
+  NonNullable<Awaited<ReturnType<typeof loadFullPageData>>>,
+  'readyPages'
+> & { readyPages: string[] };
+
 /**
  * Single query to load everything needed for a public profile page.
  * Returns page + user + links + projects + sections + readyPageTypes in one call.
  */
 export const getFullPageData = cache(async (slug: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const edgeCache = (globalThis as any).caches?.default as Cache | undefined;
+  const cacheUrl = profileCacheUrl(slug);
+
+  if (edgeCache) {
+    try {
+      const cached = await edgeCache.match(cacheUrl);
+      if (cached) {
+        const parsed = (await cached.json()) as CachedPageData;
+        return {
+          ...parsed,
+          readyPages: new Set(parsed.readyPages),
+        };
+      }
+    } catch {
+      // Cache read failure — fall through to DB.
+    }
+  }
+
+  const data = await loadFullPageData(slug);
+  if (!data) return null;
+
+  if (edgeCache) {
+    try {
+      const serializable: CachedPageData = {
+        ...data,
+        readyPages: Array.from(data.readyPages),
+      };
+      const response = new Response(JSON.stringify(serializable), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': `public, max-age=${PROFILE_CACHE_TTL_SECONDS}, s-maxage=${PROFILE_CACHE_TTL_SECONDS}`,
+        },
+      });
+      void edgeCache.put(cacheUrl, response);
+    } catch {
+      // Non-fatal: serving fresh data without storing the cache entry.
+    }
+  }
+
+  return data;
+});
+
+async function loadFullPageData(slug: string) {
   // ensureProjectsTable runs eagerly on module load (db/index.ts)
   // Just await the existing promise without re-triggering
   await ensureProjectsTable();
@@ -72,7 +131,7 @@ export const getFullPageData = cache(async (slug: string) => {
     modePreviews,
     modeContent,
   };
-});
+}
 
 export interface ModeContent {
   encyclopedia?: {
