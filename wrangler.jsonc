@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "linkchat",
-  "main": ".open-next/worker.js",
+  // Custom entry wraps OpenNext with caches.default for GET / — see worker.mjs.
+  "main": "worker.mjs",
   "workers_dev": true,
   // Worker serves: karte.cc apex + any *.karte.cc subdomain. Custom hostnames
   // (Cloudflare for SaaS) attach to the zone via the CF API in
