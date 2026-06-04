@@ -51,6 +51,8 @@
     "@types/react": "19",
     "@types/react-dom": "19",
     "babel-plugin-react-compiler": "1.0.0",
+    "beasties": "^0.4.2",
+    "critters": "^0.0.25",
     "dotenv": "17.4.2",
     "drizzle-kit": "0.31.10",
     "eslint": "10.2.1",

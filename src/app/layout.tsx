@@ -13,14 +13,23 @@ import {
 import { AnalyticsProvider } from "@/components/posthog-provider";
 import { PageAnalyticsTracker } from "@/components/public/page-analytics-tracker";
 
+// preload: false on the dashboard/app fonts — they aren't used on the
+// LCP path (which is the Onyx landing deck). Browsers still fetch them
+// when the dashboard styles reference them; this removes 4 redundant
+// <link rel="preload"> elements from the landing HTML head and frees
+// critical bandwidth for the Playfair + Inter weights that actually
+// paint the hero. psi-swarm flagged 7 font preloads as part of the 1.6s
+// render delay on karte.cc /.
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 const instrumentSerif = Instrument_Serif({
@@ -28,13 +37,14 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: "italic",
+  preload: false,
 });
 
 // ── Landing-page faces ──────────────────────────────────────────────
-// Playfair Display is the gold-foil serif used across the Onyx deck.
-// Inter and JetBrains Mono pair with it: Inter for body/UI, JetBrains
-// for the agent-spec labels. These names match the CSS variables in
-// src/app/landing.css (--font-playfair, --font-inter, --font-jetbrains).
+// Playfair Display is the gold-foil serif on the LCP h1 (.onyx-hero-h1
+// is `font-family: var(--font-playfair)`). Inter pairs with it for
+// body/UI. JetBrains is used only for the agent-spec labels deep in
+// the deck — preload skipped to save a request on the LCP path.
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
@@ -52,6 +62,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
   weight: ["300", "400", "500"],
+  preload: false,
 });
 
 const SITE_URL = "https://karte.cc";
