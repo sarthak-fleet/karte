@@ -1,4 +1,14 @@
 ---
+// Self-hosted variable fonts. Astro inlines the @font-face into the
+// page's CSS via Lightning CSS (build.inlineStylesheets: 'always'),
+// so we drop the external fonts.googleapis.com round-trip from the
+// LCP path. Family names register as 'Playfair Display Variable' and
+// 'Inter Variable' — mapped onto the existing --font-* CSS vars below
+// so landing.css needs no changes. Playfair italic is required by
+// the deck (.onyx-screen-title, .onyx-quote, etc.).
+import '@fontsource-variable/playfair-display';
+import '@fontsource-variable/playfair-display/wght-italic.css';
+import '@fontsource-variable/inter';
 import '@/styles/landing.css';
 
 interface Props {
@@ -42,46 +52,18 @@ const OG_IMAGE = `${SITE_URL}/opengraph-image`;
 
     <meta name="keywords" content="link in bio, personal website, digital card, Linktree alternative" />
 
-    {/* ── Fonts ────────────────────────────────────────────────────
-       Playfair Display (gold-foil serif on the LCP h1) + Inter (body
-       on the deck) are the two faces on the LCP path. Use the async
-       preload pattern: preload, then swap media print → all on load
-       so the stylesheet never blocks first paint. Plain <link
-       rel="stylesheet"> below is the no-JS fallback inside <noscript>.
-
-       Geist, Geist Mono, JetBrains Mono and Instrument Serif from the
-       Next.js layout are intentionally NOT preloaded — they aren't on
-       the LCP path. JetBrains is referenced by .onyx-agent-spec deep
-       in card IV, so we don't load it at all on this static port; the
-       agent-spec falls through to the CSS-stack fallback. */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap"
-      />
-    </noscript>
-
     {/* Wire the same CSS vars Next.js's next/font set up, so landing.css
        (which references var(--font-playfair) / var(--font-inter)) keeps
-       working without changes. */}
+       working without changes. Fontsource Variable registers families
+       as 'Playfair Display Variable' / 'Inter Variable', with the
+       plain names left in the fallback chain so any cached non-variable
+       face still hits before the system fallback. Geist/Instrument
+       Serif/JetBrains were never loaded on this surface — kept as
+       fallback-only var values to match the original Next.js layout. */}
     <style is:inline>
       :root {
-        --font-playfair: 'Playfair Display', Georgia, 'Times New Roman', serif;
-        --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-playfair: 'Playfair Display Variable', 'Playfair Display', Georgia, 'Times New Roman', serif;
+        --font-inter: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
         --font-instrument-serif: 'Instrument Serif', Georgia, serif;
         --font-geist-sans: 'Geist', system-ui, sans-serif;
         --font-geist-mono: 'Geist Mono', ui-monospace, monospace;
