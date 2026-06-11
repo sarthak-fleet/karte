@@ -256,7 +256,7 @@ export function qualifyVisitorLeads({
       }
 
       const eventScore = bucket.events.reduce((total, event) => {
-        if (event.eventType === 'contact_submit') {
+        if (event.eventType === 'contact_submit' || event.eventType === 'dm_submit') {
           return total + 12;
         }
 
