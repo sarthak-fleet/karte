@@ -5,7 +5,6 @@ const RESEND_API_URL = 'https://api.resend.com/emails';
 export async function sendAgentAuthCode(email: string, code: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || 'Karte <noreply@karte.cc>';
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://karte.cc';
 
   if (!apiKey) {
     console.info(`[agent-auth] sign-in code for ${email}: ${code}`);
@@ -26,7 +25,7 @@ export async function sendAgentAuthCode(email: string, code: string): Promise<vo
         `Your Karte agent sign-in code is ${code}.`,
         'It expires in 10 minutes.',
         '',
-        `Use it at ${appUrl}/api/auth/agent/verify-code`,
+        'Enter this code in the sign-in form on the page where you requested it.',
         '',
         'If you did not request this, you can ignore this email.',
       ].join('\n'),
