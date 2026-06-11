@@ -30,6 +30,38 @@ export function normalizeHostname(input: string | null | undefined): string | nu
 // Karte's own brand domains — baked in because Next.js inlines NEXT_PUBLIC_*
 // env vars at build time, making runtime env var bridging unreliable.
 const KARTE_APP_HOSTS = new Set(['karte.cc', 'www.karte.cc']);
+const MULTI_PART_PUBLIC_SUFFIXES = new Set([
+  'co.uk',
+  'org.uk',
+  'ac.uk',
+  'gov.uk',
+  'com.au',
+  'net.au',
+  'org.au',
+  'co.nz',
+  'com.br',
+  'com.mx',
+  'co.jp',
+  'ne.jp',
+  'or.jp',
+  'co.kr',
+  'com.cn',
+  'com.sg',
+  'co.in',
+  'in',
+]);
+
+function isApexHostname(hostname: string): boolean {
+  const parts = hostname.toLowerCase().split('.');
+  if (parts.length <= 2) return true;
+
+  const suffix = parts.slice(-2).join('.');
+  if (MULTI_PART_PUBLIC_SUFFIXES.has(suffix)) {
+    return parts.length === 3;
+  }
+
+  return false;
+}
 
 export function isAppHost(host: string, appHost: string | null | undefined): boolean {
   if (!host) return false;
@@ -75,7 +107,7 @@ export function getCustomDomainCnameTarget(): string {
 
 export function getDnsInstructions(hostname: string): DnsInstruction[] {
   const target = getCustomDomainCnameTarget();
-  const isApex = hostname.split('.').length === 2;
+  const isApex = isApexHostname(hostname);
   if (isApex) {
     return [
       {

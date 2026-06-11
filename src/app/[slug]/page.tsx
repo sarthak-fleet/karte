@@ -20,7 +20,6 @@ import { VideoEmbed } from '@/components/public/video-embed';
 import type { ProjectCardData } from '@/components/public/widgets';
 import { agentOperatorLabel, isAgentPage } from '@/lib/agent-profiles';
 import { isDemoSlug } from '@/lib/demo-profiles';
-import { getProfileVariant } from '@/lib/profile-variants';
 import { resolveThemeConfig } from '@/lib/themes';
 
 import { getFullPageData } from './_lib/get-page-data';
@@ -116,7 +115,6 @@ export default async function ProfilePage({ params }: Props) {
     modeContent,
   } = data;
   const theme = resolveThemeConfig(page.themeConfig);
-  const variant = getProfileVariant(undefined);
   const isAgent = isAgentPage(page);
   const operatorLabel = agentOperatorLabel(page);
 
@@ -266,7 +264,7 @@ export default async function ProfilePage({ params }: Props) {
               page.chatEnabled
                 ? isAgent
                   ? `Talk to ${page.displayName}`
-                  : variant.primaryCta
+                  : 'Start chat'
                 : 'Send a message'
             }
             calendarUrl={page.calendarUrl}

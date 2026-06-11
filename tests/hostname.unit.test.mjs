@@ -5,6 +5,26 @@ import { test } from 'node:test';
 // runs without a TS compile step. If src/lib/hostname.ts changes, mirror here.
 
 const HOSTNAME_RE = /^(?=.{1,253}$)(?!-)(?:[a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,63}$/;
+const MULTI_PART_PUBLIC_SUFFIXES = new Set([
+  'co.uk',
+  'org.uk',
+  'ac.uk',
+  'gov.uk',
+  'com.au',
+  'net.au',
+  'org.au',
+  'co.nz',
+  'com.br',
+  'com.mx',
+  'co.jp',
+  'ne.jp',
+  'or.jp',
+  'co.kr',
+  'com.cn',
+  'com.sg',
+  'co.in',
+  'in',
+]);
 
 function normalizeHostname(input) {
   if (typeof input !== 'string') return null;
@@ -45,9 +65,21 @@ function isAppHost(host, appHost) {
   return false;
 }
 
+function isApexHostname(hostname) {
+  const parts = hostname.toLowerCase().split('.');
+  if (parts.length <= 2) return true;
+
+  const suffix = parts.slice(-2).join('.');
+  if (MULTI_PART_PUBLIC_SUFFIXES.has(suffix)) {
+    return parts.length === 3;
+  }
+
+  return false;
+}
+
 function getDnsInstructions(hostname) {
   const target = 'linkchat.sarthakagrawal927.workers.dev';
-  const isApex = hostname.split('.').length === 2;
+  const isApex = isApexHostname(hostname);
   if (isApex) {
     return [
       {
@@ -129,4 +161,11 @@ test('getDnsInstructions returns single CNAME for subdomain', () => {
   assert.equal(recs.length, 1);
   assert.equal(recs[0].type, 'CNAME');
   assert.equal(recs[0].name, 'blog');
+});
+
+test('getDnsInstructions handles public-suffix apex domains', () => {
+  const recs = getDnsInstructions('example.co.uk');
+  assert.equal(recs.length, 2);
+  assert.equal(recs[0].name, '@');
+  assert.equal(recs[1].name, 'www');
 });
