@@ -5,6 +5,7 @@ import type { PageSettings } from '@/db/schema';
 import { generatedPages,pages, users } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
 import { ROAST_SYSTEM_PROMPT } from '@/lib/ai-prompts';
+import { getSession } from '@/lib/auth-server';
 import { asGeneratedPageContent, type RoastContent } from '@/lib/generated-page-types';
 import { buildProfileMemory } from '@/lib/profile-memory';
 import { rateLimit } from '@/lib/rate-limit';
@@ -15,6 +16,7 @@ export async function POST(
   { params }: { params: Promise<{ pageId: string }> }
 ) {
   const { pageId } = await params;
+  const session = await getSession();
 
   // Skip rate-limit for background generation triggered by the worker itself
   // (e.g. when a mode is toggled on in page-toggles → fire-and-forget regen).
@@ -31,10 +33,20 @@ export async function POST(
     }
   }
 
+  if (!session?.user?.id) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   await ensureProjectsTable();
 
   // Get page and user
-  const [page] = await db.select().from(pages).where(eq(pages.id, pageId));
+  const [page] = await db
+    .select()
+    .from(pages)
+    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
   if (!page || !page.roastEnabled) {
     return new Response(JSON.stringify({ error: 'Roast not enabled' }), {
       status: 404,

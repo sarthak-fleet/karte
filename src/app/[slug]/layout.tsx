@@ -36,5 +36,5 @@ export default async function SlugLayout({ params, children }: Props) {
   const data = await getFullPageData(slug);
   if (!data) notFound();
 
-  return <>{children}</>;
+  return <div data-karte-public-slug={slug}>{children}</div>;
 }

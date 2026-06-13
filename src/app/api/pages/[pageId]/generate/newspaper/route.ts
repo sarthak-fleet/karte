@@ -5,6 +5,7 @@ import type { PageSettings } from '@/db/schema';
 import { generatedPages,pages, users } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
 import { NEWSPAPER_SYSTEM_PROMPT } from '@/lib/ai-prompts';
+import { getSession } from '@/lib/auth-server';
 import { asGeneratedPageContent, type NewspaperContent } from '@/lib/generated-page-types';
 import { buildProfileMemory } from '@/lib/profile-memory';
 import { rateLimit } from '@/lib/rate-limit';
@@ -15,6 +16,7 @@ export async function POST(
   { params }: { params: Promise<{ pageId: string }> }
 ) {
   const { pageId } = await params;
+  const session = await getSession();
 
   const isBackgroundCall = req.headers.get('x-background-generation') === '1';
   if (!isBackgroundCall) {
@@ -29,9 +31,19 @@ export async function POST(
     }
   }
 
+  if (!session?.user?.id) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   await ensureProjectsTable();
 
-  const [page] = await db.select().from(pages).where(eq(pages.id, pageId));
+  const [page] = await db
+    .select()
+    .from(pages)
+    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
   if (!page || !page.newspaperEnabled) {
     return new Response(
       JSON.stringify({ error: 'Newspaper not enabled' }),

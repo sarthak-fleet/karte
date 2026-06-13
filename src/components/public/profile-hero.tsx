@@ -1,6 +1,11 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+
 import { OpenChatButton } from '@/components/public/open-chat-button';
 import { ProfileAvatar } from '@/components/public/profile-avatar';
 import { SocialIconRow } from '@/components/public/social-icon-row';
+import { getProfileVariant } from '@/lib/profile-variants';
 
 interface QuickAction {
   label: string;
@@ -75,6 +80,8 @@ export function ProfileHero({
     icon: string | null;
   }>;
 }) {
+  const searchParams = useSearchParams();
+  const selectedVariant = getProfileVariant(searchParams.get('variant'));
   const firstName = displayName.split(/\s+/)[0] || displayName;
   const restOfName = displayName.slice(firstName.length).trim();
   const initials =
@@ -170,15 +177,17 @@ export function ProfileHero({
 
       {/* Primary CTAs — stacked, not pills */}
       <div className="mt-7 flex flex-col gap-2">
-        {hasMessenger && !chatEnabled && (
+        {hasMessenger && (
           <OpenChatButton
-            mode="contact"
+            mode={chatEnabled ? 'chat' : 'contact'}
             className="group inline-flex items-center justify-between rounded-2xl px-5 py-3.5 text-[15px] font-semibold text-zinc-950 transition-all duration-200 ease-[var(--karte-ease)] hover:brightness-110 active:scale-[0.98]"
             style={{ backgroundColor: accentColor }}
           >
             <span className="flex items-center gap-2">
               <span aria-hidden="true">💬</span>
-              {primaryChatCta}
+              {selectedVariant.id === 'baseline'
+                ? primaryChatCta
+                : selectedVariant.primaryCta}
             </span>
             <span
               aria-hidden="true"

@@ -228,12 +228,12 @@ function extractPreview(type: string, content: unknown): string {
     const html = typeof c.markdown === 'string' ? c.markdown : '';
     text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   } else if (type === 'newspaper') {
+    const lead =
+      (Array.isArray(c?.pages) && c.pages[0]?.leadStory) || c?.leadStory;
     const headline =
-      typeof c?.leadStory?.headline === 'string' ? c.leadStory.headline : '';
+      typeof lead?.headline === 'string' ? lead.headline : '';
     const sub =
-      typeof c?.leadStory?.subheadline === 'string'
-        ? c.leadStory.subheadline
-        : '';
+      typeof lead?.subheadline === 'string' ? lead.subheadline : '';
     text = [headline, sub].filter(Boolean).join(' — ').trim();
   } else if (type === 'roast') {
     text = typeof c.roast === 'string' ? c.roast : '';

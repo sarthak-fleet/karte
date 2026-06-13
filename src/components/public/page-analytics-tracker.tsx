@@ -39,14 +39,26 @@ function getProfileVariantFromLocation() {
   return new URLSearchParams(window.location.search).get('variant') || 'baseline';
 }
 
+function getAnalyticsSlug(pathname: string) {
+  const pathSlug = getPublicSlug(pathname);
+  if (pathSlug) {
+    return pathSlug;
+  }
+
+  const hint = document
+    .querySelector<HTMLElement>('[data-karte-public-slug]')
+    ?.dataset.kartePublicSlug;
+  return hint || null;
+}
+
 export function PageAnalyticsTracker() {
   const pathname = usePathname();
   const lastTrackedPath = useRef<string | null>(null);
 
   useEffect(() => {
-    const slug = getPublicSlug(pathname);
+    const slug = getAnalyticsSlug(pathname);
     const profileVariant = getProfileVariantFromLocation();
-    const trackedPath = `${pathname}?variant=${profileVariant}`;
+    const trackedPath = `${slug ?? pathname}?variant=${profileVariant}`;
     if (!slug || lastTrackedPath.current === trackedPath) {
       return;
     }
@@ -64,7 +76,7 @@ export function PageAnalyticsTracker() {
   }, [pathname]);
 
   useEffect(() => {
-    const analyticsSlug = getPublicSlug(pathname);
+    const analyticsSlug = getAnalyticsSlug(pathname);
     if (!analyticsSlug) {
       return;
     }
