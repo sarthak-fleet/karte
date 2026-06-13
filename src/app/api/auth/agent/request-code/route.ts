@@ -59,7 +59,6 @@ export async function POST(req: Request) {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + CODE_TTL_MS);
   const codeId = crypto.randomUUID();
-
   await db.insert(agentAuthCodes).values({
     id: codeId,
     email,
