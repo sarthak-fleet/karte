@@ -220,6 +220,8 @@ export default async function AnalyticsPage() {
                             ? 'Section viewed'
                             : event.eventType === 'contact_submit'
                               ? 'Lead captured'
+                              : event.eventType === 'dm_submit'
+                                ? 'Direct message sent'
                               : event.eventType === 'hook_open'
                                 ? 'Chat widget opened'
                                 : event.eventType === 'chat_cta_click'
