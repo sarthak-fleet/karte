@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { GeneratingPlaceholder } from '@/components/public/generating-placeholder';
 import { GenerateNewspaper } from '@/components/public/newspaper/generate-newspaper';
 import { NewspaperFrontPage } from '@/components/public/newspaper/newspaper-front-page';
 import { getSession } from '@/lib/auth-server';
@@ -38,27 +39,11 @@ export default async function NewspaperPage({
     const isOwner = session?.user?.id === page.userId;
     if (!isOwner) {
       return (
-        <main className="grid min-h-screen place-items-center bg-[#f5f0e1] px-6 py-16 text-[#17130d]">
-          <div className="max-w-md text-center">
-            <p className="font-serif text-xs font-bold uppercase tracking-[0.22em]">
-              Going to press
-            </p>
-            <h1 className="mt-5 font-serif text-3xl font-bold leading-tight">
-              The front page is being typeset.
-            </h1>
-            <p className="mt-4 text-[15px] leading-[1.65] text-[#17130d]/70">
-              {page.displayName} just turned this surface on. The edition will
-              appear here in a moment — usually under 30 seconds. Refresh to
-              check.
-            </p>
-            <Link
-              href={`/${slug}`}
-              className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#17130d]/20 bg-white px-5 py-2 text-[13px] font-medium text-[#17130d] transition-colors hover:bg-[#17130d]/[0.04]"
-            >
-              ← Back to profile
-            </Link>
-          </div>
-        </main>
+        <GeneratingPlaceholder
+          variant="newspaper"
+          slug={slug}
+          displayName={page.displayName}
+        />
       );
     }
   }
