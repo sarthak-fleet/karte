@@ -8,6 +8,7 @@ import {
   type ImportedLinkItem,
   ImportedLinkPreview,
 } from '@/components/create/imported-link-preview';
+import { hostnameFromUrl } from '@/lib/hostname';
 
 const PENDING_IMPORT_STORAGE_KEY = 'karte_pending_import';
 
@@ -59,7 +60,7 @@ export function ImportPasteCard() {
 
     try {
       posthog.capture('import_preview_submitted', {
-        sourceHost: safeHostname(normalized),
+        sourceHost: hostnameFromUrl(normalized),
       });
     } catch {
       // Never break a user flow on analytics.
@@ -116,7 +117,7 @@ export function ImportPasteCard() {
 
       try {
         posthog.capture('import_preview_rendered', {
-          sourceHost: safeHostname(normalized),
+          sourceHost: hostnameFromUrl(normalized),
           linkCount: nextLinks.length,
         });
       } catch {
@@ -151,7 +152,7 @@ export function ImportPasteCard() {
 
     try {
       posthog.capture('import_funnel_signup_clicked', {
-        sourceHost: safeHostname(normalizedSource),
+        sourceHost: hostnameFromUrl(normalizedSource),
         linkCount: importedLinks.length,
       });
     } catch {
@@ -240,10 +241,3 @@ export function ImportPasteCard() {
   );
 }
 
-function safeHostname(value: string): string {
-  try {
-    return new URL(value).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}

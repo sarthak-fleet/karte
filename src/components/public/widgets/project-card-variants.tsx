@@ -1,4 +1,5 @@
 import { SafeImage } from '@/components/public/safe-image';
+import { hostnameFromUrl } from '@/lib/hostname';
 import type { WidgetVariant } from '@/lib/widget-types';
 
 // Data shape consumed by every ProjectCard variant. Mirrors the columns
@@ -226,7 +227,7 @@ const heroVariant: WidgetVariant<ProjectCardData> = {
 
         <div className="relative mt-1 flex items-center gap-2 text-[12.5px] font-medium text-karte-text-4 transition-colors duration-200 group-hover:text-karte-text-2">
           <span className="font-mono uppercase tracking-[0.12em]">
-            {hostnameOf(data.url)}
+            {hostnameFromUrl(data.url)}
           </span>
           <span
             aria-hidden="true"
@@ -240,14 +241,6 @@ const heroVariant: WidgetVariant<ProjectCardData> = {
     );
   },
 };
-
-function hostnameOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}
 
 export const projectCardVariants: ReadonlyArray<WidgetVariant<ProjectCardData>> = [
   lineVariant,

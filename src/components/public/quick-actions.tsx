@@ -3,16 +3,10 @@
 // auto-derives from the URL host so visitors recognize the destination
 // (Cal.com / Calendly / Ko-fi / etc.) without us hard-coding integrations.
 
-function hostnameOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}
+import { hostnameFromUrl } from '@/lib/hostname';
 
 function calendarLabel(url: string) {
-  const h = hostnameOf(url);
+  const h = hostnameFromUrl(url);
   if (h.includes('calendly')) return 'Book on Calendly';
   if (h.includes('cal.com')) return 'Book on Cal.com';
   if (h.includes('savvycal')) return 'Book on SavvyCal';
@@ -21,7 +15,7 @@ function calendarLabel(url: string) {
 }
 
 function tipLabel(url: string) {
-  const h = hostnameOf(url);
+  const h = hostnameFromUrl(url);
   if (h.includes('ko-fi')) return 'Tip on Ko-fi';
   if (h.includes('buymeacoffee')) return 'Buy me a coffee';
   if (h.includes('stripe')) return 'Send a tip';

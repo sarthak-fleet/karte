@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { OpenChatButton } from '@/components/public/open-chat-button';
 import { ProfileAvatar } from '@/components/public/profile-avatar';
 import { SocialIconRow } from '@/components/public/social-icon-row';
+import { hostnameFromUrl } from '@/lib/hostname';
 import { getProfileVariant } from '@/lib/profile-variants';
 
 interface QuickAction {
@@ -13,16 +14,8 @@ interface QuickAction {
   icon: string;
 }
 
-function hostnameOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}
-
 function calendarLabel(url: string) {
-  const h = hostnameOf(url);
+  const h = hostnameFromUrl(url);
   if (h.includes('calendly')) return 'Book on Calendly';
   if (h.includes('cal.com')) return 'Book a call';
   if (h.includes('savvycal')) return 'Book on SavvyCal';
@@ -30,7 +23,7 @@ function calendarLabel(url: string) {
 }
 
 function tipLabel(url: string) {
-  const h = hostnameOf(url);
+  const h = hostnameFromUrl(url);
   if (h.includes('ko-fi')) return 'Tip on Ko-fi';
   if (h.includes('buymeacoffee')) return 'Buy me a coffee';
   if (h.includes('stripe')) return 'Send a tip';

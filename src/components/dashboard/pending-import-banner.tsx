@@ -4,6 +4,8 @@ import { useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
 import { useEffect, useState } from 'react';
 
+import { hostnameFromUrl } from '@/lib/hostname';
+
 const PENDING_IMPORT_STORAGE_KEY = 'karte_pending_import';
 
 interface PendingImportLink {
@@ -18,14 +20,6 @@ interface PendingImportPayload {
 }
 
 type Status = 'idle' | 'importing' | 'success' | 'error';
-
-function safeHostname(value: string): string {
-  try {
-    return new URL(value).hostname.replace(/^www\./, '');
-  } catch {
-    return value;
-  }
-}
 
 function readPendingImport(): PendingImportPayload | null {
   try {
@@ -141,7 +135,7 @@ export function PendingImportBanner() {
 
       try {
         posthog.capture('import_funnel_completed', {
-          sourceHost: safeHostname(pending.sourceUrl),
+          sourceHost: hostnameFromUrl(pending.sourceUrl, pending.sourceUrl),
           linkCount: count,
         });
       } catch {
@@ -164,7 +158,7 @@ export function PendingImportBanner() {
     setPending(null);
   }
 
-  const sourceHost = safeHostname(pending.sourceUrl);
+  const sourceHost = hostnameFromUrl(pending.sourceUrl, pending.sourceUrl);
 
   return (
     <section

@@ -1,3 +1,4 @@
+import { hostnameFromUrl } from '@/lib/hostname';
 import type { WidgetVariant } from '@/lib/widget-types';
 
 // Data shape consumed by every LinkCard variant. Includes optional richer
@@ -118,12 +119,7 @@ function pathByHost(host: string): { d: string; viewBox?: string } | null {
 }
 
 function HostIcon({ url, accentColor }: { url: string; accentColor: string }) {
-  let host = '';
-  try {
-    host = new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    // ignore
-  }
+  const host = hostnameFromUrl(url);
   const glyph = host ? pathByHost(host) : null;
 
   // Compact tinted bubble with either a brand SVG (preferred) or the

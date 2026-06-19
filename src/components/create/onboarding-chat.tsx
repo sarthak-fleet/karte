@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import posthog from 'posthog-js';
 import { useEffect, useRef, useState } from 'react';
 
+import { hostnameFromUrl } from '@/lib/hostname';
+
 const STORAGE_KEY = 'karte_pending_onboarding';
 
 interface OnboardingLink {
@@ -48,21 +50,15 @@ function fieldSummary(state: OnboardingState): string[] {
   if (state.bio) lines.push(`Bio: ${state.bio}`);
   if (state.location) lines.push(`Location: ${state.location}`);
   if (state.slug) lines.push(`URL: karte.cc/${state.slug}`);
-  if (state.calendarUrl) lines.push(`Booking: ${hostnameOf(state.calendarUrl)}`);
-  if (state.newsletterUrl) lines.push(`Newsletter: ${hostnameOf(state.newsletterUrl)}`);
-  if (state.tipUrl) lines.push(`Tip jar: ${hostnameOf(state.tipUrl)}`);
-  if (state.videoUrl) lines.push(`Video: ${hostnameOf(state.videoUrl)}`);
+  if (state.calendarUrl)
+    lines.push(`Booking: ${hostnameFromUrl(state.calendarUrl, state.calendarUrl)}`);
+  if (state.newsletterUrl)
+    lines.push(`Newsletter: ${hostnameFromUrl(state.newsletterUrl, state.newsletterUrl)}`);
+  if (state.tipUrl) lines.push(`Tip jar: ${hostnameFromUrl(state.tipUrl, state.tipUrl)}`);
+  if (state.videoUrl) lines.push(`Video: ${hostnameFromUrl(state.videoUrl, state.videoUrl)}`);
   if (state.links?.length) lines.push(`Links: ${state.links.length}`);
   if (state.projects?.length) lines.push(`Projects: ${state.projects.length}`);
   return lines;
-}
-
-function hostnameOf(url: string) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
 }
 
 export function OnboardingChat() {

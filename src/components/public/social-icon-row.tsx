@@ -2,6 +2,8 @@
 // but rendered as small standalone chips — no title, no body, just the
 // icon. Hover surfaces the title as a native tooltip + an accent ring.
 
+import { hostnameFromUrl } from '@/lib/hostname';
+
 interface SocialLink {
   id?: string;
   title: string;
@@ -82,14 +84,6 @@ const SITE_GLYPH = {
   d: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm7.93 9h-3.05a15.4 15.4 0 0 0-1.36-5.36A8.03 8.03 0 0 1 19.93 11zM12 4.07c1.04 1.5 1.86 3.97 2.12 6.93H9.88C10.14 8.04 10.96 5.57 12 4.07zM4.07 11A8.03 8.03 0 0 1 8.48 5.64 15.4 15.4 0 0 0 7.12 11H4.07zm0 2h3.05a15.4 15.4 0 0 0 1.36 5.36A8.03 8.03 0 0 1 4.07 13zM12 19.93c-1.04-1.5-1.86-3.97-2.12-6.93h4.24c-.26 2.96-1.08 5.43-2.12 6.93zm3.52-1.57A15.4 15.4 0 0 0 16.88 13h3.05a8.03 8.03 0 0 1-4.41 5.36z',
 };
 
-function hostnameOf(url: string) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}
-
 export function SocialIconRow({
   links,
   accentColor,
@@ -102,7 +96,7 @@ export function SocialIconRow({
   return (
     <div className="mt-6 flex flex-wrap items-center gap-2">
       {links.map((link) => {
-        const host = hostnameOf(link.url);
+        const host = hostnameFromUrl(link.url);
         const brandGlyph = host ? pathByHost(host) : null;
         const glyph = brandGlyph ?? (host ? SITE_GLYPH : null);
         const userIcon = link.icon?.trim();

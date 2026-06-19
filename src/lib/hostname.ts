@@ -4,6 +4,19 @@
  */
 const HOSTNAME_RE = /^(?=.{1,253}$)(?!-)(?:[a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,63}$/;
 
+/**
+ * Extracts a display hostname from a full URL, stripping a leading `www.`.
+ * Returns `fallback` (default `''`) when the input is empty or not a valid URL.
+ */
+export function hostnameFromUrl(url: string | null | undefined, fallback = ''): string {
+  if (!url) return fallback;
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return fallback;
+  }
+}
+
 export function normalizeHostname(input: string | null | undefined): string | null {
   if (typeof input !== 'string') return null;
   let host = input.trim().toLowerCase();

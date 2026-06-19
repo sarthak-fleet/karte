@@ -1,6 +1,7 @@
 'use client';
 
 import { LinkCard } from '@/components/public/link-card';
+import { hostnameFromUrl } from '@/lib/hostname';
 
 export interface ImportedLinkItem {
   title: string;
@@ -32,7 +33,7 @@ export function ImportedLinkPreview({
           <p className="mt-2 text-sm text-karte-text-3">
             {links.length} link{links.length === 1 ? '' : 's'} imported
             {sourceUrl ? (
-              <span className="text-karte-text-4"> · from {prettyHost(sourceUrl)}</span>
+              <span className="text-karte-text-4"> · from {hostnameFromUrl(sourceUrl, sourceUrl)}</span>
             ) : null}
           </p>
         </div>
@@ -49,12 +50,4 @@ export function ImportedLinkPreview({
       </div>
     </div>
   );
-}
-
-function prettyHost(value: string): string {
-  try {
-    return new URL(value).hostname.replace(/^www\./, '');
-  } catch {
-    return value;
-  }
 }
