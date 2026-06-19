@@ -21,6 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
 
+import { DragHandle } from '@/components/dashboard/drag-handle';
 import { ImageUploadField } from '@/components/dashboard/image-upload-field';
 
 interface Project {
@@ -32,25 +33,6 @@ interface Project {
   description: string;
   sortOrder: number | null;
   enabled: boolean | null;
-}
-
-function DragHandle() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      className="shrink-0"
-    >
-      <circle cx="5" cy="3" r="1.5" />
-      <circle cx="11" cy="3" r="1.5" />
-      <circle cx="5" cy="8" r="1.5" />
-      <circle cx="11" cy="8" r="1.5" />
-      <circle cx="5" cy="13" r="1.5" />
-      <circle cx="11" cy="13" r="1.5" />
-    </svg>
-  );
 }
 
 function ProjectCard({
