@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 
 import { listModels } from '@/lib/ai-client';
-import { getSession } from '@/lib/auth-server';
+import { requireUser } from '@/lib/api-auth';
 
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const body = await req.json();
   const { endpointUrl, apiKey } = body;

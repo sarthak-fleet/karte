@@ -7,7 +7,7 @@ import type {
   TimelineEventType,
 } from '@/db/schema';
 import { pages, timelineEvents } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { requireUser } from '@/lib/api-auth';
 import { parseWhenLabel } from '@/lib/timeline';
 
 const VALID_TYPES: ReadonlyArray<TimelineEventType> = [
@@ -58,12 +58,10 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ pageId: string; eventId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
   const { pageId, eventId } = await params;
-  const owned = await verifyOwnership(pageId, eventId, session.user.id);
+  const owned = await verifyOwnership(pageId, eventId, auth.userId);
   if (!owned) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -121,12 +119,10 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ pageId: string; eventId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
   const { pageId, eventId } = await params;
-  const owned = await verifyOwnership(pageId, eventId, session.user.id);
+  const owned = await verifyOwnership(pageId, eventId, auth.userId);
   if (!owned) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

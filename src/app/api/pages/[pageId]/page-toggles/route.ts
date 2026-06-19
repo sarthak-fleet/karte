@@ -4,6 +4,7 @@ import { after } from 'next/server';
 import { db, ensureProjectsTable } from '@/db';
 import type { PageSettings } from '@/db/schema';
 import { generatedPages, pages } from '@/db/schema';
+import { loadOwnedPage } from '@/lib/api-auth';
 import { getSession } from '@/lib/auth-server';
 
 type GenMode = 'roast' | 'encyclopedia' | 'newspaper';
@@ -27,10 +28,7 @@ export async function PUT(
   const { pageId } = await params;
   await ensureProjectsTable();
 
-  const [page] = await db
-    .select()
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+  const page = await loadOwnedPage(pageId, session.user.id);
 
   if (!page) {
     return new Response(JSON.stringify({ error: 'Page not found' }), { status: 404 });

@@ -1,7 +1,8 @@
 import { and,eq } from 'drizzle-orm';
 
 import { db, ensureProjectsTable } from '@/db';
-import { generatedPages,pages } from '@/db/schema';
+import { generatedPages } from '@/db/schema';
+import { loadOwnedPage } from '@/lib/api-auth';
 import { getSession } from '@/lib/auth-server';
 import type { EncyclopediaContent } from '@/lib/generated-page-types';
 
@@ -15,10 +16,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ pageId: 
   await ensureProjectsTable();
 
   // Verify ownership
-  const [page] = await db
-    .select()
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+  const page = await loadOwnedPage(pageId, session.user.id);
 
   if (!page) {
     return new Response(JSON.stringify({ error: 'Page not found' }), { status: 404 });

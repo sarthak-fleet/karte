@@ -1,7 +1,8 @@
 import { and, eq, inArray } from 'drizzle-orm';
 
 import { db, ensureProjectsTable } from '@/db';
-import { generatedPages, pages } from '@/db/schema';
+import { generatedPages } from '@/db/schema';
+import { loadOwnedPage } from '@/lib/api-auth';
 import { getSession } from '@/lib/auth-server';
 
 type GenMode = 'roast' | 'encyclopedia' | 'newspaper';
@@ -32,10 +33,7 @@ export async function GET(
   await ensureProjectsTable();
 
   // Verify the page belongs to this user before exposing status.
-  const [page] = await db
-    .select({ id: pages.id })
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+  const page = await loadOwnedPage(pageId, session.user.id);
   if (!page) {
     return new Response(JSON.stringify({ error: 'Page not found' }), {
       status: 404,

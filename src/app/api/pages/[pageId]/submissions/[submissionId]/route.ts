@@ -2,8 +2,8 @@ import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
-import { contactSubmissions, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { contactSubmissions } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 
 const SUBMISSION_STATUSES = new Set(['unread', 'replied', 'archived']);
 
@@ -11,17 +11,13 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ pageId: string; submissionId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId, submissionId } = await params;
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
-  });
+  const page = await loadOwnedPage(pageId, auth.userId);
 
   if (!page) {
     return NextResponse.json({ error: 'Page not found' }, { status: 404 });

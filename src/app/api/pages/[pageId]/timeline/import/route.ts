@@ -6,15 +6,12 @@
 // so the dashboard can show a preview, let the user edit/uncheck, and
 // then call the regular POST /timeline endpoint to commit the keepers.
 
-import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
-import { db } from '@/db';
 import type { TimelineEventType } from '@/db/schema';
-import { pages } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
 import { TIMELINE_IMPORT_SYSTEM_PROMPT } from '@/lib/ai-prompts';
-import { getSession } from '@/lib/auth-server';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import { rateLimit } from '@/lib/rate-limit';
 
 const VALID_TYPES: ReadonlySet<TimelineEventType> = new Set([
@@ -47,30 +44,24 @@ interface ParsedEvent {
 }
 
 async function verifyOwnership(pageId: string, userId: string) {
-  const [page] = await db
-    .select({ id: pages.id })
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, userId)));
-  return page ?? null;
+  return loadOwnedPage(pageId, userId);
 }
 
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
   const { pageId } = await params;
-  const page = await verifyOwnership(pageId, session.user.id);
+  const page = await verifyOwnership(pageId, auth.userId);
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   // Rate-limited per user since AI calls cost money + this is the only
   // place anyone can trigger an AI parse from the dashboard.
-  const { ok } = rateLimit(`timeline-import:${session.user.id}`, {
+  const { ok } = rateLimit(`timeline-import:${auth.userId}`, {
     maxRequests: 10,
     windowMs: 60_000,
   });

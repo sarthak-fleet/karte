@@ -1,9 +1,9 @@
-import { and, desc,eq } from 'drizzle-orm';
+import { desc,eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import { infoBlocks, pages, users } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { infoBlocks, users } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import { ingestDocument } from '@/lib/saasmaker';
 import { MAX_CONTENT_LENGTH } from '@/lib/validation';
 
@@ -17,16 +17,12 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
 
-  const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
-  });
+  const page = await loadOwnedPage(pageId, auth.userId);
 
   if (!page) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -44,16 +40,12 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
 
-  const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
-  });
+  const page = await loadOwnedPage(pageId, auth.userId);
 
   if (!page) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -104,7 +96,7 @@ export async function POST(
     .returning();
 
   // Ingest into saas-maker if configured
-  const [user] = await db.select().from(users).where(eq(users.id, session.user.id));
+  const [user] = await db.select().from(users).where(eq(users.id, auth.userId));
   if (user?.smIndexId) {
     try {
       const adminKey = process.env.SAASMAKER_ADMIN_KEY!;

@@ -1,9 +1,6 @@
-import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
-import { db } from '@/db';
-import { pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import {
   createR2ImageObjectKey,
   isR2Configured,
@@ -36,10 +33,8 @@ function isUploadKind(value: string): value is UploadKind {
 }
 
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   if (!isR2Configured()) {
     return NextResponse.json(
@@ -71,9 +66,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'file is required' }, { status: 400 });
   }
 
-  const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
-  });
+  const page = await loadOwnedPage(pageId, auth.userId);
 
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

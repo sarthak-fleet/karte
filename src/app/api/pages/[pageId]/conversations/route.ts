@@ -1,25 +1,21 @@
-import { and, count, desc, eq, sql } from 'drizzle-orm';
+import { count, desc, eq, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import { conversations, messages,pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { conversations, messages } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
 
   // Verify ownership
-  const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
-  });
+  const page = await loadOwnedPage(pageId, auth.userId);
 
   if (!page) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });

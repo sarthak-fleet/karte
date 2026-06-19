@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getSession } from '@/lib/auth-server';
+import { requireUser } from '@/lib/api-auth';
 import { autoEnrichProfileFromLinks } from '@/lib/profile-auto-enrich';
 
 function readPositiveInt(value: unknown, fallback: number, max: number) {
@@ -13,17 +13,15 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
   const body = await req.json().catch(() => ({}));
 
   try {
     const result = await autoEnrichProfileFromLinks(pageId, {
-      userId: session.user.id,
+      userId: auth.userId,
       apply: Boolean(body.apply),
       updateBio: body.updateBio !== false,
       replaceExisting: body.replaceExisting !== false,

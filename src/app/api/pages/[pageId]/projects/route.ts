@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
 import { pages, projects } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { requireUser } from '@/lib/api-auth';
 import {
   isValidUrl,
   MAX_PROJECT_DESCRIPTION_LENGTH,
@@ -16,17 +16,15 @@ export async function GET(
   { params }: { params: Promise<{ pageId: string }> },
 ) {
   const { pageId } = await params;
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   await ensureProjectsTable();
 
   const [page] = await db
     .select()
     .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+    .where(and(eq(pages.id, pageId), eq(pages.userId, auth.userId)));
 
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -46,17 +44,15 @@ export async function POST(
   { params }: { params: Promise<{ pageId: string }> },
 ) {
   const { pageId } = await params;
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   await ensureProjectsTable();
 
   const [page] = await db
     .select()
     .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+    .where(and(eq(pages.id, pageId), eq(pages.userId, auth.userId)));
 
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -147,17 +143,15 @@ export async function PATCH(
   { params }: { params: Promise<{ pageId: string }> },
 ) {
   const { pageId } = await params;
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   await ensureProjectsTable();
 
   const [page] = await db
     .select()
     .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+    .where(and(eq(pages.id, pageId), eq(pages.userId, auth.userId)));
 
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

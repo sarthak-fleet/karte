@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { db, ensureProjectsTable } from '@/db';
 import { links, pages } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
-import { getSession } from '@/lib/auth-server';
+import { requireUser } from '@/lib/api-auth';
 import { isBlockedUrl, MAX_IMPORT_LINKS } from '@/lib/link-import';
 import { resolveThemeConfig } from '@/lib/themes';
 import { isValidSlug, isValidUrl, MAX_TITLE_LENGTH } from '@/lib/validation';
@@ -193,10 +193,8 @@ async function generateCards(opts: {
 
 // ── Handler ─────────────────────────────────────────────────────────
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
   await ensureProjectsTable();
 
   const body = (await req.json().catch(() => ({}))) as {
@@ -210,22 +208,22 @@ export async function POST(req: Request) {
   let [page] = await db
     .select()
     .from(pages)
-    .where(eq(pages.userId, session.user.id))
+    .where(eq(pages.userId, auth.userId))
     .limit(1);
 
   if (!page) {
     const seed =
-      slugFromName(session.user.name) || slugFromEmail(session.user.email);
+      slugFromName(auth.user.name) || slugFromEmail(auth.user.email);
     const slug = await findUniqueSlug(seed);
-    const displayName = (session.user.name || seed).slice(0, MAX_TITLE_LENGTH);
+    const displayName = (auth.user.name || seed).slice(0, MAX_TITLE_LENGTH);
     const [created] = await db
       .insert(pages)
       .values({
-        userId: session.user.id,
+        userId: auth.userId,
         slug,
         displayName,
         bio: null,
-        avatarUrl: session.user.image ?? null,
+        avatarUrl: auth.user.image ?? null,
         themeConfig: resolveThemeConfig(),
         chatEnabled: true,
       })

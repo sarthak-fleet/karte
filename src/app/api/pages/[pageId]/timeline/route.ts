@@ -1,10 +1,10 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import type { TimelineEventStatus, TimelineEventType } from '@/db/schema';
-import { pages, timelineEvents } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { timelineEvents } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import { parseWhenLabel } from '@/lib/timeline';
 
 const VALID_TYPES: ReadonlyArray<TimelineEventType> = [
@@ -33,11 +33,7 @@ const MAX_BODY = 1500;
 const MAX_FIELD = 200;
 
 async function verifyOwnership(pageId: string, userId: string) {
-  const [page] = await db
-    .select({ id: pages.id })
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, userId)));
-  return page ?? null;
+  return loadOwnedPage(pageId, userId);
 }
 
 // GET — list events for a page. Owner-only; future: a "public" mode
@@ -46,12 +42,10 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
   const { pageId } = await params;
-  const page = await verifyOwnership(pageId, session.user.id);
+  const page = await verifyOwnership(pageId, auth.userId);
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -70,12 +64,10 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
   const { pageId } = await params;
-  const page = await verifyOwnership(pageId, session.user.id);
+  const page = await verifyOwnership(pageId, auth.userId);
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

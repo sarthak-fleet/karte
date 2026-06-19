@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
 import { pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { requireUser } from '@/lib/api-auth';
 import { isThemePresetId, resolveThemeConfig } from '@/lib/themes';
 import {
   isValidSlug,
@@ -13,24 +13,22 @@ import {
 } from '@/lib/validation';
 
 export async function GET() {
-  const session = await getSession();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   await ensureProjectsTable();
 
   const userPages = await db
     .select()
     .from(pages)
-    .where(eq(pages.userId, session.user.id));
+    .where(eq(pages.userId, auth.userId));
 
   return NextResponse.json(userPages);
 }
 
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   await ensureProjectsTable();
 
@@ -129,7 +127,7 @@ export async function POST(req: Request) {
   const [page] = await db
     .insert(pages)
     .values({
-      userId: session.user.id,
+      userId: auth.userId,
       slug,
       displayName,
       bio: bio ?? null,

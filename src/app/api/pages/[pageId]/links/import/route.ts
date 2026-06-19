@@ -1,9 +1,9 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import { links, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { links } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import {
   type ImportedLink,
   ImportError,
@@ -14,25 +14,18 @@ import {
 import { isValidUrl, MAX_TITLE_LENGTH } from '@/lib/validation';
 
 async function verifyOwnership(pageId: string, userId: string) {
-  const [page] = await db
-    .select({ id: pages.id })
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, userId)));
-
-  return page ?? null;
+  return loadOwnedPage(pageId, userId);
 }
 
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
-  const page = await verifyOwnership(pageId, session.user.id);
+  const page = await verifyOwnership(pageId, auth.userId);
   if (!page) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

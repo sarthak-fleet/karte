@@ -2,8 +2,8 @@ import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import { links, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { links } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import { isValidUrl, MAX_TITLE_LENGTH } from '@/lib/validation';
 
 export async function PUT(
@@ -11,14 +11,10 @@ export async function PUT(
   { params }: { params: Promise<{ pageId: string; linkId: string }> },
 ) {
   const { pageId, linkId } = await params;
-  const session = await getSession();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
-  const [page] = await db
-    .select()
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+  const page = await loadOwnedPage(pageId, auth.userId);
   if (!page)
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -85,15 +81,11 @@ export async function DELETE(
   { params }: { params: Promise<{ pageId: string; linkId: string }> },
 ) {
   const { pageId, linkId } = await params;
-  const session = await getSession();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   // Verify page ownership
-  const [page] = await db
-    .select()
-    .from(pages)
-    .where(and(eq(pages.id, pageId), eq(pages.userId, session.user.id)));
+  const page = await loadOwnedPage(pageId, auth.userId);
 
   if (!page)
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

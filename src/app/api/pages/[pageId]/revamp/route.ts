@@ -11,7 +11,7 @@ import {
   users,
 } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
-import { getSession } from '@/lib/auth-server';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import { isPageSectionType, type PageSectionType } from '@/lib/page-sections';
 import {
   isThemePresetId,
@@ -370,17 +370,13 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
   await ensureProjectsTable();
 
-  const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
-  });
+  const page = await loadOwnedPage(pageId, auth.userId);
   if (!page) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
@@ -395,7 +391,7 @@ export async function POST(
       db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
       db.select().from(pageSections).where(eq(pageSections.pageId, pageId)).orderBy(asc(pageSections.sortOrder)),
       db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)).orderBy(asc(infoBlocks.sortOrder)),
-      db.query.users.findFirst({ where: eq(users.id, session.user.id) }),
+      db.query.users.findFirst({ where: eq(users.id, auth.userId) }),
     ]);
 
     const incomingPlan = body.plan ? normalizePlan(body.plan) : null;

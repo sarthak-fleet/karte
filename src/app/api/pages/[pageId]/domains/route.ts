@@ -1,9 +1,9 @@
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
-import { pageDomains, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { pageDomains } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import { addDomain, getDnsInstructions } from '@/lib/cloudflare-domains';
 import {
   findConflictingDomain,
@@ -14,21 +14,18 @@ import {
 
 async function requirePageOwner(pageId: string, userId: string) {
   await ensureProjectsTable();
-  return db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, userId)),
-  });
+  return loadOwnedPage(pageId, userId);
 }
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
-  const page = await requirePageOwner(pageId, session.user.id);
+  const page = await requirePageOwner(pageId, auth.userId);
   if (!page) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const domains = await db
@@ -48,12 +45,11 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
-  const page = await requirePageOwner(pageId, session.user.id);
+  const page = await requirePageOwner(pageId, auth.userId);
   if (!page) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const body = await req.json().catch(() => ({}));

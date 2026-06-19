@@ -2,16 +2,14 @@ import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
-import { pageDomains, pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { pageDomains } from '@/db/schema';
+import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import { removeDomain } from '@/lib/cloudflare-domains';
 import { invalidateHostCache } from '@/lib/page-domains';
 
 async function loadOwned(pageId: string, domainId: string, userId: string) {
   await ensureProjectsTable();
-  const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, userId)),
-  });
+  const page = await loadOwnedPage(pageId, userId);
   if (!page) return null;
   const domain = await db.query.pageDomains.findFirst({
     where: and(eq(pageDomains.id, domainId), eq(pageDomains.pageId, pageId)),
@@ -24,12 +22,11 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ pageId: string; domainId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId, domainId } = await params;
-  const owned = await loadOwned(pageId, domainId, session.user.id);
+  const owned = await loadOwned(pageId, domainId, auth.userId);
   if (!owned) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   await removeDomain(owned.domain.hostname);

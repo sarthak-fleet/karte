@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
 import { pages } from '@/db/schema';
-import { getSession } from '@/lib/auth-server';
+import { requireUser } from '@/lib/api-auth';
 import { isThemePresetId, resolveThemeConfig } from '@/lib/themes';
 import { isValidSlug, isValidUrl, MAX_BIO_LENGTH } from '@/lib/validation';
 
@@ -13,16 +13,14 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ('error' in auth) return auth.error;
 
   const { pageId } = await params;
   await ensureProjectsTable();
 
   const page = await db.query.pages.findFirst({
-    where: and(eq(pages.id, pageId), eq(pages.userId, session.user.id)),
+    where: and(eq(pages.id, pageId), eq(pages.userId, auth.userId)),
   });
 
   if (!page) {
