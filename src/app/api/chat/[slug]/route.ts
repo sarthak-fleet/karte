@@ -1,12 +1,12 @@
-import { and,eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { db, ensureProjectsTable } from '@/db';
 import { conversations, pages, users } from '@/db/schema';
 import { resolveAiConfig, streamResponse } from '@/lib/ai-client';
 import { CHAT_RESPONSE_ENVELOPE_PROMPT } from '@/lib/ai-prompts';
 import { buildProfileMemory } from '@/lib/profile-memory';
+import { search } from '@/lib/knowledgebase';
 import { rateLimit } from '@/lib/rate-limit';
-import { search } from '@/lib/saasmaker';
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
@@ -113,7 +113,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     const [memory, retrievedContext] = await Promise.all([
       buildProfileMemory({ page, mode: 'chat', query }),
       user.smApiKey && user.smIndexId
-        ? search(user.smApiKey, user.smIndexId, query, 5)
+        ? search(user.smIndexId, query, 5, { userId: page.userId, pageId: page.id })
           .then((searchResults) => searchResults.results.map((r) => r.chunk_content).join('\n\n'))
           .catch(() => '')
         : Promise.resolve(''),

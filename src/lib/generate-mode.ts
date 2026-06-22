@@ -3,6 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { db, ensureProjectsTable } from '@/db';
 import { generatedPages, pages, users } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
+import { parseAIResponse } from '@/lib/ai-response';
 import { getSession } from '@/lib/auth-server';
 import {
   asGeneratedPageContent,
@@ -10,7 +11,6 @@ import {
 } from '@/lib/generated-page-types';
 import { buildProfileMemory } from '@/lib/profile-memory';
 import { rateLimit } from '@/lib/rate-limit';
-import { parseAIResponse } from '@/lib/saasmaker';
 
 type ProfilePage = typeof pages.$inferSelect;
 

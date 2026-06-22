@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { requireUser } from '@/lib/api-auth';
-import { createIndex } from '@/lib/saasmaker';
+import { createIndex } from '@/lib/knowledgebase';
 
 export async function GET() {
   const auth = await requireUser();
@@ -43,7 +43,8 @@ export async function PUT(req: Request) {
 
   const updates: Record<string, string | null> = {};
 
-  // Handle SaaS Maker key (for RAG/chat document indexing)
+  // Handle profile-memory key setup. The stored sm* column names are legacy;
+  // RAG indexing now goes only through the shared knowledgebase Worker.
   if (aiKey !== undefined) {
     if (!aiKey?.trim()) {
       return NextResponse.json({ error: 'AI key is required' }, { status: 400 });
@@ -52,8 +53,7 @@ export async function PUT(req: Request) {
     let indexId = user.smIndexId;
     if (!indexId) {
       try {
-        const adminKey = process.env.SAASMAKER_ADMIN_KEY!;
-        const index = await createIndex(adminKey, `linkchat-${auth.userId}`);
+        const index = await createIndex(`linkchat-${auth.userId}`);
         indexId = index.id;
       } catch {
         return NextResponse.json({ error: 'Failed to initialize chat index' }, { status: 502 });

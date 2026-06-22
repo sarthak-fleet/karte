@@ -16,8 +16,8 @@
     "enrich:profile": "node scripts/enrich-profile-from-links.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf:build": "next build --webpack && node scripts/run-inline-critical-css.mjs && opennextjs-cloudflare build --skipNextBuild && opennextjs-cloudflare populateCache local && pnpm --filter ./landing-astro build && node scripts/run-overlay-astro-landing.mjs",
-    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "upload:cf": "opennextjs-cloudflare build && opennextjs-cloudflare upload"
+    "deploy:cf": "pnpm cf:build && opennextjs-cloudflare deploy",
+    "upload:cf": "pnpm cf:build && opennextjs-cloudflare upload"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.41",

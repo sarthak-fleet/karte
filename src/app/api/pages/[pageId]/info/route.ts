@@ -1,10 +1,10 @@
-import { desc,eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { infoBlocks, users } from '@/db/schema';
 import { loadOwnedPage, requireUser } from '@/lib/api-auth';
-import { ingestDocument } from '@/lib/saasmaker';
+import { ingestDocument } from '@/lib/knowledgebase';
 import { MAX_CONTENT_LENGTH } from '@/lib/validation';
 
 const ALLOWED_INFO_BLOCK_TYPES = new Set(['text', 'resume', 'faq', 'current', 'voice', 'boundaries']);
@@ -95,19 +95,21 @@ export async function POST(
     })
     .returning();
 
-  // Ingest into saas-maker if configured
+  // Ingest profile memory into the shared knowledgebase Worker.
   const [user] = await db.select().from(users).where(eq(users.id, auth.userId));
   if (user?.smIndexId) {
     try {
-      const adminKey = process.env.SAASMAKER_ADMIN_KEY!;
-      const doc = await ingestDocument(adminKey, user.smIndexId, content, {
+      const doc = await ingestDocument(user.smIndexId, content, {
+        userId: auth.userId,
+        pageId: page.id,
+        pageSlug: page.slug,
         type,
         title: title || undefined,
         blockId: block.id,
       });
       await db.update(infoBlocks).set({ smDocumentId: doc.id }).where(eq(infoBlocks.id, block.id));
     } catch {
-      console.error('Failed to ingest info block into saas-maker');
+      console.error('Failed to ingest info block into knowledgebase RAG');
     }
   }
 

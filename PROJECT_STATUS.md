@@ -23,12 +23,13 @@ Last updated: 2026-06-20
 - **Analytics:** PostHog + Cloudflare Analytics Engine (`ANALYTICS` binding).
 - **CI/CD:** `.github/workflows/deploy.yml` — auto-deploy on push to `main`.
 - **Env (required):** `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `AUTH_GOOGLE_*`, `TURSO_*`, `NEXT_PUBLIC_APP_URL`, `LINKCHAT_DEFAULT_AI_API_KEY`.
-- **Env (optional):** R2 credentials, `RAG_SERVICE_KEY`, `RAG_SERVICE_URL`, legacy `SAASMAKER_*`.
+- **Env (optional):** R2 credentials, `RAG_SERVICE_URL`.
+- **Env (RAG):** `RAG_SERVICE_KEY` is required for profile-memory indexing/search.
 
 ### Internal fleet
 
-- **RAG_SERVICE:** service binding + `RAG_SERVICE_KEY`; `infoBlocks` sync when configured.
-- **Legacy SaaS Maker RAG:** fallback still documented for migration completeness; prefer service binding.
+- **RAG_SERVICE:** service binding + `RAG_SERVICE_KEY`; `infoBlocks` sync to the shared Cloudflare `knowledgebase` Worker.
+- **Legacy SaaS Maker RAG:** removed as a fallback for profile-memory create/ingest/delete/search.
 - **Landing overlay:** `landing-astro/` built and overlaid via local `scripts/run-overlay-astro-landing.mjs` in `cf:build`.
 
 ### Stack & commands
@@ -128,7 +129,8 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 ### Integrations & quality
 
-- Shared Cloudflare RAG integration deployed; `infoBlocks` sync when `RAG_SERVICE_KEY` configured.
+- Shared Cloudflare RAG integration is wired locally and build-verified; `infoBlocks`
+  sync when `RAG_SERVICE_KEY` is configured after deploy.
 - React Compiler enabled — no hand-written `useMemo`/`useCallback`.
 
 ## Todo / Planned / Deferred / Blocked

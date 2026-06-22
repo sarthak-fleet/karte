@@ -1,10 +1,10 @@
-import { and,eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { infoBlocks, users } from '@/db/schema';
 import { loadOwnedPage, requireUser } from '@/lib/api-auth';
-import { deleteDocument } from '@/lib/saasmaker';
+import { deleteDocument } from '@/lib/knowledgebase';
 
 export async function DELETE(
   _req: Request,
@@ -21,17 +21,16 @@ export async function DELETE(
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  // Look up block for saas-maker cleanup
+  // Look up block for knowledgebase RAG cleanup.
   const [block] = await db.select().from(infoBlocks).where(and(eq(infoBlocks.id, blockId), eq(infoBlocks.pageId, pageId)));
 
   if (block?.smDocumentId) {
     const [user] = await db.select().from(users).where(eq(users.id, auth.userId));
     if (user?.smIndexId) {
       try {
-        const adminKey = process.env.SAASMAKER_ADMIN_KEY!;
-        await deleteDocument(adminKey, user.smIndexId, block.smDocumentId);
+        await deleteDocument(block.smDocumentId);
       } catch {
-        console.error('Failed to delete document from saas-maker');
+        console.error('Failed to delete document from knowledgebase RAG');
       }
     }
   }
