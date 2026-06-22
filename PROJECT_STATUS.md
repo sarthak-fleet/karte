@@ -1,6 +1,6 @@
 # linkchat — PROJECT STATUS
 
-Last updated: 2026-06-20
+Last updated: 2026-06-22
 
 ## Why/What
 
@@ -138,10 +138,11 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 ### Planned
 
 1. Make profile creation/editing resilient across guest, authenticated, and returning-user flows.
-2. Creator-facing analytics for link clicks, chat interactions, and profile-mode usage (dashboard analytics exists — deepen product metrics).
-3. Harden rate limiting beyond in-memory when traffic or abuse evidence justifies it (fleet rule: explicit approval + endpoint evidence).
-4. Keep AI-generated content reviewable and traceable for profile owners.
-5. Wire richer PostHog funnels for mode usage (chat vs encyclopedia vs roast vs newspaper).
+2. Make memory/data connection zero-config: a creator should be able to say "I am sending data your way" through upload, paste, URL, email/webhook, or API, and Karte should infer structure, ingest through Knowledgebase, show status, and make chat use it automatically without exposing indexes, embeddings, or RAG mechanics.
+3. Creator-facing analytics for link clicks, chat interactions, and profile-mode usage (dashboard analytics exists — deepen product metrics).
+4. Harden rate limiting beyond in-memory when traffic or abuse evidence justifies it (fleet rule: explicit approval + endpoint evidence).
+5. Keep AI-generated content reviewable and traceable for profile owners.
+6. Wire richer PostHog funnels for mode usage (chat vs encyclopedia vs roast vs newspaper).
 
 ### Deferred
 
