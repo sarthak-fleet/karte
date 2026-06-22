@@ -39,6 +39,19 @@ interface Message {
 
 type ChatPosition = 'bottom-right' | 'bottom-left';
 
+function ChatLoadingIndicator({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 py-0.5 text-white/65">
+      <span>{label}</span>
+      <span className="flex gap-1" aria-hidden="true">
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '0ms' }} />
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '150ms' }} />
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '300ms' }} />
+      </span>
+    </span>
+  );
+}
+
 function getButtonTextColor(color: string) {
   const normalized = color.trim().replace('#', '');
   const hex =
@@ -112,6 +125,8 @@ export function ChatWidget({
     !!initialRoomId && historyStatus === 'loaded' && messages.length > 0 && !hasJoined;
   const isFirstMessage =
     mode === 'chat' && chatEnabled && messages.length === 0 && historyStatus !== 'loading';
+  const showPendingAssistant =
+    loading && messages[messages.length - 1]?.role === 'user';
   const starterPrompts = [
     `What does ${displayName} do?`,
     `Latest projects?`,
@@ -664,9 +679,11 @@ export function ChatWidget({
             <>
               <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
                 {historyStatus === 'loading' && (
-                  <p className="mt-8 text-center text-xs text-white/50">
-                    Loading your conversation...
-                  </p>
+                  <div className="mt-8 flex justify-center">
+                    <div className={`${expanded ? 'max-w-[92%]' : 'max-w-[80%]'} rounded-xl border border-karte-border-strong bg-white/5 px-3 py-2 text-sm`}>
+                      <ChatLoadingIndicator label="Loading messages" />
+                    </div>
+                  </div>
                 )}
                 {historyStatus === 'error' && messages.length === 0 && (
                   <p className="mt-8 text-center text-xs text-white/50">
@@ -721,11 +738,7 @@ export function ChatWidget({
                       }
                     >
                       {msg.content === '' && loading && index === messages.length - 1 ? (
-                        <span className="flex gap-1 py-0.5">
-                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '0ms' }} />
-                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '150ms' }} />
-                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '300ms' }} />
-                        </span>
+                        <ChatLoadingIndicator label="Thinking" />
                       ) : msg.role === 'assistant' ? (
                         <>
                           <ChatMessageBody content={msg.content} />
@@ -752,6 +765,13 @@ export function ChatWidget({
                     </div>
                   </div>
                 ))}
+                {showPendingAssistant && (
+                  <div className="flex justify-start">
+                    <div className={`${expanded ? 'max-w-[92%]' : 'max-w-[80%]'} rounded-xl border border-karte-border-strong bg-white/5 px-3 py-2 text-sm`}>
+                      <ChatLoadingIndicator label="Thinking" />
+                    </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
