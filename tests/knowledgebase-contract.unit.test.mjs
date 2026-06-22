@@ -36,6 +36,8 @@ describe('knowledgebase RAG integration contract', () => {
 
   it('scopes indexed profile memory by account and page', () => {
     const infoRoute = read('src/app/api/pages/[pageId]/info/route.ts');
+    assert.match(infoRoute, /createIndex\(`linkchat-\$\{auth\.userId\}`\)/);
+    assert.match(infoRoute, /set\(\{\s*smIndexId:\s*indexId\s*\}\)/);
     assert.match(infoRoute, /userId:\s*auth\.userId/);
     assert.match(infoRoute, /pageId:\s*page\.id/);
     assert.match(infoRoute, /pageSlug:\s*page\.slug/);

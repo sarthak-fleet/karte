@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { infoBlocks, users } from '@/db/schema';
 import { loadOwnedPage, requireUser } from '@/lib/api-auth';
-import { ingestDocument } from '@/lib/knowledgebase';
+import { createIndex, ingestDocument } from '@/lib/knowledgebase';
 import { MAX_CONTENT_LENGTH } from '@/lib/validation';
 
 const ALLOWED_INFO_BLOCK_TYPES = new Set(['text', 'resume', 'faq', 'current', 'voice', 'boundaries']);
@@ -97,9 +97,19 @@ export async function POST(
 
   // Ingest profile memory into the shared knowledgebase Worker.
   const [user] = await db.select().from(users).where(eq(users.id, auth.userId));
-  if (user?.smIndexId) {
+  let indexId = user?.smIndexId ?? null;
+  if (!indexId) {
     try {
-      const doc = await ingestDocument(user.smIndexId, content, {
+      const index = await createIndex(`linkchat-${auth.userId}`);
+      indexId = index.id;
+      await db.update(users).set({ smIndexId: indexId }).where(eq(users.id, auth.userId));
+    } catch {
+      console.error('Failed to initialize knowledgebase RAG index');
+    }
+  }
+  if (indexId) {
+    try {
+      const doc = await ingestDocument(indexId, content, {
         userId: auth.userId,
         pageId: page.id,
         pageSlug: page.slug,
