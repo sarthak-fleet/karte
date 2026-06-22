@@ -9,6 +9,7 @@ export type AiConfig = {
 
 const DEFAULT_AI_ENDPOINT_URL = 'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1';
 const DEFAULT_AI_MODEL = 'workers-ai-llama-3.3-70b';
+const DEFAULT_FAST_AI_MODEL = 'workers-ai-llama-3b';
 const FREE_AI_PROJECT_ID = 'linkchat';
 
 export function getDefaultAiConfig(): AiConfig | null {
@@ -50,6 +51,13 @@ function isFreeAiGateway(config: AiConfig): boolean {
   return config.endpointUrl.includes('free-ai-gateway.sarthakagrawal927.workers.dev');
 }
 
+function modelForReasoning(config: AiConfig, reasoningLevel?: ReasoningLevel): string {
+  if (reasoningLevel === 'fast' && isFreeAiGateway(config)) {
+    return process.env.LINKCHAT_FAST_AI_MODEL || DEFAULT_FAST_AI_MODEL;
+  }
+  return config.model;
+}
+
 function getProvider(config: AiConfig, reasoningLevel?: ReasoningLevel) {
   const freeAi = isFreeAiGateway(config);
   const reasoningEffort = reasoningEffortFor(reasoningLevel);
@@ -81,13 +89,22 @@ function getProvider(config: AiConfig, reasoningLevel?: ReasoningLevel) {
  */
 export async function generate(
   config: AiConfig,
-  opts: { system: string; prompt: string; reasoningLevel?: ReasoningLevel },
+  opts: {
+    system: string;
+    prompt: string;
+    reasoningLevel?: ReasoningLevel;
+    maxOutputTokens?: number;
+    timeoutMs?: number;
+  },
 ): Promise<string> {
   const provider = getProvider(config, opts.reasoningLevel);
   const { text } = await generateText({
-    model: provider.chatModel(config.model),
+    model: provider.chatModel(modelForReasoning(config, opts.reasoningLevel)),
     system: opts.system,
     prompt: opts.prompt,
+    maxRetries: 0,
+    ...(opts.maxOutputTokens ? { maxOutputTokens: opts.maxOutputTokens } : {}),
+    ...(opts.timeoutMs ? { timeout: { totalMs: opts.timeoutMs } } : {}),
   });
   return text;
 }
@@ -102,13 +119,18 @@ export async function generateChat(
     system: string;
     messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>;
     reasoningLevel?: ReasoningLevel;
+    maxOutputTokens?: number;
+    timeoutMs?: number;
   },
 ): Promise<string> {
   const provider = getProvider(config, opts.reasoningLevel);
   const { text } = await generateText({
-    model: provider.chatModel(config.model),
+    model: provider.chatModel(modelForReasoning(config, opts.reasoningLevel)),
     system: opts.system,
     messages: opts.messages,
+    maxRetries: 0,
+    ...(opts.maxOutputTokens ? { maxOutputTokens: opts.maxOutputTokens } : {}),
+    ...(opts.timeoutMs ? { timeout: { totalMs: opts.timeoutMs } } : {}),
   });
   return text;
 }
@@ -118,13 +140,22 @@ export async function generateChat(
  */
 export function streamResponse(
   config: AiConfig,
-  opts: { system: string; prompt: string; reasoningLevel?: ReasoningLevel },
+  opts: {
+    system: string;
+    prompt: string;
+    reasoningLevel?: ReasoningLevel;
+    maxOutputTokens?: number;
+    timeoutMs?: number;
+  },
 ): Response {
   const provider = getProvider(config, opts.reasoningLevel);
   const result = streamText({
-    model: provider.chatModel(config.model),
+    model: provider.chatModel(modelForReasoning(config, opts.reasoningLevel)),
     system: opts.system,
     prompt: opts.prompt,
+    maxRetries: 0,
+    ...(opts.maxOutputTokens ? { maxOutputTokens: opts.maxOutputTokens } : {}),
+    ...(opts.timeoutMs ? { timeout: { totalMs: opts.timeoutMs, chunkMs: opts.timeoutMs } } : {}),
   });
   return result.toTextStreamResponse();
 }

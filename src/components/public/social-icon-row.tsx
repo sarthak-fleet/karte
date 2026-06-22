@@ -4,6 +4,8 @@
 
 import { hostnameFromUrl } from '@/lib/hostname';
 
+import { SafeImage } from './safe-image';
+
 interface SocialLink {
   id?: string;
   title: string;
@@ -84,6 +86,24 @@ const SITE_GLYPH = {
   d: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm7.93 9h-3.05a15.4 15.4 0 0 0-1.36-5.36A8.03 8.03 0 0 1 19.93 11zM12 4.07c1.04 1.5 1.86 3.97 2.12 6.93H9.88C10.14 8.04 10.96 5.57 12 4.07zM4.07 11A8.03 8.03 0 0 1 8.48 5.64 15.4 15.4 0 0 0 7.12 11H4.07zm0 2h3.05a15.4 15.4 0 0 0 1.36 5.36A8.03 8.03 0 0 1 4.07 13zM12 19.93c-1.04-1.5-1.86-3.97-2.12-6.93h4.24c-.26 2.96-1.08 5.43-2.12 6.93zm3.52-1.57A15.4 15.4 0 0 0 16.88 13h3.05a8.03 8.03 0 0 1-4.41 5.36z',
 };
 
+function faviconUrlForHost(host: string): string {
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+}
+
+function SiteGlyphFallback() {
+  return (
+    <svg
+      viewBox={SITE_GLYPH.viewBox}
+      width="18"
+      height="18"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d={SITE_GLYPH.d} />
+    </svg>
+  );
+}
+
 export function SocialIconRow({
   links,
   accentColor,
@@ -98,8 +118,8 @@ export function SocialIconRow({
       {links.map((link) => {
         const host = hostnameFromUrl(link.url);
         const brandGlyph = host ? pathByHost(host) : null;
-        const glyph = brandGlyph ?? (host ? SITE_GLYPH : null);
         const userIcon = link.icon?.trim();
+        const genericFavicon = host && !brandGlyph ? faviconUrlForHost(host) : null;
         return (
           <a
             key={link.id ?? link.url}
@@ -118,15 +138,22 @@ export function SocialIconRow({
               <span aria-hidden="true" className="text-[15px]">
                 {userIcon}
               </span>
-            ) : glyph ? (
+            ) : genericFavicon ? (
+              <SafeImage
+                src={genericFavicon}
+                alt=""
+                className="h-[22px] w-[22px] rounded-[5px]"
+                fallback={<SiteGlyphFallback />}
+              />
+            ) : brandGlyph ? (
               <svg
-                viewBox={glyph.viewBox ?? '0 0 24 24'}
+                viewBox={brandGlyph.viewBox ?? '0 0 24 24'}
                 width="18"
                 height="18"
                 fill="currentColor"
                 aria-hidden="true"
               >
-                <path d={glyph.d} />
+                <path d={brandGlyph.d} />
               </svg>
             ) : (
               <span aria-hidden="true" className="text-[13px] font-bold uppercase">

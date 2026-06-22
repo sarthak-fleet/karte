@@ -1,7 +1,7 @@
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
 import { db, ensureProjectsTable } from '@/db';
-import { conversations, pages, users } from '@/db/schema';
+import { conversations, messages, pages, users } from '@/db/schema';
 import { resolveAiConfig, streamResponse } from '@/lib/ai-client';
 import { CHAT_RESPONSE_ENVELOPE_PROMPT } from '@/lib/ai-prompts';
 import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
@@ -10,6 +10,11 @@ import { search } from '@/lib/knowledgebase';
 import { rateLimit } from '@/lib/rate-limit';
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
+const RECENT_CONTEXT_MESSAGE_LIMIT = 6;
+const RECENT_CONTEXT_CHAR_LIMIT = 1200;
+const PROFILE_CONTEXT_CHAR_LIMIT = 3600;
+const RAG_CONTEXT_CHAR_LIMIT = 1400;
+const RAG_TIMEOUT_MS = 500;
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const requestedSlug = (await params).slug;
@@ -101,6 +106,23 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     });
   }
 
+  const recentConversationContext =
+    typeof conversationId === 'string' && conversationId
+      ? await buildRecentConversationContext(conversationId, page.id)
+      : '';
+  const directRecall = answerFromRecentConversation(query, recentConversationContext);
+  if (directRecall) {
+    return new Response(directRecall, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  }
+  const directProfileAnswer = answerFromLocalProfile(query, page);
+  if (directProfileAnswer) {
+    return new Response(directProfileAnswer, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  }
+
   const [user] = await db.select().from(users).where(eq(users.id, page.userId));
 
   const aiConfig = resolveAiConfig(user);
@@ -115,8 +137,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     const [memory, retrievedContext] = await Promise.all([
       buildProfileMemory({ page, mode: 'chat', query }),
       user.smApiKey && user.smIndexId
-        ? search(user.smIndexId, query, 5, { userId: page.userId, pageId: page.id })
+        ? searchWithTimeout(user.smIndexId, query, { userId: page.userId, pageId: page.id })
           .then((searchResults) => searchResults.results.map((r) => r.chunk_content).join('\n\n'))
+          .then((context) => clampContext(context, RAG_CONTEXT_CHAR_LIMIT))
           .catch(() => '')
         : Promise.resolve(''),
     ]);
@@ -135,9 +158,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
 
     const systemPrompt = [
       baseSystemPrompt,
+      'Keep the answer tight: usually 1-3 short paragraphs, under 120 words, unless the visitor explicitly asks for depth.',
       'Use the Profile Memory source cards as the primary truth. Do not invent facts, dates, credentials, employers, or personal details that are not present in the sources.',
       'If the sources do not answer the question, say what is missing and suggest contacting the profile owner or using a listed link.',
-      `Profile Memory:\n${memory.promptContext}`,
+      `Profile Memory:\n${clampContext(memory.promptContext, PROFILE_CONTEXT_CHAR_LIMIT)}`,
+      recentConversationContext ? `Recent conversation memory:\n${recentConversationContext}` : '',
+      recentConversationContext
+        ? 'Use recent conversation memory for visitor-provided facts in this room, such as what they just said they are wearing, doing, building, or asking about. Do not claim those facts are in the public profile.'
+        : '',
       retrievedContext ? `Optional external index matches:\n${retrievedContext}` : '',
       CHAT_RESPONSE_ENVELOPE_PROMPT,
       intentHint,
@@ -151,6 +179,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       system: systemPrompt,
       prompt: query,
       reasoningLevel: 'fast',
+      maxOutputTokens: 160,
+      timeoutMs: 8000,
     });
   } catch {
     return new Response(JSON.stringify({ error: 'Chat service unavailable' }), {
@@ -158,6 +188,158 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       headers: { 'Content-Type': 'application/json' },
     });
   }
+}
+
+function answerFromLocalProfile(query: string, page: typeof pages.$inferSelect): string | null {
+  const normalizedQuery = query.toLowerCase();
+  const firstName = page.displayName.split(/\s+/)[0]?.toLowerCase() ?? '';
+  const asksIntro =
+    /\bwhat\s+is\s+(this\s+)?profile\s+about\b/.test(normalizedQuery)
+    || /\bwhat\s+(does|do)\s+.+\s+do\b/.test(normalizedQuery)
+    || /\bwho\s+(is|are)\s+/.test(normalizedQuery)
+    || /\btell me about\s+(this profile|this person|him|her|them)\b/.test(normalizedQuery)
+    || (firstName ? new RegExp(`\\btell me about\\s+${firstName}\\b`).test(normalizedQuery) : false);
+
+  if (!asksIntro || !page.bio) return null;
+
+  const bio = page.bio.replace(/\s+/g, ' ').trim();
+  const sentence = bio.split(/(?<=[.!?])\s+/).slice(0, 2).join(' ');
+  const summary = sentence || bio;
+  const clipped =
+    summary.length > 360
+      ? `${summary.slice(0, 357).replace(/\s+\S*$/, '').trim()}...`
+      : summary;
+  return `${page.displayName}: ${clipped}`;
+}
+
+function answerFromRecentConversation(query: string, context: string): string | null {
+  if (!context) return null;
+  const normalizedQuery = query.toLowerCase();
+  const asksWearingColor =
+    /\bwhat\b.*\b(colou?r|shirt|t-?shirt|wearing)\b/.test(normalizedQuery)
+    && /\b(colou?r|shirt|t-?shirt|wearing)\b/.test(normalizedQuery);
+  const asksWhatVisitorSaid =
+    /\bwhat\b.*\b(i|me|my)\b.*\b(said|say|told|tell|mentioned|shared)\b/.test(normalizedQuery)
+    || /\bwhat\b.*\b(did|do)\b.*\b(i|me)\b.*\b(say|tell|mention|share)\b/.test(normalizedQuery);
+
+  const visitorLines = context
+    .split('\n')
+    .filter((line) => line.toLowerCase().startsWith('visitor:'));
+
+  if (asksWhatVisitorSaid) {
+    const visitorFact = lastVisitorFact(visitorLines, normalizedQuery);
+    if (visitorFact) return `You told me: ${visitorFact}`;
+  }
+
+  if (!asksWearingColor) return null;
+
+  const colors = [
+    'red',
+    'blue',
+    'green',
+    'yellow',
+    'black',
+    'white',
+    'grey',
+    'gray',
+    'pink',
+    'purple',
+    'orange',
+    'brown',
+    'navy',
+    'maroon',
+  ];
+  for (const line of visitorLines.reverse()) {
+    const lower = line.toLowerCase();
+    if (!/\bwearing\b/.test(lower) || !/\b(t-?shirt|shirt)\b/.test(lower)) continue;
+    const color = colors.find((candidate) => new RegExp(`\\b${candidate}\\b`).test(lower));
+    if (color) {
+      const display = color === 'grey' ? 'gray' : color;
+      return `You said you're wearing a ${display} t-shirt.`;
+    }
+  }
+
+  return null;
+}
+
+function lastVisitorFact(visitorLines: string[], normalizedQuery: string): string | null {
+  const normalizedTopic = normalizedQuery
+    .replace(/[^\w\s-]/g, ' ')
+    .replace(/\b(what|did|do|i|me|my|say|said|tell|told|mention|mentioned|share|shared|you|about)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  for (let index = visitorLines.length - 1; index >= 0; index -= 1) {
+    const line = visitorLines[index];
+    const content = line.replace(/^visitor:\s*/i, '').replace(/\s+/g, ' ').trim();
+    if (!content || content.length > 280 || /[?]/.test(content)) continue;
+
+    const lower = content.toLowerCase();
+    if (!/\b(i am|i'm|im|my|mine|we are|we're|our|i have|i like|i prefer|i need|i want)\b/.test(lower)) {
+      continue;
+    }
+
+    if (normalizedTopic) {
+      const topicWords = normalizedTopic
+        .split(' ')
+        .filter((word) => word.length >= 3);
+      if (topicWords.length && !topicWords.some((word) => lower.includes(word))) {
+        continue;
+      }
+    }
+
+    return content;
+  }
+
+  return null;
+}
+
+function clampContext(value: string, limit: number): string {
+  const normalized = value.replace(/\s+\n/g, '\n').trim();
+  if (normalized.length <= limit) return normalized;
+  return `${normalized.slice(0, limit).trimEnd()}\n[truncated for live chat speed]`;
+}
+
+function searchWithTimeout(
+  indexId: string,
+  query: string,
+  scope: { userId: string; pageId: string },
+): ReturnType<typeof search> {
+  return Promise.race([
+    search(indexId, query, 3, scope),
+    new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('RAG search timed out')), RAG_TIMEOUT_MS);
+    }),
+  ]) as ReturnType<typeof search>;
+}
+
+async function buildRecentConversationContext(conversationId: string, pageId: string): Promise<string> {
+  const [conversation] = await db
+    .select({ pageId: conversations.pageId })
+    .from(conversations)
+    .where(eq(conversations.id, conversationId));
+
+  if (!conversation || conversation.pageId !== pageId) return '';
+
+  const recent = await db
+    .select({ role: messages.role, content: messages.content })
+    .from(messages)
+    .where(eq(messages.conversationId, conversationId))
+    .orderBy(desc(messages.createdAt))
+    .limit(RECENT_CONTEXT_MESSAGE_LIMIT);
+
+  const lines = recent
+    .reverse()
+    .map((message) => {
+      const role = message.role === 'assistant' ? 'Assistant' : 'Visitor';
+      const content = message.content.replace(/\s+/g, ' ').trim();
+      return content ? `${role}: ${content}` : '';
+    })
+    .filter(Boolean);
+
+  const context = lines.join('\n');
+  if (context.length <= RECENT_CONTEXT_CHAR_LIMIT) return context;
+  return context.slice(context.length - RECENT_CONTEXT_CHAR_LIMIT).replace(/^[^\n]*\n?/, '').trim();
 }
 
 // ── Visitor-intent ranking ──────────────────────────────────────────

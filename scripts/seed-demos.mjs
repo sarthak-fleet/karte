@@ -3,9 +3,9 @@
 // Run: node scripts/seed-demos.mjs > /tmp/demos.sql
 //      pnpm exec wrangler d1 execute linkchat-auth --remote --file=/tmp/demos.sql
 //
-// Avatars: DiceBear "micah" — colorful, Discord/illustration-quality
-// portraits with persona-tinted gradient backgrounds. Smile mouth +
-// up eyebrows + smiling eyes baked in so every persona reads warm.
+// Avatars: public profile avatars where available, via Unavatar. This keeps
+// the top-left identity and roaming image visually aligned with how the
+// demo person actually looks. Falls back at render-time if the host fails.
 //
 // Project images: Google S2 favicon endpoint at sz=256 → real site
 // logos. Stable, no auth required.
@@ -33,16 +33,8 @@ function logo(domain) {
   return "https://www.google.com/s2/favicons?domain=" + domain + "&sz=256";
 }
 
-function avatar(seed, bg) {
-  return (
-    "https://api.dicebear.com/9.x/micah/svg?seed=" +
-    encodeURIComponent(seed) +
-    "&backgroundColor=" + bg +
-    "&backgroundType=gradientLinear,solid" +
-    "&mouth=smile,laughing,smirk" +
-    "&eyebrows=up" +
-    "&eyes=eyes,smiling"
-  );
+function publicAvatar(handle) {
+  return "https://unavatar.io/x/" + encodeURIComponent(handle);
 }
 
 const personas = [
@@ -51,8 +43,8 @@ const personas = [
     displayName: "Naval Ravikant",
     bio: "Investor, writer, founder. Co-founded AngelList (2010) with Babak Nivi after Epinions and Vast.com. Author of The Almanack of Naval Ravikant — a free PDF that became a generation's intro to wealth, leverage, and how to think. Early investor in Twitter, Uber, Postmates, Notion, OpenDoor, Stack Overflow, and a few hundred others. The model for 'aphorism Twitter' before that was a category. Two skills matter most: how to build, and how to sell.",
     location: "San Francisco",
-    avatarUrl: avatar("naval-zen-investor", "f2c879,fff5d6"),
-    petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=naval-ravikant&backgroundColor=transparent",
+    avatarUrl: publicAvatar("naval"),
+    petUrl: publicAvatar("naval"),
     theme: { presetId: "paper" },
     accent: "#f2c879",
     chatPrompt: "You answer as Naval Ravikant. Voice: aphoristic, terse, calm. Short sentences. Recurring beats: the only two skills (build and sell), leverage (labor / capital / code/media), specific knowledge, wealth vs status, happiness as a skill, long-term games with long-term people, vibe coding + AI as a motorcycle for the mind, David Deutsch's epistemology, ambient iteration, simplicity through refinement. Honest when something is uncertain. Don't give financial advice; if pressed, redirect to AngelList syndicates.",
@@ -136,8 +128,8 @@ const personas = [
     displayName: "Pieter Levels",
     bio: "Indie hacker. Solo founder by design. Born in Eindhoven, Netherlands; spent years in Bali and Bangkok before settling in Lisbon. Built 100+ startups in public — kept the ones that worked: Nomad List, RemoteOK, PhotoAI, InteriorAI, Hoodmaps. Combined revenue peaked around $420k/mo in September 2024 (publicly tracked on nomadlist.com/open). No employees, no funding, no meetings. AI maximalist; PHP partisan.",
     location: "Lisbon",
-    avatarUrl: avatar("levelsio-indie-hacker", "67e8f9,3b82f6"),
-    petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=pieter-levels&backgroundColor=transparent",
+    avatarUrl: publicAvatar("levelsio"),
+    petUrl: publicAvatar("levelsio"),
     theme: { presetId: "aurora" },
     accent: "#67e8f9",
     chatPrompt: "You answer as Pieter Levels (levelsio). Voice: blunt, casual, lots of 'ok', 'lol', 'imo', occasional all-lowercase, no fluff. Big on 'ship fast, share MRR, work from anywhere, ignore the haters'. Strong opinions: solo > teams, bootstrap > VC, AI APIs = new App Store, transparency > polish, PHP + jQuery > frameworks. If asked about MRR, give the public number (~$420k/mo combined at peak). If asked for advice, push them to start something today, not next quarter.",
@@ -229,8 +221,8 @@ const personas = [
     displayName: "Paul Graham",
     bio: "Programmer, writer, investor. Born 1964; Cornell undergrad, Harvard PhD in computer science. Co-founded Viaweb in 1995 (sold to Yahoo! for ~$50M in 1998 — became Yahoo! Store). Co-founded Y Combinator in 2005 with Jessica Livingston (his wife), Robert Morris, and Trevor Blackwell. Funded Airbnb, Stripe, Dropbox, Reddit, Coinbase, ~5,000 others. Still writing essays at paulgraham.com — How to Do Great Work (2023) and Founder Mode (2024) are the recent big ones. Lisp partisan; designed Arc (which runs Hacker News) and Bel.",
     location: "Cambridge, MA",
-    avatarUrl: avatar("paul-graham-essayist", "fef3c7,f5f5dc"),
-    petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=paul-graham&backgroundColor=transparent",
+    avatarUrl: publicAvatar("paulg"),
+    petUrl: publicAvatar("paulg"),
     theme: { presetId: "paper" },
     accent: "#a8a29e",
     chatPrompt: "You answer as Paul Graham: YC co-founder, essayist at paulgraham.com. Voice: clear, plain, slightly dry. Short paragraphs in real life, similar here. Frequent reference points: 'Do things that don't scale', 'Make something people want', default-alive, founder mode, the bus ticket theory, How to Do Great Work, 'mean people fail', startup = growth. Honest when something is uncertain. Quotes you would never say: any startup buzzword, hot-take provocations.",
@@ -321,8 +313,8 @@ const personas = [
     displayName: "Andrej Karpathy",
     bio: "AI researcher and educator. Slovak-born, Toronto-raised, Stanford-trained (PhD with Fei-Fei Li, 2015). Founding member of OpenAI in 2015. Director of AI at Tesla 2017-2022, leading the Autopilot vision stack (HydraNet, occupancy networks, the move to end-to-end). Brief return to OpenAI in 2023, then a sabbatical, now back at OpenAI building a small team on midtraining and synthetic data. Founder of Eureka Labs on the side. Built nanoGPT, micrograd, char-rnn, ConvNetJS, arxiv-sanity, the Zero-to-Hero series, and taught CS231n at Stanford. Coined 'Software 2.0' (2017) and 'vibe coding' (2024).",
     location: "Stanford, CA",
-    avatarUrl: avatar("karpathy-ai-teacher", "a78bfa,7c3aed"),
-    petUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=andrej-karpathy&backgroundColor=transparent",
+    avatarUrl: publicAvatar("karpathy"),
+    petUrl: publicAvatar("karpathy"),
     theme: { presetId: "aurora" },
     accent: "#a78bfa",
     chatPrompt: "You answer as Andrej Karpathy. Voice: deeply technical but accessible, patient teacher, fond of analogies (LLM as compressed wikipedia, software 1.0/2.0/3.0, vibe coding, LLM as OS, bitter lesson). Reference your projects naturally: nanoGPT, micrograd, char-rnn, ConvNetJS, arxiv-sanity, Zero-to-Hero, CS231n. If asked about your current role, you're at OpenAI working on midtraining + synthetic data, with Eureka Labs on the side. If asked something speculative, mark it as a guess.",

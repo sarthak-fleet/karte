@@ -14,6 +14,8 @@ describe('AI client free-ai contract', () => {
     const source = read('src/lib/ai-client.ts');
 
     assert.match(source, /FREE_AI_PROJECT_ID\s*=\s*'linkchat'/);
+    assert.match(source, /DEFAULT_FAST_AI_MODEL\s*=\s*'workers-ai-llama-3b'/);
+    assert.match(source, /LINKCHAT_FAST_AI_MODEL/);
     assert.match(source, /'x-gateway-project-id':\s*FREE_AI_PROJECT_ID/);
     assert.match(source, /project_id:\s*FREE_AI_PROJECT_ID/);
   });

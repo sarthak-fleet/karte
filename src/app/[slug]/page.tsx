@@ -118,6 +118,7 @@ export default async function ProfilePage({ params }: Props) {
   } = data;
   const theme = resolveThemeConfig(page.themeConfig);
   const isAgent = isAgentPage(page);
+  const isDemoProfile = isDemoSlug(slug);
   const operatorLabel = agentOperatorLabel(page);
 
   const enabledPages = {
@@ -237,7 +238,7 @@ export default async function ProfilePage({ params }: Props) {
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-8 sm:px-8">
         {isAgent && <AgentProfileBanner page={page} slug={slug} />}
-        {isDemoSlug(slug) && !isAgent && (
+            {isDemoProfile && !isAgent && (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-400/25 bg-amber-400/[0.06] px-4 py-2.5 text-[12px] text-amber-200/90">
             <span>
               <span className="font-semibold text-amber-200">Sample profile.</span>{' '}
@@ -555,7 +556,7 @@ export default async function ProfilePage({ params }: Props) {
           AI-generated lines every 6-14 seconds. Click → opens chat. */}
       {(page.petEnabled ?? true) && (page.petUrl || page.avatarUrl) && (
         <RoamingCharacter
-          avatarUrl={page.petUrl || page.avatarUrl}
+          avatarUrl={isDemoProfile ? page.avatarUrl : page.petUrl || page.avatarUrl}
           displayName={page.displayName}
           accentColor={theme.accentColor}
           lines={greetingLines}

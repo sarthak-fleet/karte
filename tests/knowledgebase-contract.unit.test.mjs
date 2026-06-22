@@ -46,6 +46,19 @@ describe('knowledgebase RAG integration contract', () => {
     assert.match(infoRoute, /pageSlug:\s*page\.slug/);
 
     const chatRoute = read('src/app/api/chat/[slug]/route.ts');
-    assert.match(chatRoute, /search\(user\.smIndexId,\s*query,\s*5,\s*\{\s*userId:\s*page\.userId,\s*pageId:\s*page\.id\s*\}/);
+    assert.match(chatRoute, /searchWithTimeout\(user\.smIndexId,\s*query,\s*\{\s*userId:\s*page\.userId,\s*pageId:\s*page\.id\s*\}/);
+    assert.match(chatRoute, /search\(indexId,\s*query,\s*3,\s*scope\)/);
+    assert.match(chatRoute, /RAG_TIMEOUT_MS\s*=\s*500/);
+  });
+
+  it('keeps chat recall cheap and bounded before calling AI', () => {
+    const chatRoute = read('src/app/api/chat/[slug]/route.ts');
+
+    assert.match(chatRoute, /RECENT_CONTEXT_MESSAGE_LIMIT\s*=\s*6/);
+    assert.match(chatRoute, /RECENT_CONTEXT_CHAR_LIMIT\s*=\s*1200/);
+    assert.match(chatRoute, /answerFromRecentConversation\(query,\s*recentConversationContext\)/);
+    assert.match(chatRoute, /You said you're wearing a \$\{display\} t-shirt\./);
+    assert.match(chatRoute, /You told me:/);
+    assert.match(chatRoute, /streamResponse\(aiConfig/);
   });
 });

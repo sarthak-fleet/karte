@@ -85,6 +85,7 @@ export function ChatWidget({
   const initialRoomId = initialRoomIdProp ?? searchParams?.get('room') ?? null;
 
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const prevOpenRef = useRef(false);
   const [mode, setMode] = useState<'chat' | 'contact'>(chatEnabled ? 'chat' : 'contact');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -522,9 +523,14 @@ export function ChatWidget({
   const launcherPositionClass =
     position === 'bottom-left' ? 'left-4 sm:left-6' : 'right-4 sm:right-6';
   const panelPositionClass =
-    position === 'bottom-left'
-      ? 'left-3 right-3 sm:right-auto sm:left-6 sm:w-[380px]'
-      : 'left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px]';
+    expanded
+      ? 'left-3 right-3 sm:left-1/2 sm:right-auto sm:w-[min(760px,calc(100vw-3rem))] sm:-translate-x-1/2'
+      : position === 'bottom-left'
+        ? 'left-3 right-3 sm:right-auto sm:left-6 sm:w-[380px]'
+        : 'left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px]';
+  const panelHeightClass = expanded
+    ? 'h-[min(780px,calc(100vh-4.5rem))] sm:h-[min(780px,calc(100vh-3rem))]'
+    : 'h-[min(520px,calc(100vh-6rem))]';
   const showModeTabs = chatEnabled && dmEnabled;
   const title = mode === 'chat' ? `Chat with ${displayName}` : `DM ${displayName}`;
 
@@ -549,7 +555,7 @@ export function ChatWidget({
 
       {open && (
         <div
-          className={`fixed bottom-20 ${panelPositionClass} z-50 flex h-[min(520px,calc(100vh-6rem))] w-auto flex-col overflow-hidden rounded-2xl border border-karte-border-strong bg-karte-surface/95 backdrop-blur-xl sm:bottom-24`}
+          className={`fixed bottom-20 ${panelPositionClass} ${panelHeightClass} z-50 flex w-auto flex-col overflow-hidden rounded-2xl border border-karte-border-strong bg-karte-surface/95 backdrop-blur-xl transition-[height,width,transform] duration-200 ease-[var(--karte-ease)] sm:bottom-24 ${expanded ? 'sm:bottom-6' : ''}`}
         >
           <div className="border-b border-karte-border-strong px-4 py-3">
             <div className="flex items-center justify-between gap-3">
@@ -612,6 +618,29 @@ export function ChatWidget({
                     </button>
                   </div>
                 )}
+                <button
+                  type="button"
+                  onClick={() => setExpanded((current) => !current)}
+                  className="flex h-6 w-6 items-center justify-center rounded-full text-white/45 transition hover:bg-white/10 hover:text-karte-text"
+                  aria-label={expanded ? 'Shrink chat' : 'Expand chat'}
+                  title={expanded ? 'Shrink chat' : 'Expand chat'}
+                >
+                  {expanded ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M8 3v5H3" />
+                      <path d="M16 21v-5h5" />
+                      <path d="M3 8l6-6" />
+                      <path d="M21 16l-6 6" />
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M15 3h6v6" />
+                      <path d="M9 21H3v-6" />
+                      <path d="M21 3l-7 7" />
+                      <path d="M3 21l7-7" />
+                    </svg>
+                  )}
+                </button>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
@@ -680,7 +709,7 @@ export function ChatWidget({
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[80%] whitespace-pre-wrap rounded-xl px-3 py-2 text-sm ${
+                      className={`${expanded ? 'max-w-[92%]' : 'max-w-[80%]'} whitespace-pre-wrap rounded-xl px-3 py-2 text-sm ${
                         msg.role === 'user'
                           ? ''
                           : 'border border-karte-border-strong bg-white/5 text-white/90'

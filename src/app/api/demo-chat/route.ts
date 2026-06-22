@@ -65,6 +65,8 @@ export async function POST(req: Request) {
       system: SYSTEM_PROMPT,
       prompt: query,
       reasoningLevel: 'fast',
+      maxOutputTokens: 90,
+      timeoutMs: 8000,
     });
     return NextResponse.json({ answer: answer.trim() });
   } catch {
