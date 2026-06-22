@@ -75,12 +75,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   const providedEmail = bodyEmail || headerEmail;
 
   let storedEmail: string | null = null;
+  // Tracks whether the (already-fetched) conversation row belongs to this
+  // page, so the recent-context build below can skip re-fetching the same row.
+  let conversationBelongsToPage = false;
   if (typeof conversationId === 'string' && conversationId) {
     const [existing] = await db
       .select({ visitorEmail: conversations.visitorEmail, pageId: conversations.pageId })
       .from(conversations)
       .where(eq(conversations.id, conversationId));
 
+    conversationBelongsToPage = Boolean(existing && existing.pageId === page.id);
     if (existing && existing.pageId === page.id) {
       storedEmail = existing.visitorEmail ?? null;
 
@@ -107,8 +111,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   }
 
   const recentConversationContext =
-    typeof conversationId === 'string' && conversationId
-      ? await buildRecentConversationContext(conversationId, page.id)
+    conversationBelongsToPage && typeof conversationId === 'string' && conversationId
+      ? await buildRecentConversationContext(conversationId)
       : '';
   const directRecall = answerFromRecentConversation(query, recentConversationContext);
   if (directRecall) {
@@ -313,14 +317,9 @@ function searchWithTimeout(
   ]) as ReturnType<typeof search>;
 }
 
-async function buildRecentConversationContext(conversationId: string, pageId: string): Promise<string> {
-  const [conversation] = await db
-    .select({ pageId: conversations.pageId })
-    .from(conversations)
-    .where(eq(conversations.id, conversationId));
-
-  if (!conversation || conversation.pageId !== pageId) return '';
-
+// Caller has already verified the conversation exists and belongs to the page
+// (see `conversationBelongsToPage`), so this only loads the recent messages.
+async function buildRecentConversationContext(conversationId: string): Promise<string> {
   const recent = await db
     .select({ role: messages.role, content: messages.content })
     .from(messages)
