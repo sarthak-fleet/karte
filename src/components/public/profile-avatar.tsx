@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 interface ProfileAvatarProps {
@@ -64,13 +63,10 @@ export function ProfileAvatar({
 
   if (status === 'loaded' && src) {
     return (
-      <Image
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
         src={src}
         alt={alt}
-        width={128}
-        height={128}
-        sizes="128px"
-        priority
         className="relative h-28 w-28 rounded-3xl object-cover ring-1 ring-white/[0.10] sm:h-32 sm:w-32"
       />
     );
