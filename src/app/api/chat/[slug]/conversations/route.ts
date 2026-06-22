@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
 import { conversations,pages } from '@/db/schema';
+import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
@@ -10,7 +11,8 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await params;
+  const requestedSlug = (await params).slug;
+  const slug = resolvePublicProfileSlug(requestedSlug);
   const body = await req.json().catch(() => ({}));
   const { visitorId, visitorEmail } = body as {
     visitorId?: unknown;

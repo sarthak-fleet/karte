@@ -3,12 +3,14 @@ import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { conversations, messages,pages } from '@/db/schema';
+import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
 
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await params;
+  const requestedSlug = (await params).slug;
+  const slug = resolvePublicProfileSlug(requestedSlug);
   const body = await req.json();
   const { conversationId, role, content } = body;
 
@@ -62,7 +64,8 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await params;
+  const requestedSlug = (await params).slug;
+  const slug = resolvePublicProfileSlug(requestedSlug);
   const url = new URL(req.url);
   const conversationId = url.searchParams.get('conversationId');
 

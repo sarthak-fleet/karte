@@ -4,6 +4,7 @@ import { db, ensureProjectsTable } from '@/db';
 import { conversations, pages, users } from '@/db/schema';
 import { resolveAiConfig, streamResponse } from '@/lib/ai-client';
 import { CHAT_RESPONSE_ENVELOPE_PROMPT } from '@/lib/ai-prompts';
+import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
 import { buildProfileMemory } from '@/lib/profile-memory';
 import { search } from '@/lib/knowledgebase';
 import { rateLimit } from '@/lib/rate-limit';
@@ -11,7 +12,8 @@ import { rateLimit } from '@/lib/rate-limit';
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const requestedSlug = (await params).slug;
+  const slug = resolvePublicProfileSlug(requestedSlug);
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const { ok } = rateLimit(ip);

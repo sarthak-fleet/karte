@@ -11,7 +11,15 @@ export const DEMO_SLUGS: ReadonlySet<string> = new Set([
   'karpathy',
 ]);
 
+const DEMO_SLUG_ALIASES: Readonly<Record<string, string>> = {
+  demo: 'naval',
+};
+
 export function isDemoSlug(slug: string | null | undefined): boolean {
   if (!slug) return false;
   return DEMO_SLUGS.has(slug);
+}
+
+export function resolvePublicProfileSlug(slug: string): string {
+  return DEMO_SLUG_ALIASES[slug] ?? slug;
 }

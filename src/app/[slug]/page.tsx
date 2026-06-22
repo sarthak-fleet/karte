@@ -19,7 +19,7 @@ import { TypedText } from '@/components/public/typed-text';
 import { VideoEmbed } from '@/components/public/video-embed';
 import type { ProjectCardData } from '@/components/public/widgets';
 import { agentOperatorLabel, isAgentPage } from '@/lib/agent-profiles';
-import { isDemoSlug } from '@/lib/demo-profiles';
+import { isDemoSlug, resolvePublicProfileSlug } from '@/lib/demo-profiles';
 import { resolveThemeConfig } from '@/lib/themes';
 
 import { getFullPageData } from './_lib/get-page-data';
@@ -42,7 +42,8 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const requestedSlug = (await params).slug;
+  const slug = resolvePublicProfileSlug(requestedSlug);
   const data = await getFullPageData(slug);
   if (!data) return {};
 
@@ -100,7 +101,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProfilePage({ params }: Props) {
-  const { slug } = await params;
+  const requestedSlug = (await params).slug;
+  const slug = resolvePublicProfileSlug(requestedSlug);
   const data = await getFullPageData(slug);
   if (!data) notFound();
 

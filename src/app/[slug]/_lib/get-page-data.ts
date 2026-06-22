@@ -3,6 +3,7 @@ import { cache } from 'react';
 
 import { db, ensureProjectsTable } from '@/db';
 import { generatedPages,infoBlocks, links, pages, pageSections, projects, timelineEvents, users } from '@/db/schema';
+import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
 
 // CF Edge cache for resolved profile data. Owner edits propagate in
 // ~60s — short enough to feel live, long enough to absorb the bulk of
@@ -24,9 +25,10 @@ type CachedPageData = Omit<
  * Returns page + user + links + projects + sections + readyPageTypes in one call.
  */
 export const getFullPageData = cache(async (slug: string) => {
+  const resolvedSlug = resolvePublicProfileSlug(slug);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const edgeCache = (globalThis as any).caches?.default as Cache | undefined;
-  const cacheUrl = profileCacheUrl(slug);
+  const cacheUrl = profileCacheUrl(resolvedSlug);
 
   if (edgeCache) {
     try {
@@ -43,7 +45,7 @@ export const getFullPageData = cache(async (slug: string) => {
     }
   }
 
-  const data = await loadFullPageData(slug);
+  const data = await loadFullPageData(resolvedSlug);
   if (!data) return null;
 
   if (edgeCache) {
@@ -250,11 +252,12 @@ function extractPreview(type: string, content: unknown): string {
 
 // Keep individual helpers for sub-pages that don't need everything
 export const getPageBySlug = cache(async (slug: string) => {
+  const resolvedSlug = resolvePublicProfileSlug(slug);
   await ensureProjectsTable();
   const result = await db
     .select()
     .from(pages)
-    .where(and(eq(pages.slug, slug), eq(pages.published, true)))
+    .where(and(eq(pages.slug, resolvedSlug), eq(pages.published, true)))
     .limit(1);
   return result[0] ?? null;
 });
