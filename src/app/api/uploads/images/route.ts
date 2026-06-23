@@ -16,9 +16,7 @@ export const runtime = 'nodejs';
 
 type UploadKind = 'avatar' | 'project';
 
-function isUploadFile(
-  value: FormDataEntryValue | null,
-): value is File {
+function isUploadFile(value: FormDataEntryValue | null): value is File {
   return Boolean(
     value &&
       typeof value !== 'string' &&

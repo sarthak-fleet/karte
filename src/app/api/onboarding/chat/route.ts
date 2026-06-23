@@ -81,7 +81,10 @@ interface OnboardingState {
   }>;
 }
 
-function mergeState(prev: OnboardingState, next: OnboardingState): OnboardingState {
+function mergeState(
+  prev: OnboardingState,
+  next: OnboardingState,
+): OnboardingState {
   return {
     ...prev,
     ...next,
@@ -103,15 +106,23 @@ function dedupeByUrl<T extends { url: string }>(items: T[]): T[] {
   return out;
 }
 
-function parseAiJson(raw: string): { reply: string; extracted: OnboardingState; done: boolean } | null {
+function parseAiJson(
+  raw: string,
+): { reply: string; extracted: OnboardingState; done: boolean } | null {
   // Models occasionally wrap JSON in ```json fences despite instructions.
-  const trimmed = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/i, '').trim();
+  const trimmed = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```$/i, '')
+    .trim();
   try {
     const obj = JSON.parse(trimmed);
     if (typeof obj?.reply !== 'string') return null;
     return {
       reply: obj.reply,
-      extracted: (obj.extracted && typeof obj.extracted === 'object' ? obj.extracted : {}) as OnboardingState,
+      extracted: (obj.extracted && typeof obj.extracted === 'object'
+        ? obj.extracted
+        : {}) as OnboardingState,
       done: !!obj.done,
     };
   } catch {
@@ -124,7 +135,10 @@ export async function POST(req: Request) {
     req.headers.get('cf-connecting-ip') ||
     req.headers.get('x-forwarded-for') ||
     'anon';
-  const rate = rateLimit(`onboard-chat:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  const rate = rateLimit(`onboard-chat:${ip}`, {
+    maxRequests: 30,
+    windowMs: 60_000,
+  });
   if (!rate.ok) {
     return NextResponse.json(
       { error: 'Too many messages — slow down a moment.' },
@@ -140,7 +154,9 @@ export async function POST(req: Request) {
   }
 
   const messages = Array.isArray(body.messages) ? body.messages.slice(-20) : [];
-  const prevState = (body.state && typeof body.state === 'object' ? body.state : {}) as OnboardingState;
+  const prevState = (
+    body.state && typeof body.state === 'object' ? body.state : {}
+  ) as OnboardingState;
 
   const ai = resolveAiConfig();
   if (!ai) {

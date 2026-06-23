@@ -15,7 +15,13 @@ describe('chat widget reliability contract', () => {
 
     assert.match(source, /EMPTY_CHAT_RESPONSE_MESSAGE/);
     assert.match(source, /CHAT_SERVICE_UNAVAILABLE_MESSAGE/);
-    assert.match(source, /last\?\.role === 'assistant' && !last\.content\.trim\(\)/);
-    assert.match(source, /void saveMessage\(convId,\s*'assistant',\s*EMPTY_CHAT_RESPONSE_MESSAGE\)/);
+    assert.match(
+      source,
+      /last\?\.role === 'assistant' && !last\.content\.trim\(\)/,
+    );
+    assert.match(
+      source,
+      /void saveMessage\(convId,\s*'assistant',\s*EMPTY_CHAT_RESPONSE_MESSAGE\)/,
+    );
   });
 });

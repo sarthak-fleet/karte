@@ -78,7 +78,7 @@ export async function recordEvent(event: AnalyticsEvent) {
           // Avoid person names in labels for WAE
           eventType === 'contact_submit' || eventType === 'dm_submit'
             ? 'form_submission'
-            : (resourceLabel || ''),
+            : resourceLabel || '',
           coarseMetadata ? JSON.stringify(coarseMetadata) : '',
         ],
         indexes: [slug],

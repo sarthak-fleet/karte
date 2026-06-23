@@ -19,7 +19,11 @@ function getOrigin(req: Request) {
 
 async function loadOwnedAgent(slug: string, userId: string) {
   return db.query.pages.findFirst({
-    where: and(eq(pages.slug, slug), eq(pages.userId, userId), eq(pages.pageType, 'agent')),
+    where: and(
+      eq(pages.slug, slug),
+      eq(pages.userId, userId),
+      eq(pages.pageType, 'agent'),
+    ),
   });
 }
 
@@ -80,44 +84,69 @@ export async function PATCH(
 
   if (body.displayName !== undefined) {
     if (typeof body.displayName !== 'string' || !body.displayName.trim()) {
-      return NextResponse.json({ error: 'displayName must be a non-empty string' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'displayName must be a non-empty string' },
+        { status: 400 },
+      );
     }
     if (body.displayName.trim().length > MAX_TITLE_LENGTH) {
-      return NextResponse.json({ error: 'displayName is too long' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'displayName is too long' },
+        { status: 400 },
+      );
     }
     updates.displayName = body.displayName.trim();
   }
 
   if (body.agentPurpose !== undefined) {
-    const value = typeof body.agentPurpose === 'string' ? body.agentPurpose.trim() : '';
+    const value =
+      typeof body.agentPurpose === 'string' ? body.agentPurpose.trim() : '';
     if (value.length > MAX_AGENT_PURPOSE_LENGTH) {
-      return NextResponse.json({ error: 'agentPurpose is too long' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'agentPurpose is too long' },
+        { status: 400 },
+      );
     }
     updates.agentPurpose = value || null;
     updates.bio = value || null;
   }
 
   if (body.agentOperator !== undefined) {
-    const value = typeof body.agentOperator === 'string' ? body.agentOperator.trim() : '';
+    const value =
+      typeof body.agentOperator === 'string' ? body.agentOperator.trim() : '';
     if (value.length > MAX_AGENT_OPERATOR_LENGTH) {
-      return NextResponse.json({ error: 'agentOperator is too long' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'agentOperator is too long' },
+        { status: 400 },
+      );
     }
     updates.agentOperator = value || null;
   }
 
   if (body.agentOperatorUrl !== undefined) {
-    const value = typeof body.agentOperatorUrl === 'string' ? body.agentOperatorUrl.trim() : '';
+    const value =
+      typeof body.agentOperatorUrl === 'string'
+        ? body.agentOperatorUrl.trim()
+        : '';
     if (value && !isValidUrl(value)) {
-      return NextResponse.json({ error: 'agentOperatorUrl must be a valid URL' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'agentOperatorUrl must be a valid URL' },
+        { status: 400 },
+      );
     }
     updates.agentOperatorUrl = value || null;
   }
 
   if (body.agentDisclosurePolicy !== undefined) {
     const value =
-      typeof body.agentDisclosurePolicy === 'string' ? body.agentDisclosurePolicy.trim() : '';
+      typeof body.agentDisclosurePolicy === 'string'
+        ? body.agentDisclosurePolicy.trim()
+        : '';
     if (value.length > MAX_AGENT_DISCLOSURE_LENGTH) {
-      return NextResponse.json({ error: 'agentDisclosurePolicy is too long' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'agentDisclosurePolicy is too long' },
+        { status: 400 },
+      );
     }
     updates.agentDisclosurePolicy = value || null;
   }
@@ -125,15 +154,22 @@ export async function PATCH(
   if (body.agentCapabilities !== undefined) {
     const capabilities = normalizeAgentCapabilities(body.agentCapabilities);
     if (capabilities === null) {
-      return NextResponse.json({ error: 'agentCapabilities must be a valid array' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'agentCapabilities must be a valid array' },
+        { status: 400 },
+      );
     }
     updates.agentCapabilities = capabilities;
   }
 
   if (body.avatarUrl !== undefined) {
-    const value = typeof body.avatarUrl === 'string' ? body.avatarUrl.trim() : '';
+    const value =
+      typeof body.avatarUrl === 'string' ? body.avatarUrl.trim() : '';
     if (value && !isValidUrl(value)) {
-      return NextResponse.json({ error: 'avatarUrl must be a valid URL' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'avatarUrl must be a valid URL' },
+        { status: 400 },
+      );
     }
     updates.avatarUrl = value || null;
   }
@@ -143,15 +179,24 @@ export async function PATCH(
   }
 
   if (body.brainEndpointUrl !== undefined) {
-    const value = typeof body.brainEndpointUrl === 'string' ? body.brainEndpointUrl.trim() : '';
+    const value =
+      typeof body.brainEndpointUrl === 'string'
+        ? body.brainEndpointUrl.trim()
+        : '';
     if (value && !isValidUrl(value)) {
-      return NextResponse.json({ error: 'brainEndpointUrl must be a valid URL' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'brainEndpointUrl must be a valid URL' },
+        { status: 400 },
+      );
     }
     updates.brainEndpointUrl = value || null;
   }
 
   if (body.brainEndpointAuth !== undefined) {
-    const value = typeof body.brainEndpointAuth === 'string' ? body.brainEndpointAuth.trim() : '';
+    const value =
+      typeof body.brainEndpointAuth === 'string'
+        ? body.brainEndpointAuth.trim()
+        : '';
     updates.brainEndpointAuth = value || null;
   }
 

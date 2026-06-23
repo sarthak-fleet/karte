@@ -1,4 +1,4 @@
-import { and,eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
@@ -47,7 +47,7 @@ export async function PUT(
 
   // Quick-action URL fields: accept undefined (unchanged), null/empty (clear),
   // string (set). One-liner so the .set() block reads clean below.
-  const upsertText = <T,>(incoming: unknown, current: T): T | string | null =>
+  const upsertText = <T>(incoming: unknown, current: T): T | string | null =>
     incoming === undefined
       ? current
       : typeof incoming === 'string' && incoming.trim()
@@ -56,7 +56,10 @@ export async function PUT(
 
   if (slug && !isValidSlug(slug)) {
     return NextResponse.json(
-      { error: 'Slug must be 3-50 chars, lowercase alphanumeric and hyphens only' },
+      {
+        error:
+          'Slug must be 3-50 chars, lowercase alphanumeric and hyphens only',
+      },
       { status: 400 },
     );
   }
@@ -77,7 +80,10 @@ export async function PUT(
     }
   }
 
-  if (dmMode !== undefined && (typeof dmMode !== 'string' || !DM_MODES.has(dmMode))) {
+  if (
+    dmMode !== undefined &&
+    (typeof dmMode !== 'string' || !DM_MODES.has(dmMode))
+  ) {
     return NextResponse.json(
       { error: 'DM mode must be off, anonymous, or email' },
       { status: 400 },
@@ -86,7 +92,10 @@ export async function PUT(
 
   let normalizedThemeConfig = page.themeConfig ?? resolveThemeConfig();
   if (themeConfig !== undefined) {
-    if (themeConfig !== null && (typeof themeConfig !== 'object' || Array.isArray(themeConfig))) {
+    if (
+      themeConfig !== null &&
+      (typeof themeConfig !== 'object' || Array.isArray(themeConfig))
+    ) {
       return NextResponse.json(
         { error: 'themeConfig must be an object' },
         { status: 400 },
@@ -131,7 +140,8 @@ export async function PUT(
       slug: slug ?? page.slug,
       displayName: displayName ?? page.displayName,
       bio: bio !== undefined ? bio : page.bio,
-      avatarUrl: avatarUrl !== undefined ? avatarUrl?.trim() || null : page.avatarUrl,
+      avatarUrl:
+        avatarUrl !== undefined ? avatarUrl?.trim() || null : page.avatarUrl,
       themeConfig: normalizedThemeConfig,
       published: published !== undefined ? published : page.published,
       dmMode: dmMode ?? page.dmMode,

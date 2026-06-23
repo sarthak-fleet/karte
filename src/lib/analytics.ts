@@ -25,7 +25,7 @@ export function trackEvent(slug: string, payload: TrackPayload) {
   };
 
   const body = JSON.stringify(fullPayload);
-  
+
   if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
     const blob = new Blob([body], { type: 'application/json' });
     if (navigator.sendBeacon(`/api/track/${slug}`, blob)) {

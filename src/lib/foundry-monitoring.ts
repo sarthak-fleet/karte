@@ -1,24 +1,27 @@
-"use client";
+'use client';
 
-import posthog from "posthog-js";
+import posthog from 'posthog-js';
 
-import { maybeReloadOnChunkError } from "./chunk-reload";
+import { maybeReloadOnChunkError } from './chunk-reload';
 
-const PROJECT_SLUG = "linkchat";
+const PROJECT_SLUG = 'linkchat';
 
 function route() {
-  if (typeof window === "undefined") return undefined;
+  if (typeof window === 'undefined') return undefined;
   return `${window.location.origin}${window.location.pathname}`;
 }
 
 function messageFrom(error: unknown) {
   if (error instanceof Error) return error.message;
-  if (typeof error === "string") return error;
+  if (typeof error === 'string') return error;
   return String(error);
 }
 
-export function capturePageCrash(error: unknown, source: "window_error" | "unhandled_rejection") {
-  posthog.capture("foundry_page_crash", {
+export function capturePageCrash(
+  error: unknown,
+  source: 'window_error' | 'unhandled_rejection',
+) {
+  posthog.capture('foundry_page_crash', {
     project_id: PROJECT_SLUG,
     route: route(),
     source,
@@ -28,15 +31,15 @@ export function capturePageCrash(error: unknown, source: "window_error" | "unhan
 }
 
 type ErrorBoundaryScope =
-  | "root"
-  | "global"
-  | "public-profile"
-  | "encyclopedia"
-  | "roast"
-  | "newspaper"
-  | "dashboard"
-  | "ai-component"
-  | "unknown";
+  | 'root'
+  | 'global'
+  | 'public-profile'
+  | 'encyclopedia'
+  | 'roast'
+  | 'newspaper'
+  | 'dashboard'
+  | 'ai-component'
+  | 'unknown';
 
 /**
  * Emits an "error_captured" event for an error surfaced by a React error
@@ -45,15 +48,19 @@ type ErrorBoundaryScope =
  */
 export function captureError(
   error: unknown,
-  options: { scope?: ErrorBoundaryScope; digest?: string; source?: string } = {},
+  options: {
+    scope?: ErrorBoundaryScope;
+    digest?: string;
+    source?: string;
+  } = {},
 ) {
   try {
-    posthog.capture("error_captured", {
+    posthog.capture('error_captured', {
       project_id: PROJECT_SLUG,
       route: route(),
-      scope: options.scope ?? "unknown",
+      scope: options.scope ?? 'unknown',
       digest: options.digest,
-      source: options.source ?? "error_boundary",
+      source: options.source ?? 'error_boundary',
       message: messageFrom(error),
       stack: error instanceof Error ? error.stack : undefined,
     });
@@ -68,14 +75,14 @@ export function captureError(
  */
 export function captureActionFailure(
   error: unknown,
-  options: { action: string; source?: string } = { action: "unknown" },
+  options: { action: string; source?: string } = { action: 'unknown' },
 ) {
   try {
-    posthog.capture("action_failed", {
+    posthog.capture('action_failed', {
       project_id: PROJECT_SLUG,
       route: route(),
       action: options.action,
-      source: options.source ?? "client",
+      source: options.source ?? 'client',
       message: messageFrom(error),
     });
   } catch {
@@ -84,25 +91,25 @@ export function captureActionFailure(
 }
 
 export function installBrowserMonitoring() {
-  if (typeof window === "undefined") return () => {};
+  if (typeof window === 'undefined') return () => {};
 
   const onError = (event: ErrorEvent) => {
     // Stale-chunk crashes get a silent reload before they ever reach
     // PostHog or the React error boundary — the user is about to be
     // sent to a fresh page, no need to surface UI or log a crash.
     if (maybeReloadOnChunkError(event.error ?? event.message)) return;
-    capturePageCrash(event.error ?? event.message, "window_error");
+    capturePageCrash(event.error ?? event.message, 'window_error');
   };
   const onUnhandledRejection = (event: PromiseRejectionEvent) => {
     if (maybeReloadOnChunkError(event.reason)) return;
-    capturePageCrash(event.reason, "unhandled_rejection");
+    capturePageCrash(event.reason, 'unhandled_rejection');
   };
 
-  window.addEventListener("error", onError);
-  window.addEventListener("unhandledrejection", onUnhandledRejection);
+  window.addEventListener('error', onError);
+  window.addEventListener('unhandledrejection', onUnhandledRejection);
 
   return () => {
-    window.removeEventListener("error", onError);
-    window.removeEventListener("unhandledrejection", onUnhandledRejection);
+    window.removeEventListener('error', onError);
+    window.removeEventListener('unhandledrejection', onUnhandledRejection);
   };
 }

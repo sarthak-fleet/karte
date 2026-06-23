@@ -1,4 +1,8 @@
-import { type ComponentPropsWithoutRef, forwardRef, type ReactNode } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  forwardRef,
+  type ReactNode,
+} from 'react';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -27,7 +31,11 @@ export const Textarea = forwardRef<
   HTMLTextAreaElement,
   ComponentPropsWithoutRef<'textarea'>
 >(({ className, ...props }, ref) => (
-  <textarea ref={ref} className={cn(fieldClass, 'leading-[1.55]', className)} {...props} />
+  <textarea
+    ref={ref}
+    className={cn(fieldClass, 'leading-[1.55]', className)}
+    {...props}
+  />
 ));
 Textarea.displayName = 'Textarea';
 
@@ -37,7 +45,11 @@ export const Select = forwardRef<
 >(({ className, children, ...props }, ref) => (
   <select
     ref={ref}
-    className={cn(fieldClass, 'appearance-none pr-9 bg-no-repeat bg-[right_0.85rem_center]', className)}
+    className={cn(
+      fieldClass,
+      'appearance-none pr-9 bg-no-repeat bg-[right_0.85rem_center]',
+      className,
+    )}
     style={{
       backgroundImage:
         "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'><path d='M3 5L6 8L9 5' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>\")",
@@ -64,12 +76,10 @@ const sizeStyles: Record<ButtonSize, string> = {
 };
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary:
-    'bg-karte-text text-karte-bg hover:bg-white',
+  primary: 'bg-karte-text text-karte-bg hover:bg-white',
   secondary:
     'border border-karte-border-strong bg-transparent text-karte-text hover:border-karte-border-emphasis hover:bg-white/[0.04]',
-  ghost:
-    'text-karte-text-3 hover:text-karte-text',
+  ghost: 'text-karte-text-3 hover:text-karte-text',
   danger:
     'border border-red-500/25 bg-red-500/[0.06] text-red-300 hover:border-red-500/40 hover:bg-red-500/10',
 };
@@ -83,7 +93,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', className, ...props }, ref) => (
     <button
       ref={ref}
-      className={cn(baseButton, sizeStyles[size], variantStyles[variant], className)}
+      className={cn(
+        baseButton,
+        sizeStyles[size],
+        variantStyles[variant],
+        className,
+      )}
       {...props}
     />
   ),
@@ -99,7 +114,12 @@ interface ToggleProps {
   disabled?: boolean;
 }
 
-export function Toggle({ checked, onChange, className, disabled }: ToggleProps) {
+export function Toggle({
+  checked,
+  onChange,
+  className,
+  disabled,
+}: ToggleProps) {
   return (
     <button
       type="button"
@@ -132,7 +152,12 @@ interface BadgeProps {
   removeLabel?: string;
 }
 
-export function Badge({ children, className, onRemove, removeLabel }: BadgeProps) {
+export function Badge({
+  children,
+  className,
+  onRemove,
+  removeLabel,
+}: BadgeProps) {
   return (
     <span
       className={cn(
@@ -232,7 +257,9 @@ export function FormField({
     <div className={className}>
       <Label htmlFor={htmlFor}>{label}</Label>
       {description && (
-        <p className="mb-2 text-[12px] leading-[1.5] text-karte-text-4">{description}</p>
+        <p className="mb-2 text-[12px] leading-[1.5] text-karte-text-4">
+          {description}
+        </p>
       )}
       {children}
     </div>

@@ -28,10 +28,13 @@ export async function PUT(
   if (
     chatSystemPrompt !== undefined &&
     chatSystemPrompt !== null &&
-    (typeof chatSystemPrompt !== 'string' || chatSystemPrompt.length > MAX_CHAT_SYSTEM_PROMPT_LENGTH)
+    (typeof chatSystemPrompt !== 'string' ||
+      chatSystemPrompt.length > MAX_CHAT_SYSTEM_PROMPT_LENGTH)
   ) {
     return NextResponse.json(
-      { error: `chatSystemPrompt must be a string of at most ${MAX_CHAT_SYSTEM_PROMPT_LENGTH} characters` },
+      {
+        error: `chatSystemPrompt must be a string of at most ${MAX_CHAT_SYSTEM_PROMPT_LENGTH} characters`,
+      },
       { status: 400 },
     );
   }

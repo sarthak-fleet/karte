@@ -186,7 +186,8 @@ export function buildKarteSkillsIndex(appUrl = getKarteAppUrl()) {
       {
         name: 'karte',
         version: KARTE_AGENT_SKILL_VERSION,
-        description: 'Publish AI agent trust cards on Karte with email-code auth and public manifests.',
+        description:
+          'Publish AI agent trust cards on Karte with email-code auth and public manifests.',
         skill_url: `${appUrl}/skill.md`,
         install_url: `${appUrl}/skills/karte/install.sh`,
         llms_url: `${appUrl}/llms.txt`,
@@ -199,7 +200,8 @@ export function buildKarteAgentDiscoveryCard(appUrl = getKarteAppUrl()) {
   return {
     name: 'Karte Agent Trust Cards',
     version: KARTE_AGENT_SKILL_VERSION,
-    description: 'Register public trust cards for AI agents with operator metadata and machine-readable manifests.',
+    description:
+      'Register public trust cards for AI agents with operator metadata and machine-readable manifests.',
     url: appUrl,
     skill: `${appUrl}/skill.md`,
     authentication: {

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -20,7 +20,10 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf:build": "next build --webpack && node scripts/run-inline-critical-css.mjs && opennextjs-cloudflare build --skipNextBuild && opennextjs-cloudflare populateCache local && pnpm --filter ./landing-astro build && node scripts/run-overlay-astro-landing.mjs",
     "deploy:cf": "pnpm cf:build && opennextjs-cloudflare deploy",
-    "upload:cf": "pnpm cf:build && opennextjs-cloudflare upload"
+    "upload:cf": "pnpm cf:build && opennextjs-cloudflare upload",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check ."
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.41",
@@ -45,27 +48,24 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "sanitize-html": "^2.17.3",
-    "zod": "^4.4.3",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.1",
     "@playwright/test": "1.59.1",
     "@tailwindcss/postcss": "4",
     "@types/node": "25.6.0",
     "@types/react": "19",
     "@types/react-dom": "19",
+    "@vitest/coverage-v8": "^4.1.9",
     "babel-plugin-react-compiler": "1.0.0",
     "beasties": "^0.3.5",
     "dotenv": "17.4.2",
     "drizzle-kit": "0.31.10",
-    "eslint": "10.2.1",
-    "eslint-config-next": "16.2.4",
-    "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-simple-import-sort": "13.0.0",
     "tailwindcss": "4",
     "typescript": "6.0.3",
     "vitest": "^4.1.9",
-    "@vitest/coverage-v8": "^4.1.9",
     "wrangler": "4.85.0"
   }
 }

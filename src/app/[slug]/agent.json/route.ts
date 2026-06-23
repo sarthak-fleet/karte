@@ -17,7 +17,13 @@ export async function GET(
   const [page] = await db
     .select()
     .from(pages)
-    .where(and(eq(pages.slug, slug), eq(pages.pageType, 'agent'), eq(pages.published, true)));
+    .where(
+      and(
+        eq(pages.slug, slug),
+        eq(pages.pageType, 'agent'),
+        eq(pages.published, true),
+      ),
+    );
 
   if (!page) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });

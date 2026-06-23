@@ -4,24 +4,24 @@
 // stdout. Pipe into `wrangler d1 execute linkchat-auth --remote --file=-`.
 
 const PAGE_ID = 'test-page-1'; // from `SELECT id FROM pages WHERE slug='sarthak'`
-const NOW = Date.now();
+const _NOW = Date.now();
 
 function q(value) {
   if (value === null || value === undefined) return 'NULL';
   if (typeof value === 'number') return String(value);
   if (typeof value === 'boolean') return value ? '1' : '0';
-  return "'" + String(value).replace(/'/g, "''") + "'";
+  return `'${String(value).replace(/'/g, "''")}'`;
 }
 
 function logo(domain) {
-  return 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=256';
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
 }
 
 // ── Page-level updates ──────────────────────────────────────────────
 const pageUpdates = [
   // Tighter bio that leads with the line he uses on GitHub.
   `UPDATE pages SET bio = ${q(
-    "I build the rails AI runs on — and the products that ride them. Backend + AI infra at VaultWealth (Peak XV). Previously Front.Page (YC S21). Building Karte, CodeVetter, SaaS Maker, free-ai, high-signal, tinygpt on the side.",
+    'I build the rails AI runs on — and the products that ride them. Backend + AI infra at VaultWealth (Peak XV). Previously Front.Page (YC S21). Building Karte, CodeVetter, SaaS Maker, free-ai, high-signal, tinygpt on the side.',
   )} WHERE id = ${q(PAGE_ID)};`,
   // Real Google Calendar meeting link.
   `UPDATE pages SET calendarUrl = ${q('https://calendar.app.google/ZMDHRKzLDNpZsv6x6')} WHERE id = ${q(PAGE_ID)};`,
@@ -76,7 +76,7 @@ const newInfoBlocks = [
     type: 'text',
     title: 'Engineering philosophy',
     content:
-      'It\'s the stuff around the happy path that matters. Most engineers can write the happy-path code; what separates good systems from great ones is how they handle timeouts, queue backups, retries, idempotency, and downstream failures. Most production incidents live in those edges.',
+      "It's the stuff around the happy path that matters. Most engineers can write the happy-path code; what separates good systems from great ones is how they handle timeouts, queue backups, retries, idempotency, and downstream failures. Most production incidents live in those edges.",
   },
   {
     type: 'text',
@@ -106,7 +106,7 @@ const newInfoBlocks = [
     type: 'faq',
     title: 'What is free-ai?',
     content:
-      'An OpenAI-compatible LLM gateway running on Cloudflare Workers. You point any OpenAI SDK at it and it routes to Cloudflare Workers AI, OpenRouter, or whatever chat-completions endpoint you configure. Powers Karte\'s free tier — that is how visitors get to chat with a profile without anyone paying for tokens.',
+      "An OpenAI-compatible LLM gateway running on Cloudflare Workers. You point any OpenAI SDK at it and it routes to Cloudflare Workers AI, OpenRouter, or whatever chat-completions endpoint you configure. Powers Karte's free tier — that is how visitors get to chat with a profile without anyone paying for tokens.",
   },
   {
     type: 'faq',
@@ -135,7 +135,9 @@ const newInfoBlocks = [
 ];
 
 const out = [];
-out.push('-- Enrichment for /sarthak. Idempotent for projects (skip-existing) and');
+out.push(
+  '-- Enrichment for /sarthak. Idempotent for projects (skip-existing) and',
+);
 out.push('-- adds new info blocks at the tail of sortOrder.');
 out.push('');
 out.push('-- 1. page-level updates');
@@ -148,7 +150,7 @@ for (const p of newProjects) {
   out.push(
     'INSERT INTO projects (id, pageId, title, url, imageUrl, description, sortOrder, enabled) VALUES (' +
       [
-        q('proj-sarthak-' + p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')),
+        q(`proj-sarthak-${p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`),
         q(PAGE_ID),
         q(p.title),
         q(p.url),
@@ -184,4 +186,4 @@ for (const b of newInfoBlocks) {
   );
 }
 
-process.stdout.write(out.join('\n') + '\n');
+process.stdout.write(`${out.join('\n')}\n`);

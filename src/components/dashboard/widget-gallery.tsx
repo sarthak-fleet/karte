@@ -162,10 +162,7 @@ export function WidgetGallery() {
         </SectionTitle>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {PAGE_SECTION_TYPES.map((type) => (
-            <div
-              key={type.value}
-              className="rounded-2xl bg-white/[0.02] p-5"
-            >
+            <div key={type.value} className="rounded-2xl bg-white/[0.02] p-5">
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-karte-text-4">
                 section.{type.value}
               </p>
@@ -190,12 +187,13 @@ export function WidgetGallery() {
               variants per section type (compact / standard / featured)
             </li>
             <li>
-              <span className="text-karte-text-2">layoutPlan storage</span>{' '}
-              — Drizzle column on <code className="text-karte-text-2">pages</code> so AI Revamp output persists
+              <span className="text-karte-text-2">layoutPlan storage</span> —
+              Drizzle column on <code className="text-karte-text-2">pages</code>{' '}
+              so AI Revamp output persists
             </li>
             <li>
-              <span className="text-karte-text-2">LayoutRenderer</span> —
-              swap the profile page&apos;s ad-hoc rendering for plan-driven output
+              <span className="text-karte-text-2">LayoutRenderer</span> — swap
+              the profile page&apos;s ad-hoc rendering for plan-driven output
             </li>
             <li>
               <span className="text-karte-text-2">Drag-and-drop override</span>{' '}

@@ -26,7 +26,10 @@ export default function EncyclopediaLoading() {
             <div className="h-3 w-24 animate-pulse rounded bg-gray-400" />
             <div className="mt-5 space-y-3">
               {[0, 1, 2, 3, 4].map((item) => (
-                <div key={item} className="h-2 animate-pulse rounded bg-gray-300" />
+                <div
+                  key={item}
+                  className="h-2 animate-pulse rounded bg-gray-300"
+                />
               ))}
             </div>
           </aside>
@@ -39,15 +42,20 @@ export default function EncyclopediaLoading() {
               <div className="h-3 w-9/12 animate-pulse rounded bg-gray-200" />
             </div>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {['Summary', 'Background', 'Projects', 'References'].map((label) => (
-                <div key={label} className="rounded-lg border border-gray-200 bg-[#f8f9fa] p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                    {label}
-                  </p>
-                  <div className="mt-3 h-2 animate-pulse rounded bg-gray-300" />
-                  <div className="mt-2 h-2 w-2/3 animate-pulse rounded bg-gray-200" />
-                </div>
-              ))}
+              {['Summary', 'Background', 'Projects', 'References'].map(
+                (label) => (
+                  <div
+                    key={label}
+                    className="rounded-lg border border-gray-200 bg-[#f8f9fa] p-3"
+                  >
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                      {label}
+                    </p>
+                    <div className="mt-3 h-2 animate-pulse rounded bg-gray-300" />
+                    <div className="mt-2 h-2 w-2/3 animate-pulse rounded bg-gray-200" />
+                  </div>
+                ),
+              )}
             </div>
           </div>
 

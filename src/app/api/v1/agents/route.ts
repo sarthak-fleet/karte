@@ -37,7 +37,9 @@ export async function GET(req: Request) {
   const rows = await db
     .select()
     .from(pages)
-    .where(and(eq(pages.userId, gate.auth.userId), eq(pages.pageType, 'agent')));
+    .where(
+      and(eq(pages.userId, gate.auth.userId), eq(pages.pageType, 'agent')),
+    );
 
   return NextResponse.json({
     agents: rows.map(sanitizeAgentPageResponse),
@@ -57,27 +59,43 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const slug = typeof body.slug === 'string' ? body.slug.trim().toLowerCase() : '';
-  const displayName = typeof body.displayName === 'string' ? body.displayName.trim() : '';
+  const slug =
+    typeof body.slug === 'string' ? body.slug.trim().toLowerCase() : '';
+  const displayName =
+    typeof body.displayName === 'string' ? body.displayName.trim() : '';
 
   if (!slug || !displayName) {
-    return NextResponse.json({ error: 'slug and displayName are required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'slug and displayName are required' },
+      { status: 400 },
+    );
   }
 
   if (!isValidSlug(slug)) {
     return NextResponse.json(
-      { error: 'Slug must be 3-50 chars, lowercase alphanumeric and hyphens only' },
+      {
+        error:
+          'Slug must be 3-50 chars, lowercase alphanumeric and hyphens only',
+      },
       { status: 400 },
     );
   }
 
   if (displayName.length > MAX_TITLE_LENGTH) {
-    return NextResponse.json({ error: 'displayName is too long' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'displayName is too long' },
+      { status: 400 },
+    );
   }
 
-  const existing = await db.query.pages.findFirst({ where: eq(pages.slug, slug) });
+  const existing = await db.query.pages.findFirst({
+    where: eq(pages.slug, slug),
+  });
   if (existing) {
-    return NextResponse.json({ error: 'Slug is already taken' }, { status: 409 });
+    return NextResponse.json(
+      { error: 'Slug is already taken' },
+      { status: 409 },
+    );
   }
 
   const agentPurpose =
@@ -88,47 +106,78 @@ export async function POST(req: Request) {
         : null;
 
   if (agentPurpose && agentPurpose.length > MAX_AGENT_PURPOSE_LENGTH) {
-    return NextResponse.json({ error: 'agentPurpose is too long' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'agentPurpose is too long' },
+      { status: 400 },
+    );
   }
 
   const agentOperator =
     typeof body.agentOperator === 'string' ? body.agentOperator.trim() : null;
   if (agentOperator && agentOperator.length > MAX_AGENT_OPERATOR_LENGTH) {
-    return NextResponse.json({ error: 'agentOperator is too long' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'agentOperator is too long' },
+      { status: 400 },
+    );
   }
 
   const agentOperatorUrl =
-    typeof body.agentOperatorUrl === 'string' ? body.agentOperatorUrl.trim() : null;
+    typeof body.agentOperatorUrl === 'string'
+      ? body.agentOperatorUrl.trim()
+      : null;
   if (agentOperatorUrl && !isValidUrl(agentOperatorUrl)) {
-    return NextResponse.json({ error: 'agentOperatorUrl must be a valid URL' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'agentOperatorUrl must be a valid URL' },
+      { status: 400 },
+    );
   }
 
   const agentDisclosurePolicy =
     typeof body.agentDisclosurePolicy === 'string'
       ? body.agentDisclosurePolicy.trim()
       : null;
-  if (agentDisclosurePolicy && agentDisclosurePolicy.length > MAX_AGENT_DISCLOSURE_LENGTH) {
-    return NextResponse.json({ error: 'agentDisclosurePolicy is too long' }, { status: 400 });
+  if (
+    agentDisclosurePolicy &&
+    agentDisclosurePolicy.length > MAX_AGENT_DISCLOSURE_LENGTH
+  ) {
+    return NextResponse.json(
+      { error: 'agentDisclosurePolicy is too long' },
+      { status: 400 },
+    );
   }
 
   const capabilities = normalizeAgentCapabilities(body.agentCapabilities);
   if (body.agentCapabilities !== undefined && capabilities === null) {
-    return NextResponse.json({ error: 'agentCapabilities must be a valid array' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'agentCapabilities must be a valid array' },
+      { status: 400 },
+    );
   }
 
-  const avatarUrl = typeof body.avatarUrl === 'string' ? body.avatarUrl.trim() : null;
+  const avatarUrl =
+    typeof body.avatarUrl === 'string' ? body.avatarUrl.trim() : null;
   if (avatarUrl && !isValidUrl(avatarUrl)) {
-    return NextResponse.json({ error: 'avatarUrl must be a valid URL' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'avatarUrl must be a valid URL' },
+      { status: 400 },
+    );
   }
 
   const brainEndpointUrl =
-    typeof body.brainEndpointUrl === 'string' ? body.brainEndpointUrl.trim() : null;
+    typeof body.brainEndpointUrl === 'string'
+      ? body.brainEndpointUrl.trim()
+      : null;
   if (brainEndpointUrl && !isValidUrl(brainEndpointUrl)) {
-    return NextResponse.json({ error: 'brainEndpointUrl must be a valid URL' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'brainEndpointUrl must be a valid URL' },
+      { status: 400 },
+    );
   }
 
   const brainEndpointAuth =
-    typeof body.brainEndpointAuth === 'string' ? body.brainEndpointAuth.trim() : null;
+    typeof body.brainEndpointAuth === 'string'
+      ? body.brainEndpointAuth.trim()
+      : null;
 
   const now = new Date();
   const origin = getOrigin(req);
@@ -144,7 +193,8 @@ export async function POST(req: Request) {
       avatarUrl,
       themeConfig: resolveThemeConfig(),
       published: false,
-      chatEnabled: body.chatEnabled === undefined ? true : Boolean(body.chatEnabled),
+      chatEnabled:
+        body.chatEnabled === undefined ? true : Boolean(body.chatEnabled),
       agentPurpose,
       agentOperator,
       agentOperatorUrl,

@@ -36,7 +36,9 @@ function isExternalUrl(href: string) {
 }
 
 function getProfileVariantFromLocation() {
-  return new URLSearchParams(window.location.search).get('variant') || 'baseline';
+  return (
+    new URLSearchParams(window.location.search).get('variant') || 'baseline'
+  );
 }
 
 function getAnalyticsSlug(pathname: string) {
@@ -45,8 +47,7 @@ function getAnalyticsSlug(pathname: string) {
     return pathSlug;
   }
 
-  const hint = document
-    .querySelector<HTMLElement>('[data-karte-public-slug]')
+  const hint = document.querySelector<HTMLElement>('[data-karte-public-slug]')
     ?.dataset.kartePublicSlug;
   return hint || null;
 }

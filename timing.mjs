@@ -14,7 +14,7 @@ export function withTiming(handler) {
 
     // Add Server-Timing header
     const headers = new Headers(response.headers);
-    headers.set("Server-Timing", `app;dur=${Math.round(duration)}`);
+    headers.set('Server-Timing', `app;dur=${Math.round(duration)}`);
     const timedResponse = new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
@@ -23,7 +23,9 @@ export function withTiming(handler) {
 
     // Log slow requests
     if (duration > 200) {
-      console.warn(`[slow] ${request.method} ${url.pathname} — ${Math.round(duration)}ms`);
+      console.warn(
+        `[slow] ${request.method} ${url.pathname} — ${Math.round(duration)}ms`,
+      );
     }
 
     return timedResponse;

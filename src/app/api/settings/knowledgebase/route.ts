@@ -29,7 +29,9 @@ export async function POST() {
     const indexId = await ensureProfileMemoryIndex(auth.userId);
     return NextResponse.json({ ok: true, hasIndex: true, indexId });
   } catch {
-    return NextResponse.json({ error: 'Failed to initialize profile memory index' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Failed to initialize profile memory index' },
+      { status: 502 },
+    );
   }
 }
-

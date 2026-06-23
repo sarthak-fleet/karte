@@ -33,12 +33,13 @@ export async function PublicTopBar({
   let userPage: { slug: string } | null = null;
 
   try {
-    session = await getSession() as typeof session;
+    session = (await getSession()) as typeof session;
     if (session?.user?.id) {
-      userPage = await db.query.pages.findFirst({
-        where: eq(pages.userId, session.user.id),
-        columns: { slug: true },
-      }) ?? null;
+      userPage =
+        (await db.query.pages.findFirst({
+          where: eq(pages.userId, session.user.id),
+          columns: { slug: true },
+        })) ?? null;
     }
   } catch {
     // Auth failed — show anonymous UI
@@ -171,7 +172,10 @@ export async function PublicTopBar({
               </Link>
               <div
                 className="flex items-center gap-2 rounded-full border px-2 py-1.5 text-karte-text"
-                style={{ borderColor: `${accentColor}40`, backgroundColor: `${accentColor}12` }}
+                style={{
+                  borderColor: `${accentColor}40`,
+                  backgroundColor: `${accentColor}12`,
+                }}
               >
                 {session?.user?.image ? (
                   <Image

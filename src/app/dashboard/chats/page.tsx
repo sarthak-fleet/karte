@@ -19,7 +19,9 @@ export default async function ChatsPage() {
         <ChatList pageId={page.id} />
       ) : (
         <div className="rounded-2xl bg-white/[0.02] p-8 text-center">
-          <p className="text-karte-text-3">Create a page first to start receiving chats.</p>
+          <p className="text-karte-text-3">
+            Create a page first to start receiving chats.
+          </p>
         </div>
       )}
     </div>

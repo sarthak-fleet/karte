@@ -10,9 +10,20 @@ interface ProfilePreviewProps {
 
 type Frame = 'phone' | 'desktop';
 
-const FRAMES: Record<Frame, { label: string; widthClass: string; aspect: string }> = {
-  phone: { label: 'Phone', widthClass: 'max-w-[400px]', aspect: 'aspect-[9/19.5]' },
-  desktop: { label: 'Desktop', widthClass: 'max-w-full', aspect: 'aspect-[4/3]' },
+const FRAMES: Record<
+  Frame,
+  { label: string; widthClass: string; aspect: string }
+> = {
+  phone: {
+    label: 'Phone',
+    widthClass: 'max-w-[400px]',
+    aspect: 'aspect-[9/19.5]',
+  },
+  desktop: {
+    label: 'Desktop',
+    widthClass: 'max-w-full',
+    aspect: 'aspect-[4/3]',
+  },
 };
 
 /**
@@ -65,7 +76,15 @@ export function ProfilePreview({ slug, refreshKey }: ProfilePreviewProps) {
             aria-label="Refresh preview"
             className="rounded-full p-1.5 text-karte-text-3 transition-colors duration-150 hover:bg-white/[0.05] hover:text-karte-text"
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.84 1.05 6.5 2.74" />
               <path d="M21 4v5h-5" />
             </svg>
@@ -78,7 +97,15 @@ export function ProfilePreview({ slug, refreshKey }: ProfilePreviewProps) {
             aria-label="Open profile in new tab"
             className="rounded-full p-1.5 text-karte-text-3 transition-colors duration-150 hover:bg-white/[0.05] hover:text-karte-text"
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M7 17 17 7" />
               <path d="M7 7h10v10" />
             </svg>
@@ -95,9 +122,7 @@ export function ProfilePreview({ slug, refreshKey }: ProfilePreviewProps) {
           }}
         >
           {frame === 'phone' && (
-            <>
-              <div className="pointer-events-none absolute left-1/2 top-2 z-10 h-1 w-12 -translate-x-1/2 rounded-full bg-white/[0.10]" />
-            </>
+            <div className="pointer-events-none absolute left-1/2 top-2 z-10 h-1 w-12 -translate-x-1/2 rounded-full bg-white/[0.10]" />
           )}
           <div className={`w-full ${cfg.aspect}`}>
             <iframe

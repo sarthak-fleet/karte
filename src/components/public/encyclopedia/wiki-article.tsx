@@ -12,7 +12,12 @@ interface WikiArticleProps {
   accentColor: string;
 }
 
-export function WikiArticle({ content, displayName, avatarUrl, accentColor }: WikiArticleProps) {
+export function WikiArticle({
+  content,
+  displayName,
+  avatarUrl,
+  accentColor,
+}: WikiArticleProps) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 text-[#202122] sm:py-10">
       <article className="overflow-hidden border border-[#d8dee8] bg-white shadow-[0_28px_80px_-64px_rgba(15,23,42,0.7)]">
@@ -35,8 +40,12 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
               </div>
             </div>
             <div className="flex gap-2 text-xs text-[#3366cc]">
-              <span className="border border-[#d8dee8] bg-white px-3 py-1">Read</span>
-              <span className="border border-[#d8dee8] bg-white px-3 py-1">View source</span>
+              <span className="border border-[#d8dee8] bg-white px-3 py-1">
+                Read
+              </span>
+              <span className="border border-[#d8dee8] bg-white px-3 py-1">
+                View source
+              </span>
             </div>
           </div>
         </div>
@@ -48,7 +57,9 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
             </p>
             <div className="mt-4 space-y-2">
               {['Article', 'Contents', 'Infobox', 'Categories'].map((item) => (
-                <p key={item} className="text-[#3366cc]">{item}</p>
+                <p key={item} className="text-[#3366cc]">
+                  {item}
+                </p>
               ))}
             </div>
           </aside>
@@ -61,7 +72,8 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
               <h1
                 className="text-[32px] font-normal leading-tight sm:text-[42px]"
                 style={{
-                  fontFamily: 'Linux Libertine, Georgia, "Times New Roman", serif',
+                  fontFamily:
+                    'Linux Libertine, Georgia, "Times New Roman", serif',
                   color: '#000000',
                 }}
               >
@@ -70,7 +82,8 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
             </header>
 
             <p className="mb-5 border-l-4 border-[#a7d7f9] bg-[#f8f9fa] px-3 py-2 text-xs italic text-[#54595d]">
-              From Karte Encyclopedia, a source-backed profile article generated from public profile memory.
+              From Karte Encyclopedia, a source-backed profile article generated
+              from public profile memory.
             </p>
 
             <WikiInfobox
@@ -80,11 +93,16 @@ export function WikiArticle({ content, displayName, avatarUrl, accentColor }: Wi
               accentColor={accentColor}
             />
 
-            <WikiTocFromHtml html={content.markdown} accentColor={accentColor} />
+            <WikiTocFromHtml
+              html={content.markdown}
+              accentColor={accentColor}
+            />
 
             <div
               className="wiki-prose clear-none"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.markdown) }}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(content.markdown),
+              }}
             />
 
             {content.categories.length > 0 && (

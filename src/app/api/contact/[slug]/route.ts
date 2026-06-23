@@ -18,7 +18,8 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const { ok } = rateLimit(`contact:${ip}:${slug}`);
   if (!ok) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
@@ -28,8 +29,10 @@ export async function POST(
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   const email = typeof body.email === 'string' ? body.email.trim() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
-  const visitorId = typeof body.visitorId === 'string' ? body.visitorId.trim() : null;
-  const sectionId = typeof body.sectionId === 'string' ? body.sectionId.trim() : null;
+  const visitorId =
+    typeof body.visitorId === 'string' ? body.visitorId.trim() : null;
+  const sectionId =
+    typeof body.sectionId === 'string' ? body.sectionId.trim() : null;
   const senderType = body.senderType === 'anonymous' ? 'anonymous' : 'email';
 
   if (!message || (senderType === 'email' && (!name || !email))) {
@@ -47,7 +50,10 @@ export async function POST(
   }
 
   if (senderType === 'email' && !isValidEmail(email)) {
-    return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid email address' },
+      { status: 400 },
+    );
   }
 
   if (message.length > MAX_CONTACT_MESSAGE_LENGTH) {
@@ -73,7 +79,10 @@ export async function POST(
 
   if (isDmWidgetSubmission) {
     if (page.dmMode === 'off') {
-      return NextResponse.json({ error: 'Direct messages are disabled' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Direct messages are disabled' },
+        { status: 403 },
+      );
     }
 
     if (page.dmMode === 'email') {
@@ -106,9 +115,9 @@ export async function POST(
   }
 
   const submissionName =
-    senderType === 'anonymous' ? 'Anonymous' : verifiedSender?.name ?? name;
+    senderType === 'anonymous' ? 'Anonymous' : (verifiedSender?.name ?? name);
   const submissionEmail =
-    senderType === 'anonymous' ? '' : verifiedSender?.email ?? email;
+    senderType === 'anonymous' ? '' : (verifiedSender?.email ?? email);
 
   const [submission] = await db
     .insert(contactSubmissions)

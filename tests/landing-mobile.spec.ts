@@ -64,6 +64,6 @@ test.describe('landing page', () => {
     const cta = page.getByRole('link', { name: /See it live/i }).first();
     const box = await cta.boundingBox();
     expect(box).not.toBeNull();
-    expect(box!.height).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
   });
 });

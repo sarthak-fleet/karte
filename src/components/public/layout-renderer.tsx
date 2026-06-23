@@ -49,7 +49,9 @@ export function LayoutRenderer({
   const restProjects =
     heroIdx >= 0 ? projectPicks.filter((_, i) => i !== heroIdx) : projectPicks;
 
-  const squarePicks = restProjects.filter((p) => p.variantId === 'project-square');
+  const squarePicks = restProjects.filter(
+    (p) => p.variantId === 'project-square',
+  );
   const widePicks = restProjects.filter((p) => p.variantId === 'project-wide');
   const linePicks: AnyPick[] = [
     ...restProjects.filter((p) => p.variantId === 'project-line'),
@@ -71,13 +73,18 @@ export function LayoutRenderer({
   return (
     <div className="space-y-6">
       {heroPick &&
-        reveal(allVariantsById[heroPick.variantId]?.render(heroPick.data, ctx), 'hero')}
+        reveal(
+          allVariantsById[heroPick.variantId]?.render(heroPick.data, ctx),
+          'hero',
+        )}
 
       {squarePicks.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2">
           {squarePicks.map((pick) => {
             const v = allVariantsById[pick.variantId];
-            return v ? reveal(v.render(pick.data, ctx), `sq:${pick.data.id}`) : null;
+            return v
+              ? reveal(v.render(pick.data, ctx), `sq:${pick.data.id}`)
+              : null;
           })}
         </div>
       )}
@@ -86,7 +93,9 @@ export function LayoutRenderer({
         <div className="space-y-3">
           {widePicks.map((pick) => {
             const v = allVariantsById[pick.variantId];
-            return v ? reveal(v.render(pick.data, ctx), `wd:${pick.data.id}`) : null;
+            return v
+              ? reveal(v.render(pick.data, ctx), `wd:${pick.data.id}`)
+              : null;
           })}
         </div>
       )}
@@ -95,7 +104,9 @@ export function LayoutRenderer({
         <div className="grid gap-2.5 sm:grid-cols-2">
           {linePicks.map((pick) => {
             const v = allVariantsById[pick.variantId];
-            return v ? reveal(v.render(pick.data, ctx), `ln:${pick.data.id}`) : null;
+            return v
+              ? reveal(v.render(pick.data, ctx), `ln:${pick.data.id}`)
+              : null;
           })}
         </div>
       )}

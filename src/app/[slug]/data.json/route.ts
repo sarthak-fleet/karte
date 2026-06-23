@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
-import { getFullPageData } from "../_lib/get-page-data";
+import { getFullPageData } from '../_lib/get-page-data';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 /**
  * Public JSON dump of a profile — same data the public page renders,
@@ -16,7 +16,7 @@ export async function GET(
   const { slug } = await ctx.params;
   const data = await getFullPageData(slug);
   if (!data) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 
   const { page, links, projects, sections, readyPages } = data;
@@ -30,9 +30,11 @@ export async function GET(
       themeConfig: page.themeConfig ?? null,
       modes: {
         chat: page.chatEnabled ?? false,
-        encyclopedia: (page.encyclopediaEnabled ?? false) && readyPages.has("encyclopedia"),
-        roast: (page.roastEnabled ?? false) && readyPages.has("roast"),
-        newspaper: (page.newspaperEnabled ?? false) && readyPages.has("newspaper"),
+        encyclopedia:
+          (page.encyclopediaEnabled ?? false) && readyPages.has('encyclopedia'),
+        roast: (page.roastEnabled ?? false) && readyPages.has('roast'),
+        newspaper:
+          (page.newspaperEnabled ?? false) && readyPages.has('newspaper'),
       },
       links: links.map((l) => ({
         id: l.id,
@@ -63,7 +65,7 @@ export async function GET(
     {
       status: 200,
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       },
     },
   );

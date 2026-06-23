@@ -1,7 +1,7 @@
 'use client';
 
 import posthog from 'posthog-js';
-import { useCallback,useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { captureActionFailure } from '@/lib/foundry-monitoring';
 import type { RoastContent } from '@/lib/generated-page-types';
@@ -91,7 +91,7 @@ export function RoastPageClient({
     const text = `I just got roasted by AI on Karte. Vibe score: ${roast?.vibeScore}/100. Think you can handle it?`;
     window.open(
       `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-      '_blank'
+      '_blank',
     );
   }, [slug, roast?.vibeScore]);
 
@@ -153,8 +153,13 @@ export function RoastPageClient({
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {['Red flags', 'Best link', 'Bio autopsy'].map((label) => (
-              <div key={label} className="rotate-1 border-2 border-white bg-[#ff2aa3] p-3 text-black shadow-[5px_5px_0_#f9ff00]">
-                <p className="text-xs font-black uppercase tracking-[0.16em]">{label}</p>
+              <div
+                key={label}
+                className="rotate-1 border-2 border-white bg-[#ff2aa3] p-3 text-black shadow-[5px_5px_0_#f9ff00]"
+              >
+                <p className="text-xs font-black uppercase tracking-[0.16em]">
+                  {label}
+                </p>
                 <div className="mt-3 h-2 animate-pulse bg-black/35" />
                 <div className="mt-2 h-2 w-2/3 animate-pulse bg-black/25" />
               </div>
@@ -175,7 +180,9 @@ export function RoastPageClient({
             <h1 className="text-3xl font-black uppercase tracking-[-0.02em] text-karte-text sm:text-4xl">
               {displayName}&apos;s Roast
             </h1>
-            <p className="text-[#f9ff00]">An unserious audit of a very serious profile.</p>
+            <p className="text-[#f9ff00]">
+              An unserious audit of a very serious profile.
+            </p>
           </div>
 
           {error && (
@@ -187,7 +194,10 @@ export function RoastPageClient({
           <button
             onClick={handleGenerate}
             className="w-full border-2 border-white px-6 py-3 text-sm font-black uppercase tracking-[0.14em] text-black transition-all hover:translate-x-1 hover:translate-y-1 active:scale-[0.98]"
-            style={{ backgroundColor: '#f9ff00', boxShadow: `8px 8px 0 ${accentColor}` }}
+            style={{
+              backgroundColor: '#f9ff00',
+              boxShadow: `8px 8px 0 ${accentColor}`,
+            }}
           >
             Generate Roast
           </button>
@@ -204,7 +214,10 @@ export function RoastPageClient({
   return (
     <div className="w-full text-karte-text">
       <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:py-16">
-        <div ref={captureRef} className="space-y-8 bg-[#12020b] px-2 py-2 sm:px-6 sm:py-6">
+        <div
+          ref={captureRef}
+          className="space-y-8 bg-[#12020b] px-2 py-2 sm:px-6 sm:py-6"
+        >
           <div className="mx-auto max-w-4xl border-4 border-white bg-[#210815] px-5 py-8 text-center shadow-[16px_16px_0_#f9ff00]">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.32em] text-[#00ffd5]">
               Karte Roast Me
@@ -225,7 +238,10 @@ export function RoastPageClient({
             </p>
           </div>
 
-          <RoastScoreCard vibeScore={roast.vibeScore} accentColor={accentColor} />
+          <RoastScoreCard
+            vibeScore={roast.vibeScore}
+            accentColor={accentColor}
+          />
 
           <div className="mx-auto max-w-3xl rotate-1 border-4 border-[#00ffd5] bg-black p-6 shadow-[12px_12px_0_#ff2aa3]">
             <p className="text-base font-medium leading-relaxed text-karte-text sm:text-lg">
@@ -305,7 +321,11 @@ export function RoastPageClient({
           <button
             onClick={handleShareX}
             className="flex items-center gap-2 border-2 border-white px-5 py-2.5 text-sm font-black uppercase tracking-[0.08em] transition-all hover:translate-x-1 hover:translate-y-1 active:scale-[0.98]"
-            style={{ backgroundColor: '#f9ff00', color: '#000', boxShadow: `6px 6px 0 ${accentColor}` }}
+            style={{
+              backgroundColor: '#f9ff00',
+              color: '#000',
+              boxShadow: `6px 6px 0 ${accentColor}`,
+            }}
           >
             Share on X
           </button>

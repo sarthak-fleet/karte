@@ -82,7 +82,9 @@ export function createR2ImageObjectKey(args: {
 export function buildR2PublicUrl(objectKey: string): string {
   const baseUrl = (getEnv('R2_PUBLIC_BASE_URL') ?? '').replace(/\/+$/, '');
   if (!baseUrl) {
-    throw new Error('Missing required environment variable: R2_PUBLIC_BASE_URL');
+    throw new Error(
+      'Missing required environment variable: R2_PUBLIC_BASE_URL',
+    );
   }
   return `${baseUrl}/${encodeObjectKeyForUrl(objectKey)}`;
 }
@@ -97,17 +99,13 @@ export async function uploadImageToR2(args: {
     throw new Error('R2 binding IMAGES_BUCKET is not configured');
   }
 
-  await bucket.put(
-    args.objectKey,
-    args.body as unknown as ArrayBuffer,
-    {
-      httpMetadata: {
-        contentType: args.contentType,
-        cacheControl: 'public, max-age=31536000, immutable',
-        contentDisposition: 'inline',
-      },
+  await bucket.put(args.objectKey, args.body as unknown as ArrayBuffer, {
+    httpMetadata: {
+      contentType: args.contentType,
+      cacheControl: 'public, max-age=31536000, immutable',
+      contentDisposition: 'inline',
     },
-  );
+  });
 
   return {
     objectKey: args.objectKey,

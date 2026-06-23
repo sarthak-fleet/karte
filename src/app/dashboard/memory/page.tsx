@@ -9,7 +9,11 @@ import { infoBlocks, links, projects, users } from '@/db/schema';
 import { getDefaultAiConfig } from '@/lib/ai-client';
 import { getCurrentPage, getSession } from '@/lib/auth-server';
 
-function SectionEyebrow({ label, title, description }: {
+function SectionEyebrow({
+  label,
+  title,
+  description,
+}: {
   label: string;
   title: string;
   description: string;
@@ -46,12 +50,15 @@ export default async function MemoryPage() {
     );
   }
 
-  const [user] = await db.select({
-    smApiKey: users.smApiKey,
-    aiEndpointUrl: users.aiEndpointUrl,
-    aiApiKey: users.aiApiKey,
-    aiModel: users.aiModel,
-  }).from(users).where(eq(users.id, session.user.id));
+  const [user] = await db
+    .select({
+      smApiKey: users.smApiKey,
+      aiEndpointUrl: users.aiEndpointUrl,
+      aiApiKey: users.aiApiKey,
+      aiModel: users.aiModel,
+    })
+    .from(users)
+    .where(eq(users.id, session.user.id));
 
   const [blocks, pageLinks, pageProjects] = await Promise.all([
     db.query.infoBlocks.findMany({
@@ -59,10 +66,14 @@ export default async function MemoryPage() {
       orderBy: [infoBlocks.sortOrder],
     }),
     db.select({ id: links.id }).from(links).where(eq(links.pageId, page.id)),
-    db.select({ id: projects.id }).from(projects).where(eq(projects.pageId, page.id)),
+    db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.pageId, page.id)),
   ]);
 
-  const sourceCount = blocks.length + pageLinks.length + pageProjects.length + (page.bio ? 1 : 0);
+  const sourceCount =
+    blocks.length + pageLinks.length + pageProjects.length + (page.bio ? 1 : 0);
   const defaultAiConfig = getDefaultAiConfig();
   const coverageStrong = blocks.length >= 2 && sourceCount >= 4;
 
@@ -103,9 +114,7 @@ export default async function MemoryPage() {
           </div>
           <div
             className={`rounded-xl p-4 ${
-              coverageStrong
-                ? 'bg-karte-accent/[0.08]'
-                : 'bg-white/[0.025]'
+              coverageStrong ? 'bg-karte-accent/[0.08]' : 'bg-white/[0.025]'
             }`}
           >
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-karte-text-4">
@@ -158,10 +167,18 @@ export default async function MemoryPage() {
         />
         <AiKeySettings
           hasKey={!!user?.smApiKey}
-          hasAiConfig={!!(user?.aiEndpointUrl && user?.aiApiKey && user?.aiModel) || !!defaultAiConfig}
-          aiEndpointUrl={user?.aiEndpointUrl || defaultAiConfig?.endpointUrl || ''}
+          hasAiConfig={
+            !!(user?.aiEndpointUrl && user?.aiApiKey && user?.aiModel) ||
+            !!defaultAiConfig
+          }
+          aiEndpointUrl={
+            user?.aiEndpointUrl || defaultAiConfig?.endpointUrl || ''
+          }
           aiModel={user?.aiModel || defaultAiConfig?.model || ''}
-          isUsingDefaultAi={!(user?.aiEndpointUrl && user?.aiApiKey && user?.aiModel) && !!defaultAiConfig}
+          isUsingDefaultAi={
+            !(user?.aiEndpointUrl && user?.aiApiKey && user?.aiModel) &&
+            !!defaultAiConfig
+          }
         />
       </section>
     </div>

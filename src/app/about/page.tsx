@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: "About — Karte",
+  title: 'About — Karte',
   description:
-    "Karte is a link-in-bio that talks back. Chat, encyclopedia, roast, and newspaper modes powered by AI on top of your profile content.",
+    'Karte is a link-in-bio that talks back. Chat, encyclopedia, roast, and newspaper modes powered by AI on top of your profile content.',
 };
 
 export default function AboutPage() {
@@ -17,9 +17,9 @@ export default function AboutPage() {
         About
       </h1>
       <p className="mt-4 text-sm leading-6 text-karte-text-3">
-        Karte is a link-in-bio with personality. Visitors don&apos;t
-        just see a list of URLs — they get to interact with your
-        profile through one of four AI-enhanced lenses.
+        Karte is a link-in-bio with personality. Visitors don&apos;t just see a
+        list of URLs — they get to interact with your profile through one of
+        four AI-enhanced lenses.
       </p>
 
       <section className="mt-8 space-y-3 text-sm leading-6">
@@ -52,9 +52,9 @@ export default function AboutPage() {
         </h2>
         <p className="text-karte-text-3">
           Profiles are public unless you flip the visibility toggle on
-          /dashboard. Visitor chat queries are validated server-side
-          (length, shape, type) and not stored unless your profile
-          explicitly opts into analytics.
+          /dashboard. Visitor chat queries are validated server-side (length,
+          shape, type) and not stored unless your profile explicitly opts into
+          analytics.
         </p>
       </section>
     </main>

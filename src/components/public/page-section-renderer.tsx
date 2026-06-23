@@ -96,8 +96,11 @@ export function PageSectionRenderer({
 
         <div className="divide-y divide-white/10">
           {posts.map((post, index) => {
-            const isLinked = post.url?.startsWith('http://') || post.url?.startsWith('https://');
-            const className = 'group block p-6 transition hover:bg-white/[0.045] sm:p-8';
+            const isLinked =
+              post.url?.startsWith('http://') ||
+              post.url?.startsWith('https://');
+            const className =
+              'group block p-6 transition hover:bg-white/[0.045] sm:p-8';
             const body = (
               <>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -110,7 +113,9 @@ export function PageSectionRenderer({
                     </h4>
                   </div>
                   {post.date && (
-                    <p className="shrink-0 text-sm text-white/40">{post.date}</p>
+                    <p className="shrink-0 text-sm text-white/40">
+                      {post.date}
+                    </p>
                   )}
                 </div>
                 {post.description && (
@@ -119,7 +124,10 @@ export function PageSectionRenderer({
                   </p>
                 )}
                 {isLinked && (
-                  <p className="mt-5 text-sm font-semibold" style={{ color: accentColor }}>
+                  <p
+                    className="mt-5 text-sm font-semibold"
+                    style={{ color: accentColor }}
+                  >
                     Read article -&gt;
                   </p>
                 )}
@@ -221,8 +229,10 @@ export function PageSectionRenderer({
         >
           {section.title || 'Experience'}
         </p>
-        <ol className="mt-6 space-y-5 border-l-2 pl-5"
-            style={{ borderColor: `${accentColor}40` }}>
+        <ol
+          className="mt-6 space-y-5 border-l-2 pl-5"
+          style={{ borderColor: `${accentColor}40` }}
+        >
           {roles.map((r, i) => (
             <li key={i} className="relative">
               <span

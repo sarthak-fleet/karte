@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { maybeReloadOnChunkError } from "@/lib/chunk-reload";
-import { captureError } from "@/lib/foundry-monitoring";
+import { maybeReloadOnChunkError } from '@/lib/chunk-reload';
+import { captureError } from '@/lib/foundry-monitoring';
 
 export default function Error({
   error,
@@ -16,7 +16,7 @@ export default function Error({
     if (maybeReloadOnChunkError(error)) return;
     // Full detail goes to the console + PostHog — never to the user.
     console.error(error);
-    captureError(error, { scope: "root", digest: error.digest });
+    captureError(error, { scope: 'root', digest: error.digest });
   }, [error]);
 
   return (
@@ -35,7 +35,7 @@ export default function Error({
             Try again
           </button>
           <button
-            onClick={() => window.location.replace("/")}
+            onClick={() => window.location.replace('/')}
             className="px-4 py-2 rounded border hover:opacity-80"
           >
             Home

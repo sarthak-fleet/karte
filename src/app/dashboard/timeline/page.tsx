@@ -18,8 +18,8 @@ export default async function TimelinePage() {
           Create your profile first
         </h1>
         <p className="mt-3 text-[14px] leading-[1.6] text-karte-text-3">
-          Timeline events attach to your Karte page. Set up your page on
-          the Appearance tab, then come back here.
+          Timeline events attach to your Karte page. Set up your page on the
+          Appearance tab, then come back here.
         </p>
       </div>
     );
@@ -36,9 +36,9 @@ export default async function TimelinePage() {
         </h1>
         <p className="mt-3 max-w-xl text-[14.5px] leading-[1.6] text-karte-text-3">
           Career milestones, shipped projects, talks, life events. Each entry
-          shows on your public profile in reverse-chronological order AND
-          feeds the AI surfaces (chat, encyclopedia, newspaper, roast) with
-          dated context they would otherwise have to guess.
+          shows on your public profile in reverse-chronological order AND feeds
+          the AI surfaces (chat, encyclopedia, newspaper, roast) with dated
+          context they would otherwise have to guess.
         </p>
       </header>
 

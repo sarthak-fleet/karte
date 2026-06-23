@@ -1,16 +1,19 @@
-import { asc,eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { links, pages, projects } from '@/db/schema';
 import type { ScrapedCache } from '@/lib/scraper';
-import { formatScrapedContent, isCacheValid,scrapeUrls } from '@/lib/scraper';
+import { formatScrapedContent, isCacheValid, scrapeUrls } from '@/lib/scraper';
 
 /**
  * Get scraped content for a page's links and projects.
  * Uses a 24h cache stored on the pages table; re-scrapes if stale or missing.
  * Never throws — returns empty string on failure.
  */
-export async function getScrapedContext(pageId: string, page: { scrapedContent: ScrapedCache | null }): Promise<string> {
+export async function getScrapedContext(
+  pageId: string,
+  page: { scrapedContent: ScrapedCache | null },
+): Promise<string> {
   try {
     // Check cache first
     const cached = page.scrapedContent;
@@ -20,8 +23,16 @@ export async function getScrapedContext(pageId: string, page: { scrapedContent: 
 
     // Fetch links and projects for scraping
     const [pageLinks, pageProjects] = await Promise.all([
-      db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
-      db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
+      db
+        .select()
+        .from(links)
+        .where(eq(links.pageId, pageId))
+        .orderBy(asc(links.sortOrder)),
+      db
+        .select()
+        .from(projects)
+        .where(eq(projects.pageId, pageId))
+        .orderBy(asc(projects.sortOrder)),
     ]);
 
     const allUrls = [

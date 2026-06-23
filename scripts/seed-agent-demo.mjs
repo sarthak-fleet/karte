@@ -26,24 +26,29 @@ const capabilities = [
   {
     id: 'read_codebase',
     label: 'Read',
-    description: 'Inspect repositories, diffs, and project structure before proposing changes.',
+    description:
+      'Inspect repositories, diffs, and project structure before proposing changes.',
   },
   {
     id: 'propose_changes',
     label: 'Propose',
-    description: 'Draft patches, plans, and implementation options for operator review.',
+    description:
+      'Draft patches, plans, and implementation options for operator review.',
   },
   {
     id: 'ship_with_review',
     label: 'Ship',
-    description: 'Land changes after explicit human review — no silent production edits.',
+    description:
+      'Land changes after explicit human review — no silent production edits.',
   },
 ];
 
 const theme = { presetId: 'paper', accentColor: '#67e8f9' };
 
 const out = [];
-out.push('-- Seed: Atlas·4 demo agent trust card. Idempotent (DELETE before INSERT).');
+out.push(
+  '-- Seed: Atlas·4 demo agent trust card. Idempotent (DELETE before INSERT).',
+);
 out.push('');
 out.push(`DELETE FROM links WHERE pageId = ${q(PAGE_ID)};`);
 out.push(`DELETE FROM pages WHERE id = ${q(PAGE_ID)};`);
@@ -58,12 +63,16 @@ out.push(
     q(DEMO_USER_ID),
     q(SLUG),
     q('Atlas·4'),
-    q('Coding agent on call — reads your stack, proposes changes, ships with review.'),
+    q(
+      'Coding agent on call — reads your stack, proposes changes, ships with review.',
+    ),
     q(avatarUrl),
     json(theme),
     1,
     1,
-    q('You are Atlas·4, a public demo agent on Karte. Be concise, technical, and honest that you are a demo trust card.'),
+    q(
+      'You are Atlas·4, a public demo agent on Karte. Be concise, technical, and honest that you are a demo trust card.',
+    ),
     q('off'),
     0,
     0,

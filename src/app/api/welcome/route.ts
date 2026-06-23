@@ -27,27 +27,35 @@ interface IncomingLink {
 function slugFromEmail(email: string | undefined | null): string {
   if (!email) return 'profile';
   const localPart = email.split('@')[0] ?? 'profile';
-  return localPart
-    .toLowerCase()
-    .replace(/\+.*$/, '')
-    .replace(/[^a-z0-9-]/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 40) || 'profile';
+  return (
+    localPart
+      .toLowerCase()
+      .replace(/\+.*$/, '')
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40) || 'profile'
+  );
 }
 
 function slugFromName(name: string | undefined | null): string {
   if (!name) return 'profile';
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9-\s]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .slice(0, 40) || 'profile';
+  return (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9-\s]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .slice(0, 40) || 'profile'
+  );
 }
 
 async function findUniqueSlug(base: string): Promise<string> {
   const candidate = isValidSlug(base) ? base : 'profile';
-  const [existing] = await db.select({ id: pages.id }).from(pages).where(eq(pages.slug, candidate)).limit(1);
+  const [existing] = await db
+    .select({ id: pages.id })
+    .from(pages)
+    .where(eq(pages.slug, candidate))
+    .limit(1);
   if (!existing) return candidate;
 
   // Try short numeric suffixes; falls back to random hex on the off
@@ -56,7 +64,11 @@ async function findUniqueSlug(base: string): Promise<string> {
     const suffix = Math.floor(Math.random() * 9000) + 1000;
     const next = `${candidate.slice(0, 40 - 5)}-${suffix}`;
     if (!isValidSlug(next)) continue;
-    const [taken] = await db.select({ id: pages.id }).from(pages).where(eq(pages.slug, next)).limit(1);
+    const [taken] = await db
+      .select({ id: pages.id })
+      .from(pages)
+      .where(eq(pages.slug, next))
+      .limit(1);
     if (!taken) return next;
   }
   return `${candidate}-${Date.now().toString(36).slice(-6)}`;
@@ -124,9 +136,12 @@ function parseCards(raw: string): WowCards | null {
     const parsed = JSON.parse(match[0]) as unknown;
     if (!parsed || typeof parsed !== 'object') return null;
     const record = parsed as Record<string, unknown>;
-    const headline = typeof record.headline === 'string' ? record.headline.trim() : '';
+    const headline =
+      typeof record.headline === 'string' ? record.headline.trim() : '';
     const roast = typeof record.roast === 'string' ? record.roast.trim() : '';
-    const rawQuestions = Array.isArray(record.questions) ? record.questions : [];
+    const rawQuestions = Array.isArray(record.questions)
+      ? record.questions
+      : [];
     const questions = rawQuestions
       .map((item) => {
         if (!item || typeof item !== 'object') return null;
@@ -145,7 +160,10 @@ function parseCards(raw: string): WowCards | null {
   }
 }
 
-function fallbackCards(opts: { displayName: string; links: IncomingLink[] }): WowCards {
+function fallbackCards(opts: {
+  displayName: string;
+  links: IncomingLink[];
+}): WowCards {
   // Used when AI is unavailable or returns garbage. Still concrete,
   // still references the imported data — not a generic stock string.
   const firstName = opts.displayName.split(' ')[0] || opts.displayName;
@@ -201,7 +219,8 @@ export async function POST(req: Request) {
     sourceUrl?: string;
     links?: unknown;
   };
-  const sourceUrl = typeof body.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
+  const sourceUrl =
+    typeof body.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
   const incomingLinks = sanitizeIncomingLinks(body.links);
 
   // Step 1 — find or create the user's page.
@@ -212,8 +231,7 @@ export async function POST(req: Request) {
     .limit(1);
 
   if (!page) {
-    const seed =
-      slugFromName(auth.user.name) || slugFromEmail(auth.user.email);
+    const seed = slugFromName(auth.user.name) || slugFromEmail(auth.user.email);
     const slug = await findUniqueSlug(seed);
     const displayName = (auth.user.name || seed).slice(0, MAX_TITLE_LENGTH);
     const [created] = await db
@@ -232,7 +250,10 @@ export async function POST(req: Request) {
   }
 
   if (!page) {
-    return NextResponse.json({ error: 'Failed to provision page' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to provision page' },
+      { status: 500 },
+    );
   }
 
   // Step 2 — bulk-import links, deduping by URL.

@@ -14,8 +14,21 @@ function capture(event: string, props?: Record<string, unknown>) {
 
 type AgentAuthState =
   | { step: 'idle' }
-  | { step: 'email'; email: string; submitting: boolean; message: string; error: boolean }
-  | { step: 'code'; email: string; code: string; submitting: boolean; message: string; error: boolean }
+  | {
+      step: 'email';
+      email: string;
+      submitting: boolean;
+      message: string;
+      error: boolean;
+    }
+  | {
+      step: 'code';
+      email: string;
+      code: string;
+      submitting: boolean;
+      message: string;
+      error: boolean;
+    }
   | { step: 'done'; email: string; apiKey: string; docsUrl: string };
 
 /**
@@ -32,7 +45,11 @@ export function OnyxAgents() {
 
     const email = state.email.trim();
     if (!isValidEmail(email)) {
-      setState({ ...state, message: 'That doesn’t look like an email.', error: true });
+      setState({
+        ...state,
+        message: 'That doesn’t look like an email.',
+        error: true,
+      });
       return;
     }
 
@@ -44,7 +61,10 @@ export function OnyxAgents() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        message?: string;
+      };
       if (!res.ok) {
         throw new Error(data.error || data.message || 'Could not send code.');
       }
@@ -75,7 +95,11 @@ export function OnyxAgents() {
 
     const code = state.code.trim();
     if (!/^\d{6}$/.test(code)) {
-      setState({ ...state, message: 'Enter the 6-digit code from your email.', error: true });
+      setState({
+        ...state,
+        message: 'Enter the 6-digit code from your email.',
+        error: true,
+      });
       return;
     }
 
@@ -118,16 +142,15 @@ export function OnyxAgents() {
   return (
     <div className="onyx-agents">
       <div className="onyx-agents-left">
-        <div className="onyx-eyebrow">·  ISSUED → ANY AGENT  ·</div>
+        <div className="onyx-eyebrow">· ISSUED → ANY AGENT ·</div>
         <h2 className="onyx-h2">
           For the agents,
           <br />
           <em>too.</em>
         </h2>
         <p className="onyx-agents-p">
-          Your agent has a rate, a stack, a set of boundaries.
-          It should have a card, too. Karte issues one to any agent
-          you put on the open web.
+          Your agent has a rate, a stack, a set of boundaries. It should have a
+          card, too. Karte issues one to any agent you put on the open web.
         </p>
 
         {state.step === 'idle' ? (
@@ -151,7 +174,9 @@ export function OnyxAgents() {
             <a className="onyx-agents-docs-link" href="/skill.md">
               Read agent skill
             </a>
-            <code className="onyx-agents-install">curl -fsSL karte.cc/skills/karte/install.sh | bash</code>
+            <code className="onyx-agents-install">
+              curl -fsSL karte.cc/skills/karte/install.sh | bash
+            </code>
           </div>
         ) : null}
 
@@ -165,17 +190,27 @@ export function OnyxAgents() {
                 placeholder="you@operator.com"
                 value={state.email}
                 onChange={(e) =>
-                  setState({ ...state, email: e.target.value, message: '', error: false })
+                  setState({
+                    ...state,
+                    email: e.target.value,
+                    message: '',
+                    error: false,
+                  })
                 }
                 disabled={state.submitting}
                 required
               />
-              <button type="submit" disabled={state.submitting || !state.email.trim()}>
+              <button
+                type="submit"
+                disabled={state.submitting || !state.email.trim()}
+              >
                 {state.submitting ? 'Sending…' : 'Send code'}
               </button>
             </form>
             {state.message ? (
-              <p className={`onyx-agents-waitlist-msg ${state.error ? 'error' : ''}`}>
+              <p
+                className={`onyx-agents-waitlist-msg ${state.error ? 'error' : ''}`}
+              >
                 {state.message}
               </p>
             ) : (
@@ -196,17 +231,27 @@ export function OnyxAgents() {
                 placeholder="6-digit code"
                 value={state.code}
                 onChange={(e) =>
-                  setState({ ...state, code: e.target.value, message: '', error: false })
+                  setState({
+                    ...state,
+                    code: e.target.value,
+                    message: '',
+                    error: false,
+                  })
                 }
                 disabled={state.submitting}
                 required
               />
-              <button type="submit" disabled={state.submitting || state.code.trim().length < 6}>
+              <button
+                type="submit"
+                disabled={state.submitting || state.code.trim().length < 6}
+              >
                 {state.submitting ? 'Verifying…' : 'Verify'}
               </button>
             </form>
             {state.message ? (
-              <p className={`onyx-agents-waitlist-msg ${state.error ? 'error' : ''}`}>
+              <p
+                className={`onyx-agents-waitlist-msg ${state.error ? 'error' : ''}`}
+              >
                 {state.message}
               </p>
             ) : null}
@@ -216,8 +261,8 @@ export function OnyxAgents() {
         {state.step === 'done' ? (
           <div className="onyx-agents-success">
             <p className="onyx-agents-waitlist-msg">
-              API key issued for <strong>{state.email}</strong>. Save it now — it won&apos;t be
-              shown again.
+              API key issued for <strong>{state.email}</strong>. Save it now —
+              it won&apos;t be shown again.
             </p>
             <code className="onyx-agents-key">{state.apiKey}</code>
             <div className="onyx-agents-actions">
@@ -245,7 +290,9 @@ function AtlasMiniCard() {
         <span>№ a-0042</span>
       </div>
       <div className="onyx-agent-mini-mid">
-        <div className="onyx-agent-mini-avatar" aria-hidden="true">○</div>
+        <div className="onyx-agent-mini-avatar" aria-hidden="true">
+          ○
+        </div>
         <div className="onyx-agent-mini-name">Atlas·4</div>
         <div className="onyx-agent-mini-rule" aria-hidden="true" />
         <div className="onyx-agent-mini-role">

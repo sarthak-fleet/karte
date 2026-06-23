@@ -14,10 +14,14 @@ function loadDotenv() {
     const text = readFileSync(envPath, 'utf8');
     for (const line of text.split(/\r?\n/)) {
       const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+      if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('='))
+        continue;
       const index = trimmed.indexOf('=');
       const key = trimmed.slice(0, index).trim();
-      const value = trimmed.slice(index + 1).trim().replace(/^["']|["']$/g, '');
+      const value = trimmed
+        .slice(index + 1)
+        .trim()
+        .replace(/^["']|["']$/g, '');
       if (key && process.env[key] === undefined) process.env[key] = value;
     }
   } catch {
@@ -39,30 +43,20 @@ function parseArgs() {
     if (arg === '--apply') parsed.apply = true;
     else if (arg === '--update-bio') parsed.updateBio = true;
     else if (arg === '--no-replace-existing') parsed.replaceExisting = false;
-    else if (arg === '--slug') parsed.slug = args[index += 1];
-    else if (arg === '--page-id') parsed.pageId = args[index += 1];
-    else if (arg === '--max-urls') parsed.maxUrls = Math.min(Number(args[index += 1]) || DEFAULT_MAX_URLS, 20);
+    else if (arg === '--slug') parsed.slug = args[(index += 1)];
+    else if (arg === '--page-id') parsed.pageId = args[(index += 1)];
+    else if (arg === '--max-urls')
+      parsed.maxUrls = Math.min(
+        Number(args[(index += 1)]) || DEFAULT_MAX_URLS,
+        20,
+      );
     else if (arg === '--help') parsed.help = true;
   }
 
   return parsed;
 }
 
-function usage() {
-  console.log(`Usage:
-  pnpm enrich:profile -- --slug sarthak
-  pnpm enrich:profile -- --slug sarthak --apply
-  pnpm enrich:profile -- --page-id <id> --apply --update-bio
-
-Options:
-  --slug <slug>             Profile slug to enrich
-  --page-id <id>            Page id to enrich
-  --apply                   Write generated projects, memory blocks, and scraped cache
-  --update-bio              Also replace the page bio when a generated bio exists
-  --no-replace-existing     Do not update existing projects with the same URL
-  --max-urls <n>            Max attached links/project URLs to scrape, default 12, max 20
-`);
-}
+function usage() {}
 
 function normalizeUrl(url) {
   try {
@@ -70,7 +64,9 @@ function normalizeUrl(url) {
     parsed.hash = '';
     return parsed.toString().replace(/\/+$/, '').toLowerCase();
   } catch {
-    return String(url || '').trim().toLowerCase();
+    return String(url || '')
+      .trim()
+      .toLowerCase();
   }
 }
 
@@ -87,7 +83,12 @@ function isBlockedUrl(urlStr) {
   try {
     const { hostname } = new URL(urlStr);
     const lower = hostname.toLowerCase();
-    if (lower === 'localhost' || lower.endsWith('.local') || lower.endsWith('.internal')) return true;
+    if (
+      lower === 'localhost' ||
+      lower.endsWith('.local') ||
+      lower.endsWith('.internal')
+    )
+      return true;
     if (lower.includes('metadata') || lower.includes('internal')) return true;
 
     const ipv4 = lower.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
@@ -99,7 +100,13 @@ function isBlockedUrl(urlStr) {
       if (a === 169 && b === 254) return true;
     }
 
-    if (lower === '[::1]' || lower.startsWith('[fe80:') || lower.startsWith('[fc') || lower.startsWith('[fd')) return true;
+    if (
+      lower === '[::1]' ||
+      lower.startsWith('[fe80:') ||
+      lower.startsWith('[fc') ||
+      lower.startsWith('[fd')
+    )
+      return true;
     return false;
   } catch {
     return true;
@@ -143,22 +150,29 @@ function extractTitle(html) {
 }
 
 function extractDescription(html) {
-  const match = html.match(/<meta\s+[^>]*name\s*=\s*["']description["'][^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*\/?>/i)
-    || html.match(/<meta\s+[^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*name\s*=\s*["']description["'][^>]*\/?>/i);
+  const match =
+    html.match(
+      /<meta\s+[^>]*name\s*=\s*["']description["'][^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*\/?>/i,
+    ) ||
+    html.match(
+      /<meta\s+[^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*name\s*=\s*["']description["'][^>]*\/?>/i,
+    );
   return match ? decodeEntities(match[1].trim()) : '';
 }
 
 function extractBody(html) {
-  return decodeEntities(html
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
-    .replace(/<nav[\s\S]*?<\/nav>/gi, ' ')
-    .replace(/<footer[\s\S]*?<\/footer>/gi, ' ')
-    .replace(/<header[\s\S]*?<\/header>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim());
+  return decodeEntities(
+    html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
+      .replace(/<nav[\s\S]*?<\/nav>/gi, ' ')
+      .replace(/<footer[\s\S]*?<\/footer>/gi, ' ')
+      .replace(/<header[\s\S]*?<\/header>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim(),
+  );
 }
 
 function pageFromReader(url, text) {
@@ -171,17 +185,24 @@ function pageFromReader(url, text) {
     .replace(/^Description:\s*.+$/gim, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  return { url, title, description, content: content.slice(0, MAX_CONTENT_LENGTH) };
+  return {
+    url,
+    title,
+    description,
+    content: content.slice(0, MAX_CONTENT_LENGTH),
+  };
 }
 
 function hasUsefulContent(page) {
-  const content = `${page.title} ${page.description} ${page.content}`.toLowerCase();
-  const isShell = content.includes('enable javascript')
-    || content.includes('just a moment')
-    || content.includes('sign in')
-    || content.includes('log in')
-    || content.includes('abs.twimg.com')
-    || content.includes('responsive-web/client-web');
+  const content =
+    `${page.title} ${page.description} ${page.content}`.toLowerCase();
+  const isShell =
+    content.includes('enable javascript') ||
+    content.includes('just a moment') ||
+    content.includes('sign in') ||
+    content.includes('log in') ||
+    content.includes('abs.twimg.com') ||
+    content.includes('responsive-web/client-web');
   if (isShell) return false;
   return page.content.length > 220;
 }
@@ -191,13 +212,17 @@ async function scrapeOne(url) {
   if (isBlockedUrl(fullUrl)) return null;
 
   const headers = {
-    'User-Agent': 'Mozilla/5.0 (compatible; LinkChatBot/1.0; +https://linkchat.dev)',
+    'User-Agent':
+      'Mozilla/5.0 (compatible; LinkChatBot/1.0; +https://linkchat.dev)',
     Accept: 'text/html,application/xhtml+xml,text/plain',
   };
   const htmlRes = await fetchWithTimeout(fullUrl, headers);
   if (htmlRes) {
     const contentType = htmlRes.headers.get('content-type') || '';
-    if (contentType.includes('text/html') || contentType.includes('text/plain')) {
+    if (
+      contentType.includes('text/html') ||
+      contentType.includes('text/plain')
+    ) {
       const html = await htmlRes.text();
       const page = {
         url,
@@ -209,10 +234,14 @@ async function scrapeOne(url) {
     }
   }
 
-  const readerRes = await fetchWithTimeout(`https://r.jina.ai/http://r.jina.ai/http://${fullUrl}`, {
-    'User-Agent': 'Mozilla/5.0 (compatible; LinkChatBot/1.0; +https://linkchat.dev)',
-    Accept: 'text/plain,text/markdown',
-  });
+  const readerRes = await fetchWithTimeout(
+    `https://r.jina.ai/http://r.jina.ai/http://${fullUrl}`,
+    {
+      'User-Agent':
+        'Mozilla/5.0 (compatible; LinkChatBot/1.0; +https://linkchat.dev)',
+      Accept: 'text/plain,text/markdown',
+    },
+  );
   if (!readerRes) return null;
   return pageFromReader(url, await readerRes.text());
 }
@@ -239,18 +268,34 @@ function buildPlan(page, links, scraped, skippedUrls) {
     .map((source) => ({
       title: source.title.slice(0, 100),
       url: source.url,
-      description: [source.description, source.content].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim().slice(0, 500)
-        || 'A public project or profile page found from attached links.',
+      description:
+        [source.description, source.content]
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 500) ||
+        'A public project or profile page found from attached links.',
     }));
 
   const scrapedLines = scraped.map((source) => {
     const title = source.title || source.url;
-    const summary = [source.description, source.content].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim().slice(0, 520);
+    const summary = [source.description, source.content]
+      .filter(Boolean)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 520);
     return `- ${title} (${source.url}): ${summary}`;
   });
 
   return {
-    bio: page.bio ? null : `${page.displayName} maintains a public profile built from attached links, projects, and public web context.`.slice(0, 320),
+    bio: page.bio
+      ? null
+      : `${page.displayName} maintains a public profile built from attached links, projects, and public web context.`.slice(
+          0,
+          320,
+        ),
     projects,
     memoryBlocks: [
       {
@@ -259,9 +304,15 @@ function buildPlan(page, links, scraped, skippedUrls) {
         title: 'Auto-enriched public link context',
         content: [
           'Public context discovered from attached links:',
-          scrapedLines.join('\n') || 'No readable public page text was available from the attached links.',
-          links.length ? `\nAttached profile links:\n${links.map((link) => `${link.title}: ${link.url}`).join('\n')}` : '',
-        ].filter(Boolean).join('\n').slice(0, 2600),
+          scrapedLines.join('\n') ||
+            'No readable public page text was available from the attached links.',
+          links.length
+            ? `\nAttached profile links:\n${links.map((link) => `${link.title}: ${link.url}`).join('\n')}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join('\n')
+          .slice(0, 2600),
       },
       {
         id: `auto-enrich-links-boundaries-${stableIdFor(page.id)}`,
@@ -270,8 +321,12 @@ function buildPlan(page, links, scraped, skippedUrls) {
         content: [
           'Use only attached public links, project descriptions, and readable public scrape results as evidence.',
           'Do not infer private work, employers, education, awards, personal history, or facts from login-only pages.',
-          skippedUrls.length ? `Unreadable or skipped URLs: ${skippedUrls.join(', ')}` : '',
-        ].filter(Boolean).join(' '),
+          skippedUrls.length
+            ? `Unreadable or skipped URLs: ${skippedUrls.join(', ')}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
       },
     ],
     sourceCount: scraped.length,
@@ -297,18 +352,32 @@ async function main() {
   });
 
   const pageQuery = args.pageId
-    ? await client.execute({ sql: 'SELECT * FROM pages WHERE id = ?', args: [args.pageId] })
-    : await client.execute({ sql: 'SELECT * FROM pages WHERE slug = ?', args: [args.slug] });
+    ? await client.execute({
+        sql: 'SELECT * FROM pages WHERE id = ?',
+        args: [args.pageId],
+      })
+    : await client.execute({
+        sql: 'SELECT * FROM pages WHERE slug = ?',
+        args: [args.slug],
+      });
   const page = pageQuery.rows[0];
   if (!page) throw new Error('Page not found');
 
   const [linksResult, projectsResult] = await Promise.all([
-    client.execute({ sql: 'SELECT * FROM links WHERE pageId = ? ORDER BY sortOrder ASC', args: [page.id] }),
-    client.execute({ sql: 'SELECT * FROM projects WHERE pageId = ? ORDER BY sortOrder ASC', args: [page.id] }),
+    client.execute({
+      sql: 'SELECT * FROM links WHERE pageId = ? ORDER BY sortOrder ASC',
+      args: [page.id],
+    }),
+    client.execute({
+      sql: 'SELECT * FROM projects WHERE pageId = ? ORDER BY sortOrder ASC',
+      args: [page.id],
+    }),
   ]);
 
   const urls = sourceUrls(linksResult.rows, projectsResult.rows, args.maxUrls);
-  const scrapedSettled = await Promise.allSettled(urls.map((url) => scrapeOne(url)));
+  const scrapedSettled = await Promise.allSettled(
+    urls.map((url) => scrapeOne(url)),
+  );
   const scraped = scrapedSettled
     .filter((result) => result.status === 'fulfilled' && result.value)
     .map((result) => result.value);
@@ -317,8 +386,16 @@ async function main() {
   const plan = buildPlan(page, linksResult.rows, scraped, skippedUrls);
 
   if (args.apply) {
-    const existingProjectUrls = new Map(projectsResult.rows.map((project) => [normalizeUrl(project.url), project]));
-    const maxProjectOrder = projectsResult.rows.reduce((max, project) => Math.max(max, Number(project.sortOrder ?? -1)), -1);
+    const existingProjectUrls = new Map(
+      projectsResult.rows.map((project) => [
+        normalizeUrl(project.url),
+        project,
+      ]),
+    );
+    const maxProjectOrder = projectsResult.rows.reduce(
+      (max, project) => Math.max(max, Number(project.sortOrder ?? -1)),
+      -1,
+    );
     let nextProjectOrder = maxProjectOrder + 1;
 
     for (const project of plan.projects) {
@@ -335,7 +412,14 @@ async function main() {
 
       await client.execute({
         sql: 'INSERT OR REPLACE INTO projects (id, pageId, title, url, description, sortOrder, enabled) VALUES (?, ?, ?, ?, ?, ?, 1)',
-        args: [`auto-project-${stableIdFor(`${page.id}:${project.url}`)}`, page.id, project.title, project.url, project.description, nextProjectOrder],
+        args: [
+          `auto-project-${stableIdFor(`${page.id}:${project.url}`)}`,
+          page.id,
+          project.title,
+          project.url,
+          project.description,
+          nextProjectOrder,
+        ],
       });
       nextProjectOrder += 1;
     }
@@ -351,7 +435,14 @@ async function main() {
         sql: `INSERT INTO infoBlocks (id, pageId, type, title, content, sortOrder)
               VALUES (?, ?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET type = excluded.type, title = excluded.title, content = excluded.content`,
-        args: [block.id, page.id, block.type, block.title, block.content, nextBlockOrder],
+        args: [
+          block.id,
+          page.id,
+          block.type,
+          block.title,
+          block.content,
+          nextBlockOrder,
+        ],
       });
       nextBlockOrder += 1;
     }
@@ -365,17 +456,13 @@ async function main() {
 
     await client.execute({
       sql: 'UPDATE pages SET scrapedContent = ?, updatedAt = ? WHERE id = ?',
-      args: [JSON.stringify({ data: scraped, scrapedAt: Date.now() }), Date.now(), page.id],
+      args: [
+        JSON.stringify({ data: scraped, scrapedAt: Date.now() }),
+        Date.now(),
+        page.id,
+      ],
     });
   }
-
-  console.log(JSON.stringify({
-    page: { id: page.id, slug: page.slug, displayName: page.displayName },
-    mode: args.apply ? 'applied' : 'dry-run',
-    scraped: scraped.map((source) => ({ url: source.url, title: source.title })),
-    skippedUrls,
-    plan,
-  }, null, 2));
 }
 
 main().catch((error) => {

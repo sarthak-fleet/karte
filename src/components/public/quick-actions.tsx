@@ -39,7 +39,11 @@ export function QuickActions({
   const items: Array<{ label: string; url: string; icon: string }> = [];
 
   if (calendarUrl) {
-    items.push({ label: calendarLabel(calendarUrl), url: calendarUrl, icon: '📅' });
+    items.push({
+      label: calendarLabel(calendarUrl),
+      url: calendarUrl,
+      icon: '📅',
+    });
   }
   if (newsletterUrl) {
     items.push({ label: 'Subscribe', url: newsletterUrl, icon: '✉︎' });

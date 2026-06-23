@@ -3,7 +3,7 @@ import { and, asc, desc, eq } from 'drizzle-orm';
 import { db, ensureProjectsTable } from '@/db';
 import { infoBlocks, links, pages, projects, users } from '@/db/schema';
 import { generate, resolveAiConfig } from '@/lib/ai-client';
-import { type ScrapedPage,scrapeUrls } from '@/lib/scraper';
+import { type ScrapedPage, scrapeUrls } from '@/lib/scraper';
 
 type LinkRecord = typeof links.$inferSelect;
 type ProjectRecord = typeof projects.$inferSelect;
@@ -55,7 +55,8 @@ function extractJson(text: string) {
 
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
-  if (start !== -1 && end !== -1 && end > start) return text.slice(start, end + 1);
+  if (start !== -1 && end !== -1 && end > start)
+    return text.slice(start, end + 1);
 
   return text;
 }
@@ -80,10 +81,18 @@ function stableIdForUrl(url: string) {
   return (hash >>> 0).toString(36);
 }
 
-function sourceUrls(pageLinks: LinkRecord[], pageProjects: ProjectRecord[], maxUrls: number) {
+function sourceUrls(
+  pageLinks: LinkRecord[],
+  pageProjects: ProjectRecord[],
+  maxUrls: number,
+) {
   const urls = [
-    ...pageLinks.filter((link) => link.enabled !== false).map((link) => link.url),
-    ...pageProjects.filter((project) => project.enabled !== false).map((project) => project.url),
+    ...pageLinks
+      .filter((link) => link.enabled !== false)
+      .map((link) => link.url),
+    ...pageProjects
+      .filter((project) => project.enabled !== false)
+      .map((project) => project.url),
   ];
   const seen = new Set<string>();
   const unique: string[] = [];
@@ -99,10 +108,19 @@ function sourceUrls(pageLinks: LinkRecord[], pageProjects: ProjectRecord[], maxU
   return unique;
 }
 
-function normalizePlan(value: unknown, sourceCount: number, skippedUrls: string[]): ProfileEnrichmentPlan {
-  const source = value && typeof value === 'object' ? value as Record<string, unknown> : {};
+function normalizePlan(
+  value: unknown,
+  sourceCount: number,
+  skippedUrls: string[],
+): ProfileEnrichmentPlan {
+  const source =
+    value && typeof value === 'object'
+      ? (value as Record<string, unknown>)
+      : {};
   const rawProjects = Array.isArray(source.projects) ? source.projects : [];
-  const rawMemoryBlocks = Array.isArray(source.memoryBlocks) ? source.memoryBlocks : [];
+  const rawMemoryBlocks = Array.isArray(source.memoryBlocks)
+    ? source.memoryBlocks
+    : [];
 
   const projectsPlan = rawProjects
     .map((raw): ProfileEnrichmentProject | null => {
@@ -114,7 +132,11 @@ function normalizePlan(value: unknown, sourceCount: number, skippedUrls: string[
       return {
         title: cleanText(item.title, 'Untitled project', 100),
         url,
-        description: cleanText(item.description, 'A public project found from attached profile links.', 500),
+        description: cleanText(
+          item.description,
+          'A public project found from attached profile links.',
+          500,
+        ),
       };
     })
     .filter((item): item is ProfileEnrichmentProject => Boolean(item))
@@ -134,7 +156,9 @@ function normalizePlan(value: unknown, sourceCount: number, skippedUrls: string[
         content: cleanText(item.content, '', MAX_MEMORY_LENGTH),
       };
     })
-    .filter((item): item is ProfileEnrichmentMemoryBlock => Boolean(item?.content))
+    .filter((item): item is ProfileEnrichmentMemoryBlock =>
+      Boolean(item?.content),
+    )
     .slice(0, 5);
 
   return {
@@ -155,7 +179,10 @@ function fallbackPlan(opts: {
 }): ProfileEnrichmentPlan {
   const scrapedLines = opts.scraped.map((source) => {
     const title = source.title || source.url;
-    const summary = [source.description, source.content].filter(Boolean).join(' ').slice(0, 520);
+    const summary = [source.description, source.content]
+      .filter(Boolean)
+      .join(' ')
+      .slice(0, 520);
     return `- ${title} (${source.url}): ${summary}`;
   });
 
@@ -178,7 +205,12 @@ function fallbackPlan(opts: {
     .join('\n');
 
   return {
-    bio: opts.page.bio ? null : `${opts.page.displayName} maintains a public profile built from attached links, projects, and public web context.`.slice(0, MAX_BIO_LENGTH),
+    bio: opts.page.bio
+      ? null
+      : `${opts.page.displayName} maintains a public profile built from attached links, projects, and public web context.`.slice(
+          0,
+          MAX_BIO_LENGTH,
+        ),
     projects: projectCandidates,
     memoryBlocks: [
       {
@@ -187,9 +219,13 @@ function fallbackPlan(opts: {
         title: 'Auto-enriched public link context',
         content: [
           'Public context discovered from attached links:',
-          scrapedLines.join('\n') || 'No readable public page text was available from the attached links.',
+          scrapedLines.join('\n') ||
+            'No readable public page text was available from the attached links.',
           attachedLinks ? `\nAttached profile links:\n${attachedLinks}` : '',
-        ].filter(Boolean).join('\n').slice(0, MAX_MEMORY_LENGTH),
+        ]
+          .filter(Boolean)
+          .join('\n')
+          .slice(0, MAX_MEMORY_LENGTH),
       },
       {
         id: `${AUTO_INFO_PREFIX}-boundaries`,
@@ -198,8 +234,12 @@ function fallbackPlan(opts: {
         content: [
           'Use only the attached public links, project descriptions, and readable public scrape results as evidence.',
           'Do not infer private work, employers, education, awards, personal history, or facts from login-only pages.',
-          opts.skippedUrls.length ? `Unreadable or skipped URLs: ${opts.skippedUrls.join(', ')}` : '',
-        ].filter(Boolean).join(' '),
+          opts.skippedUrls.length
+            ? `Unreadable or skipped URLs: ${opts.skippedUrls.join(', ')}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
       },
     ],
     sourceCount: opts.scraped.length,
@@ -213,7 +253,9 @@ async function generatePlan(opts: {
   pageProjects: ProjectRecord[];
   scraped: ScrapedPage[];
 }) {
-  const user = await db.query.users.findFirst({ where: eq(users.id, opts.page.userId) });
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, opts.page.userId),
+  });
   const aiConfig = resolveAiConfig(user);
   if (!aiConfig) {
     return fallbackPlan({ ...opts, skippedUrls: [] });
@@ -229,7 +271,10 @@ Prefer concrete projects and chat-useful memory. Keep wording concise and commer
         displayName: opts.page.displayName,
         bio: opts.page.bio,
       },
-      links: opts.pageLinks.map((link) => ({ title: link.title, url: link.url })),
+      links: opts.pageLinks.map((link) => ({
+        title: link.title,
+        url: link.url,
+      })),
       existingProjects: opts.pageProjects.map((project) => ({
         title: project.title,
         url: project.url,
@@ -254,7 +299,8 @@ Prefer concrete projects and chat-useful memory. Keep wording concise and commer
           {
             type: 'text',
             title: 'Public work map',
-            content: 'Source-backed profile memory for chat and generated pages',
+            content:
+              'Source-backed profile memory for chat and generated pages',
           },
           {
             type: 'boundaries',
@@ -266,7 +312,11 @@ Prefer concrete projects and chat-useful memory. Keep wording concise and commer
     }),
   });
 
-  return normalizePlan(JSON.parse(extractJson(result)), opts.scraped.length, []);
+  return normalizePlan(
+    JSON.parse(extractJson(result)),
+    opts.scraped.length,
+    [],
+  );
 }
 
 export async function buildProfileEnrichmentPlan(
@@ -288,8 +338,16 @@ export async function buildProfileEnrichmentPlan(
   if (!page) throw new Error('PAGE_NOT_FOUND');
 
   const [pageLinks, pageProjects] = await Promise.all([
-    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
-    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
+    db
+      .select()
+      .from(links)
+      .where(eq(links.pageId, pageId))
+      .orderBy(asc(links.sortOrder)),
+    db
+      .select()
+      .from(projects)
+      .where(eq(projects.pageId, pageId))
+      .orderBy(asc(projects.sortOrder)),
   ]);
 
   const urls = sourceUrls(pageLinks, pageProjects, options.maxUrls ?? 12);
@@ -299,8 +357,12 @@ export async function buildProfileEnrichmentPlan(
     maxContentLength: 1800,
     useReaderFallback: true,
   });
-  const scrapedUrlSet = new Set(scraped.map((source) => normalizeUrl(source.url)));
-  const skippedUrls = urls.filter((url) => !scrapedUrlSet.has(normalizeUrl(url)));
+  const scrapedUrlSet = new Set(
+    scraped.map((source) => normalizeUrl(source.url)),
+  );
+  const skippedUrls = urls.filter(
+    (url) => !scrapedUrlSet.has(normalizeUrl(url)),
+  );
 
   let plan: ProfileEnrichmentPlan;
   try {
@@ -309,12 +371,25 @@ export async function buildProfileEnrichmentPlan(
       ...plan,
       sourceCount: scraped.length,
       skippedUrls,
-      memoryBlocks: plan.memoryBlocks.length > 0
-        ? plan.memoryBlocks
-        : fallbackPlan({ page, pageLinks, pageProjects, scraped, skippedUrls }).memoryBlocks,
+      memoryBlocks:
+        plan.memoryBlocks.length > 0
+          ? plan.memoryBlocks
+          : fallbackPlan({
+              page,
+              pageLinks,
+              pageProjects,
+              scraped,
+              skippedUrls,
+            }).memoryBlocks,
     };
   } catch {
-    plan = fallbackPlan({ page, pageLinks, pageProjects, scraped, skippedUrls });
+    plan = fallbackPlan({
+      page,
+      pageLinks,
+      pageProjects,
+      scraped,
+      skippedUrls,
+    });
   }
 
   return { page, plan, sources: scraped };
@@ -332,7 +407,9 @@ export async function applyProfileEnrichmentPlan(
     .from(projects)
     .where(eq(projects.pageId, pageId))
     .orderBy(asc(projects.sortOrder));
-  const existingByUrl = new Map(existingProjects.map((project) => [normalizeUrl(project.url), project]));
+  const existingByUrl = new Map(
+    existingProjects.map((project) => [normalizeUrl(project.url), project]),
+  );
   const [maxProject] = await db
     .select({ sortOrder: projects.sortOrder })
     .from(projects)
@@ -363,7 +440,10 @@ export async function applyProfileEnrichmentPlan(
   // acceptable here because the function re-runs on the next enrich
   // cycle and individual operations are idempotent (onConflictDoUpdate).
   if (options.updateBio && plan.bio) {
-    await db.update(pages).set({ bio: plan.bio, updatedAt: new Date() }).where(eq(pages.id, pageId));
+    await db
+      .update(pages)
+      .set({ bio: plan.bio, updatedAt: new Date() })
+      .where(eq(pages.id, pageId));
     applied.bioUpdated = true;
   }
 
@@ -378,28 +458,33 @@ export async function applyProfileEnrichmentPlan(
             description: project.description,
             enabled: true,
           })
-          .where(and(eq(projects.id, existing.id), eq(projects.pageId, pageId)));
+          .where(
+            and(eq(projects.id, existing.id), eq(projects.pageId, pageId)),
+          );
         applied.projectsUpdated += 1;
       }
       continue;
     }
 
-    await db.insert(projects).values({
-      id: `auto-project-${stableIdForUrl(`${pageId}:${project.url}`)}`,
-      pageId,
-      title: project.title,
-      url: project.url,
-      description: project.description,
-      sortOrder: nextProjectOrder,
-      enabled: true,
-    }).onConflictDoUpdate({
-      target: projects.id,
-      set: {
+    await db
+      .insert(projects)
+      .values({
+        id: `auto-project-${stableIdForUrl(`${pageId}:${project.url}`)}`,
+        pageId,
         title: project.title,
+        url: project.url,
         description: project.description,
+        sortOrder: nextProjectOrder,
         enabled: true,
-      },
-    });
+      })
+      .onConflictDoUpdate({
+        target: projects.id,
+        set: {
+          title: project.title,
+          description: project.description,
+          enabled: true,
+        },
+      });
     nextProjectOrder += 1;
     applied.projectsInserted += 1;
   }
@@ -409,21 +494,24 @@ export async function applyProfileEnrichmentPlan(
       ? block.id
       : `${AUTO_INFO_PREFIX}-${stableIdForUrl(block.title)}`;
     const id = `${idBase}-${stableIdForUrl(pageId)}`;
-    await db.insert(infoBlocks).values({
-      id,
-      pageId,
-      type: block.type,
-      title: block.title,
-      content: block.content,
-      sortOrder: nextBlockOrder,
-    }).onConflictDoUpdate({
-      target: infoBlocks.id,
-      set: {
+    await db
+      .insert(infoBlocks)
+      .values({
+        id,
+        pageId,
         type: block.type,
         title: block.title,
         content: block.content,
-      },
-    });
+        sortOrder: nextBlockOrder,
+      })
+      .onConflictDoUpdate({
+        target: infoBlocks.id,
+        set: {
+          type: block.type,
+          title: block.title,
+          content: block.content,
+        },
+      });
     nextBlockOrder += 1;
     applied.memoryBlocksUpserted += 1;
   }

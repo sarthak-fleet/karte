@@ -5,8 +5,8 @@ import { db, ensureProjectsTable } from '@/db';
 import {
   infoBlocks,
   links,
-  pages,
   pageSections,
+  pages,
   projects,
   users,
 } from '@/db/schema';
@@ -74,15 +74,25 @@ function isHexColor(v: unknown): v is string {
 }
 
 function normalizePlan(value: unknown): RevampPlan {
-  const source = value && typeof value === 'object' ? value as Record<string, unknown> : {};
-  const requestedTheme = typeof source.themePresetId === 'string' ? source.themePresetId : '';
-  const themePresetId = isThemePresetId(requestedTheme) ? requestedTheme : 'midnight';
+  const source =
+    value && typeof value === 'object'
+      ? (value as Record<string, unknown>)
+      : {};
+  const requestedTheme =
+    typeof source.themePresetId === 'string' ? source.themePresetId : '';
+  const themePresetId = isThemePresetId(requestedTheme)
+    ? requestedTheme
+    : 'midnight';
 
   const rawColors = source.customColors;
   let customColors: CustomColors | undefined;
   if (rawColors && typeof rawColors === 'object') {
     const c = rawColors as Record<string, unknown>;
-    if (isHexColor(c.gradientFrom) && isHexColor(c.gradientTo) && isHexColor(c.accentColor)) {
+    if (
+      isHexColor(c.gradientFrom) &&
+      isHexColor(c.gradientTo) &&
+      isHexColor(c.accentColor)
+    ) {
       customColors = {
         gradientFrom: c.gradientFrom.trim(),
         gradientTo: c.gradientTo.trim(),
@@ -95,19 +105,24 @@ function normalizePlan(value: unknown): RevampPlan {
     .map((raw): RevampBlock | null => {
       if (!raw || typeof raw !== 'object') return null;
       const block = raw as Record<string, unknown>;
-      const type = typeof block.type === 'string' && isPageSectionType(block.type)
-        ? block.type
-        : 'text';
+      const type =
+        typeof block.type === 'string' && isPageSectionType(block.type)
+          ? block.type
+          : 'text';
       const title = `${REVAMP_TITLE_PREFIX} ${clampText(block.title, 'Featured direction', 70).replace(/^AI Revamp:\s*/i, '')}`;
       const content = clampText(
         block.content,
         'A focused profile block generated from the current profile context.',
         type === 'blog' ? 1600 : 900,
       );
-      const buttonLabel = type === 'cta' ? clampText(block.buttonLabel, 'Start here', 40) : null;
-      const buttonUrl = type === 'cta' && typeof block.buttonUrl === 'string' && /^https?:\/\//.test(block.buttonUrl)
-        ? block.buttonUrl
-        : null;
+      const buttonLabel =
+        type === 'cta' ? clampText(block.buttonLabel, 'Start here', 40) : null;
+      const buttonUrl =
+        type === 'cta' &&
+        typeof block.buttonUrl === 'string' &&
+        /^https?:\/\//.test(block.buttonUrl)
+          ? block.buttonUrl
+          : null;
 
       if (type === 'cta' && !buttonUrl) return null;
 
@@ -120,7 +135,8 @@ function normalizePlan(value: unknown): RevampPlan {
     blocks.push({
       type: 'text',
       title: `${REVAMP_TITLE_PREFIX} Start here`,
-      content: 'A tighter intro block that explains who this page is for, what to open first, and why visitors should start a conversation.',
+      content:
+        'A tighter intro block that explains who this page is for, what to open first, and why visitors should start a conversation.',
       buttonLabel: null,
       buttonUrl: null,
     });
@@ -136,7 +152,9 @@ function normalizePlan(value: unknown): RevampPlan {
 
   const removeSectionIds = Array.isArray(source.removeSectionIds)
     ? source.removeSectionIds
-        .filter((id): id is string => typeof id === 'string' && id.trim().length > 0)
+        .filter(
+          (id): id is string => typeof id === 'string' && id.trim().length > 0,
+        )
         .map((id) => id.trim())
         .slice(0, 12)
     : [];
@@ -156,25 +174,38 @@ function normalizePlan(value: unknown): RevampPlan {
   };
 }
 
-function fallbackPlan(prompt: string, page: typeof pages.$inferSelect): RevampPlan {
+function fallbackPlan(
+  prompt: string,
+  page: typeof pages.$inferSelect,
+): RevampPlan {
   const lower = prompt.toLowerCase();
-  const themePresetId: ThemePresetId = lower.includes('weird') || lower.includes('fun')
-    ? 'terminal'
-    : lower.includes('writer') || lower.includes('blog') || lower.includes('editorial')
-      ? 'editorial'
-      : lower.includes('creative') || lower.includes('creator')
-        ? 'studio'
-        : 'midnight';
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL
-    || process.env.BETTER_AUTH_URL
-    || 'https://karte.cc';
+  const themePresetId: ThemePresetId =
+    lower.includes('weird') || lower.includes('fun')
+      ? 'terminal'
+      : lower.includes('writer') ||
+          lower.includes('blog') ||
+          lower.includes('editorial')
+        ? 'editorial'
+        : lower.includes('creative') || lower.includes('creator')
+          ? 'studio'
+          : 'midnight';
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.BETTER_AUTH_URL ||
+    'https://karte.cc';
 
   return {
     themePresetId,
     headline: `${page.displayName} as a clearer personal site`,
     rationale:
       'Lead with links and chat, then use projects, writing, and generated modes as supporting proof. Keep the page polished enough for professional visitors while preserving shareability.',
-    emphasis: ['Find Me Online', 'Chat', 'Projects', 'Writing', 'Generated modes'],
+    emphasis: [
+      'Find Me Online',
+      'Chat',
+      'Projects',
+      'Writing',
+      'Generated modes',
+    ],
     removeSectionIds: [],
     blocks: [
       {
@@ -204,7 +235,15 @@ async function generatePlan(opts: {
   memoryBlocks: Array<typeof infoBlocks.$inferSelect>;
   aiConfig: ReturnType<typeof resolveAiConfig>;
 }) {
-  const { prompt, page, pageLinks, pageProjects, sections, memoryBlocks, aiConfig } = opts;
+  const {
+    prompt,
+    page,
+    pageLinks,
+    pageProjects,
+    sections,
+    memoryBlocks,
+    aiConfig,
+  } = opts;
   if (!aiConfig) return fallbackPlan(prompt, page);
 
   const result = await generate(aiConfig, {
@@ -249,11 +288,14 @@ Prefer additive changes when the prompt is purely about vibe/theme. The owner se
       })),
       requiredJsonShape: {
         themePresetId: 'midnight',
-        customColors: '(optional) { gradientFrom: "#hex", gradientTo: "#hex", accentColor: "#hex" } — only include if user requested a specific color scheme',
+        customColors:
+          '(optional) { gradientFrom: "#hex", gradientTo: "#hex", accentColor: "#hex" } — only include if user requested a specific color scheme',
         headline: 'Short name for the revamp',
         rationale: 'Why this structure works',
         emphasis: ['ordered list of public blocks to emphasize'],
-        removeSectionIds: ['(optional) list of pageSection IDs from `sections` above that the user explicitly asked to remove'],
+        removeSectionIds: [
+          '(optional) list of pageSection IDs from `sections` above that the user explicitly asked to remove',
+        ],
         blocks: [
           {
             type: 'text',
@@ -355,8 +397,8 @@ async function applyPlan(pageId: string, plan: RevampPlan) {
         type: block.type,
         title: block.title,
         content: block.content,
-        buttonLabel: block.type === 'cta' ? block.buttonLabel ?? null : null,
-        buttonUrl: block.type === 'cta' ? block.buttonUrl ?? null : null,
+        buttonLabel: block.type === 'cta' ? (block.buttonLabel ?? null) : null,
+        buttonUrl: block.type === 'cta' ? (block.buttonUrl ?? null) : null,
         sortOrder: startOrder + index,
         enabled: true,
       }),
@@ -382,28 +424,51 @@ export async function POST(
   }
 
   const body = await req.json();
-  const prompt = clampText(body.prompt, 'Make my profile clearer and more commercially polished.', 1200);
+  const prompt = clampText(
+    body.prompt,
+    'Make my profile clearer and more commercially polished.',
+    1200,
+  );
   const shouldApply = Boolean(body.apply);
 
   try {
-    const [pageLinks, pageProjects, sections, memoryBlocks, user] = await Promise.all([
-      db.select().from(links).where(eq(links.pageId, pageId)).orderBy(asc(links.sortOrder)),
-      db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(asc(projects.sortOrder)),
-      db.select().from(pageSections).where(eq(pageSections.pageId, pageId)).orderBy(asc(pageSections.sortOrder)),
-      db.select().from(infoBlocks).where(eq(infoBlocks.pageId, pageId)).orderBy(asc(infoBlocks.sortOrder)),
-      db.query.users.findFirst({ where: eq(users.id, auth.userId) }),
-    ]);
+    const [pageLinks, pageProjects, sections, memoryBlocks, user] =
+      await Promise.all([
+        db
+          .select()
+          .from(links)
+          .where(eq(links.pageId, pageId))
+          .orderBy(asc(links.sortOrder)),
+        db
+          .select()
+          .from(projects)
+          .where(eq(projects.pageId, pageId))
+          .orderBy(asc(projects.sortOrder)),
+        db
+          .select()
+          .from(pageSections)
+          .where(eq(pageSections.pageId, pageId))
+          .orderBy(asc(pageSections.sortOrder)),
+        db
+          .select()
+          .from(infoBlocks)
+          .where(eq(infoBlocks.pageId, pageId))
+          .orderBy(asc(infoBlocks.sortOrder)),
+        db.query.users.findFirst({ where: eq(users.id, auth.userId) }),
+      ]);
 
     const incomingPlan = body.plan ? normalizePlan(body.plan) : null;
-    const plan = incomingPlan ?? await generatePlan({
-      prompt,
-      page,
-      pageLinks,
-      pageProjects,
-      sections,
-      memoryBlocks,
-      aiConfig: resolveAiConfig(user),
-    });
+    const plan =
+      incomingPlan ??
+      (await generatePlan({
+        prompt,
+        page,
+        pageLinks,
+        pageProjects,
+        sections,
+        memoryBlocks,
+        aiConfig: resolveAiConfig(user),
+      }));
 
     if (shouldApply) {
       await applyPlan(pageId, plan);
@@ -414,11 +479,12 @@ export async function POST(
     // would actually go. The intersection with `sections` here is the
     // same validation applyPlan does — IDs that don't belong to the
     // page get silently dropped.
-    const removedSections = plan.removeSectionIds.length > 0
-      ? sections
-          .filter((s) => plan.removeSectionIds.includes(s.id))
-          .map((s) => ({ id: s.id, title: s.title, type: s.type }))
-      : [];
+    const removedSections =
+      plan.removeSectionIds.length > 0
+        ? sections
+            .filter((s) => plan.removeSectionIds.includes(s.id))
+            .map((s) => ({ id: s.id, title: s.title, type: s.type }))
+        : [];
 
     return NextResponse.json({ plan, applied: shouldApply, removedSections });
   } catch (error) {
@@ -431,7 +497,10 @@ export async function POST(
       name: error instanceof Error ? error.name : undefined,
     });
     return NextResponse.json(
-      { error: 'Could not generate a revamp right now. Try a shorter prompt or try again.' },
+      {
+        error:
+          'Could not generate a revamp right now. Try a shorter prompt or try again.',
+      },
       { status: 502 },
     );
   }

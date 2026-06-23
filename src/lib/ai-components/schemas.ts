@@ -8,9 +8,12 @@
 
 import { z } from 'zod';
 
-const httpUrl = z.string().url().refine((u) => /^https?:\/\//i.test(u), {
-  message: 'Must be http(s) URL',
-});
+const httpUrl = z
+  .string()
+  .url()
+  .refine((u) => /^https?:\/\//i.test(u), {
+    message: 'Must be http(s) URL',
+  });
 
 // Visitor / AI layout intent. Cards that visitors most naturally ask
 // to resize (projects, essays, timelines, metrics) accept this prop.
@@ -125,7 +128,10 @@ export const layoutDirectivesSchema = z.object({
 // known type fail; valid props pass through with .data populated.
 export const renderableComponentSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('AskAgain'), props: askAgainSchema }),
-  z.object({ type: z.literal('AvailabilityChip'), props: availabilityChipSchema }),
+  z.object({
+    type: z.literal('AvailabilityChip'),
+    props: availabilityChipSchema,
+  }),
   z.object({ type: z.literal('BookCallSlot'), props: bookCallSlotSchema }),
   z.object({ type: z.literal('EssayLink'), props: essayLinkSchema }),
   z.object({ type: z.literal('HiringStatus'), props: hiringStatusSchema }),
@@ -138,4 +144,6 @@ export const renderableComponentSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('TimelineSlice'), props: timelineSliceSchema }),
 ]);
 
-export type ValidatedRenderableComponent = z.infer<typeof renderableComponentSchema>;
+export type ValidatedRenderableComponent = z.infer<
+  typeof renderableComponentSchema
+>;

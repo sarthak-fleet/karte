@@ -157,10 +157,13 @@ export function RoamingCharacter({
       const id = setTimeout(() => setCharIdx((c) => c + 1), TYPE_MS);
       return () => clearTimeout(id);
     }
-    const id = setTimeout(() => {
-      setSpeaking(false);
-      setLineIdx((i) => (i + 1) % lines.length);
-    }, TALK_DURATION_MS - current.length * TYPE_MS);
+    const id = setTimeout(
+      () => {
+        setSpeaking(false);
+        setLineIdx((i) => (i + 1) % lines.length);
+      },
+      TALK_DURATION_MS - current.length * TYPE_MS,
+    );
     return () => clearTimeout(id);
   }, [speaking, charIdx, lineIdx, lines]);
 
@@ -214,7 +217,9 @@ export function RoamingCharacter({
         ref={buttonRef}
         type="button"
         onClick={() => {
-          window.dispatchEvent(new CustomEvent('karte:open-widget', { detail: { mode: 'chat' } }));
+          window.dispatchEvent(
+            new CustomEvent('karte:open-widget', { detail: { mode: 'chat' } }),
+          );
         }}
         title={`Chat with ${displayName}`}
         aria-label={`Chat with ${displayName}`}

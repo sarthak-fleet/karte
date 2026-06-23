@@ -7,7 +7,8 @@ export type AiConfig = {
   model: string;
 };
 
-const DEFAULT_AI_ENDPOINT_URL = 'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1';
+const DEFAULT_AI_ENDPOINT_URL =
+  'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1';
 const DEFAULT_AI_MODEL = 'workers-ai-llama-3.3-70b';
 const DEFAULT_FAST_AI_MODEL = 'workers-ai-llama-3b';
 const FREE_AI_PROJECT_ID = 'linkchat';
@@ -17,7 +18,8 @@ export function getDefaultAiConfig(): AiConfig | null {
   if (!apiKey) return null;
 
   return {
-    endpointUrl: process.env.LINKCHAT_DEFAULT_AI_ENDPOINT_URL || DEFAULT_AI_ENDPOINT_URL,
+    endpointUrl:
+      process.env.LINKCHAT_DEFAULT_AI_ENDPOINT_URL || DEFAULT_AI_ENDPOINT_URL,
     apiKey,
     model: process.env.LINKCHAT_DEFAULT_AI_MODEL || DEFAULT_AI_MODEL,
   };
@@ -41,17 +43,24 @@ export function resolveAiConfig(config?: {
 
 export type ReasoningLevel = 'fast' | 'deep';
 
-function reasoningEffortFor(level?: ReasoningLevel): 'low' | 'high' | undefined {
+function reasoningEffortFor(
+  level?: ReasoningLevel,
+): 'low' | 'high' | undefined {
   if (level === 'fast') return 'low';
   if (level === 'deep') return 'high';
   return undefined;
 }
 
 function isFreeAiGateway(config: AiConfig): boolean {
-  return config.endpointUrl.includes('free-ai-gateway.sarthakagrawal927.workers.dev');
+  return config.endpointUrl.includes(
+    'free-ai-gateway.sarthakagrawal927.workers.dev',
+  );
 }
 
-function modelForReasoning(config: AiConfig, reasoningLevel?: ReasoningLevel): string {
+function modelForReasoning(
+  config: AiConfig,
+  reasoningLevel?: ReasoningLevel,
+): string {
   if (reasoningLevel === 'fast' && isFreeAiGateway(config)) {
     return process.env.LINKCHAT_FAST_AI_MODEL || DEFAULT_FAST_AI_MODEL;
   }
@@ -65,7 +74,9 @@ function getProvider(config: AiConfig, reasoningLevel?: ReasoningLevel) {
     name: 'custom',
     baseURL: config.endpointUrl,
     apiKey: config.apiKey,
-    headers: freeAi ? { 'x-gateway-project-id': FREE_AI_PROJECT_ID } : undefined,
+    headers: freeAi
+      ? { 'x-gateway-project-id': FREE_AI_PROJECT_ID }
+      : undefined,
     transformRequestBody: freeAi
       ? (body) => ({
           ...body,
@@ -155,7 +166,9 @@ export function streamResponse(
     prompt: opts.prompt,
     maxRetries: 0,
     ...(opts.maxOutputTokens ? { maxOutputTokens: opts.maxOutputTokens } : {}),
-    ...(opts.timeoutMs ? { timeout: { totalMs: opts.timeoutMs, chunkMs: opts.timeoutMs } } : {}),
+    ...(opts.timeoutMs
+      ? { timeout: { totalMs: opts.timeoutMs, chunkMs: opts.timeoutMs } }
+      : {}),
   });
   return result.toTextStreamResponse();
 }

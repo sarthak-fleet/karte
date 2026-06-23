@@ -2,7 +2,16 @@ import { and, asc, desc, eq } from 'drizzle-orm';
 import { cache } from 'react';
 
 import { db, ensureProjectsTable } from '@/db';
-import { generatedPages,infoBlocks, links, pages, pageSections, projects, timelineEvents, users } from '@/db/schema';
+import {
+  generatedPages,
+  infoBlocks,
+  links,
+  pageSections,
+  pages,
+  projects,
+  timelineEvents,
+  users,
+} from '@/db/schema';
 import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
 
 // CF Edge cache for resolved profile data. Owner edits propagate in
@@ -89,23 +98,50 @@ async function loadFullPageData(slug: string) {
   const user = row.user;
 
   // 2. Fetch remaining data in parallel
-  const [pageLinks, pageProjects, publicSections, readyGeneratedPages, publicTimeline] = await Promise.all([
-    db.select().from(links)
+  const [
+    pageLinks,
+    pageProjects,
+    publicSections,
+    readyGeneratedPages,
+    publicTimeline,
+  ] = await Promise.all([
+    db
+      .select()
+      .from(links)
       .where(and(eq(links.pageId, page.id), eq(links.enabled, true)))
       .orderBy(asc(links.sortOrder)),
-    db.select().from(projects)
+    db
+      .select()
+      .from(projects)
       .where(and(eq(projects.pageId, page.id), eq(projects.enabled, true)))
       .orderBy(asc(projects.sortOrder)),
-    db.select().from(pageSections)
-      .where(and(eq(pageSections.pageId, page.id), eq(pageSections.enabled, true)))
+    db
+      .select()
+      .from(pageSections)
+      .where(
+        and(eq(pageSections.pageId, page.id), eq(pageSections.enabled, true)),
+      )
       .orderBy(asc(pageSections.sortOrder)),
-    db.select({ type: generatedPages.type, content: generatedPages.content })
+    db
+      .select({ type: generatedPages.type, content: generatedPages.content })
       .from(generatedPages)
-      .where(and(eq(generatedPages.pageId, page.id), eq(generatedPages.status, 'ready'))),
+      .where(
+        and(
+          eq(generatedPages.pageId, page.id),
+          eq(generatedPages.status, 'ready'),
+        ),
+      ),
     // Only 'published' timeline events render publicly. 'hidden' still
     // feeds AI memory (separate query in buildProfileMemory).
-    db.select().from(timelineEvents)
-      .where(and(eq(timelineEvents.pageId, page.id), eq(timelineEvents.status, 'published')))
+    db
+      .select()
+      .from(timelineEvents)
+      .where(
+        and(
+          eq(timelineEvents.pageId, page.id),
+          eq(timelineEvents.status, 'published'),
+        ),
+      )
       .orderBy(desc(timelineEvents.sortDate)),
   ]);
 
@@ -228,14 +264,15 @@ function extractPreview(type: string, content: unknown): string {
   let text = '';
   if (type === 'encyclopedia') {
     const html = typeof c.markdown === 'string' ? c.markdown : '';
-    text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    text = html
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   } else if (type === 'newspaper') {
     const lead =
       (Array.isArray(c?.pages) && c.pages[0]?.leadStory) || c?.leadStory;
-    const headline =
-      typeof lead?.headline === 'string' ? lead.headline : '';
-    const sub =
-      typeof lead?.subheadline === 'string' ? lead.subheadline : '';
+    const headline = typeof lead?.headline === 'string' ? lead.headline : '';
+    const sub = typeof lead?.subheadline === 'string' ? lead.subheadline : '';
     text = [headline, sub].filter(Boolean).join(' — ').trim();
   } else if (type === 'roast') {
     text = typeof c.roast === 'string' ? c.roast : '';
@@ -268,32 +305,44 @@ export const getPageUser = cache(async (userId: string) => {
 });
 
 export const getPageLinks = cache(async (pageId: string) => {
-  return db.select().from(links)
+  return db
+    .select()
+    .from(links)
     .where(and(eq(links.pageId, pageId), eq(links.enabled, true)))
     .orderBy(asc(links.sortOrder));
 });
 
 export const getPageProjects = cache(async (pageId: string) => {
-  return db.select().from(projects)
+  return db
+    .select()
+    .from(projects)
     .where(and(eq(projects.pageId, pageId), eq(projects.enabled, true)))
     .orderBy(asc(projects.sortOrder));
 });
 
 export const getPageSections = cache(async (pageId: string) => {
-  return db.select().from(pageSections)
+  return db
+    .select()
+    .from(pageSections)
     .where(and(eq(pageSections.pageId, pageId), eq(pageSections.enabled, true)))
     .orderBy(asc(pageSections.sortOrder));
 });
 
 export const getPageInfoBlocks = cache(async (pageId: string) => {
-  return db.select().from(infoBlocks)
+  return db
+    .select()
+    .from(infoBlocks)
     .where(eq(infoBlocks.pageId, pageId))
     .orderBy(asc(infoBlocks.sortOrder));
 });
 
 export const getGeneratedPage = cache(async (pageId: string, type: string) => {
-  const result = await db.select().from(generatedPages)
-    .where(and(eq(generatedPages.pageId, pageId), eq(generatedPages.type, type)))
+  const result = await db
+    .select()
+    .from(generatedPages)
+    .where(
+      and(eq(generatedPages.pageId, pageId), eq(generatedPages.type, type)),
+    )
     .limit(1);
   return result[0] ?? null;
 });
@@ -302,6 +351,11 @@ export const getReadyPages = cache(async (pageId: string) => {
   const results = await db
     .select({ type: generatedPages.type })
     .from(generatedPages)
-    .where(and(eq(generatedPages.pageId, pageId), eq(generatedPages.status, 'ready')));
+    .where(
+      and(
+        eq(generatedPages.pageId, pageId),
+        eq(generatedPages.status, 'ready'),
+      ),
+    );
   return new Set(results.map((r) => r.type));
 });

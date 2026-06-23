@@ -1,4 +1,4 @@
-import { and,eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -19,8 +19,12 @@ export default async function DashboardEncyclopediaPage() {
   if (!page) {
     return (
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-4 text-2xl font-bold text-karte-text">Encyclopedia</h1>
-        <p className="text-karte-text-3">Create a profile first to manage your encyclopedia.</p>
+        <h1 className="mb-4 text-2xl font-bold text-karte-text">
+          Encyclopedia
+        </h1>
+        <p className="text-karte-text-3">
+          Create a profile first to manage your encyclopedia.
+        </p>
       </div>
     );
   }
@@ -41,11 +45,16 @@ export default async function DashboardEncyclopediaPage() {
   if (!content) {
     return (
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-4 text-2xl font-bold text-karte-text">Encyclopedia</h1>
+        <h1 className="mb-4 text-2xl font-bold text-karte-text">
+          Encyclopedia
+        </h1>
         <div className="rounded-2xl bg-white/[0.02] p-6">
           <p className="text-karte-text-3">
             Generate your encyclopedia first from the{' '}
-            <Link href="/dashboard/pages" className="text-karte-text underline underline-offset-2 transition hover:text-karte-text-2">
+            <Link
+              href="/dashboard/pages"
+              className="text-karte-text underline underline-offset-2 transition hover:text-karte-text-2"
+            >
               Pages tab
             </Link>
             .

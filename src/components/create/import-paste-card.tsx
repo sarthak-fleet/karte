@@ -22,7 +22,9 @@ function isLikelyUrl(value: string): boolean {
   const trimmed = value.trim();
   if (!trimmed) return false;
   try {
-    const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    const withProtocol = /^https?:\/\//i.test(trimmed)
+      ? trimmed
+      : `https://${trimmed}`;
     const parsed = new URL(withProtocol);
     return parsed.hostname.includes('.');
   } catch {
@@ -179,8 +181,8 @@ export function ImportPasteCard() {
             </span>
           </h2>
           <p className="mt-3 max-w-xl text-[14px] leading-[1.6] text-karte-text-3">
-            Paste your Linktree, Beacons, Bio.link or Carrd URL. We&apos;ll pull your
-            links and show you exactly how they&apos;ll look on Karte.
+            Paste your Linktree, Beacons, Bio.link or Carrd URL. We&apos;ll pull
+            your links and show you exactly how they&apos;ll look on Karte.
           </p>
         </div>
       </div>
@@ -222,7 +224,8 @@ export function ImportPasteCard() {
 
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
             <p className="text-sm text-karte-text-3">
-              Looks good? Sign in to claim your Karte page and bring these links along.
+              Looks good? Sign in to claim your Karte page and bring these links
+              along.
             </p>
             <button
               type="button"
@@ -240,4 +243,3 @@ export function ImportPasteCard() {
     </section>
   );
 }
-

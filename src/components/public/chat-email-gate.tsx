@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef,useState } from 'react';
+import { useRef, useState } from 'react';
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
@@ -51,7 +51,7 @@ export function ChatEmailGate({
   // Hex with alpha — accentColor is dynamic (per-page theme), so we compose
   // ring + border colors from it inline rather than via Tailwind classes.
   const focusBorder = `${accentColor}66`; // ~40%
-  const focusRing = `${accentColor}26`;   // ~15%
+  const focusRing = `${accentColor}26`; // ~15%
 
   return (
     <form

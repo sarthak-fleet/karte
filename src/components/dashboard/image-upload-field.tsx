@@ -34,7 +34,9 @@ export function ImageUploadField({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'error' | 'success'>('success');
+  const [messageType, setMessageType] = useState<'error' | 'success'>(
+    'success',
+  );
 
   function updateMessage(nextMessage: string, type: 'error' | 'success') {
     setMessage(nextMessage);
@@ -46,9 +48,7 @@ export function ImageUploadField({
     onUploadingChange?.(nextUploading);
   }
 
-  async function handleFileSelect(
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  async function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = event.target.files?.[0];
     event.target.value = '';
 
@@ -119,7 +119,10 @@ export function ImageUploadField({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-3">
-        <label htmlFor={inputId} className="block text-sm font-medium text-karte-text">
+        <label
+          htmlFor={inputId}
+          className="block text-sm font-medium text-karte-text"
+        >
           {label}
         </label>
         <span className="text-xs text-karte-text-4">
@@ -145,7 +148,9 @@ export function ImageUploadField({
           onClick={() => fileInputRef.current?.click()}
           className="rounded-full bg-white/[0.05] px-4 py-2 text-sm font-medium text-karte-text transition-colors duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {uploading ? 'Uploading...' : `Upload ${kind === 'avatar' ? 'Avatar' : 'Image'}`}
+          {uploading
+            ? 'Uploading...'
+            : `Upload ${kind === 'avatar' ? 'Avatar' : 'Image'}`}
         </button>
         <button
           type="button"

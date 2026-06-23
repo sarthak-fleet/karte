@@ -1,4 +1,4 @@
-import { and,eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { db, ensureProjectsTable } from '@/db';
 import { generatedPages } from '@/db/schema';
@@ -6,10 +6,15 @@ import { loadOwnedPage } from '@/lib/api-auth';
 import { getSession } from '@/lib/auth-server';
 import type { EncyclopediaContent } from '@/lib/generated-page-types';
 
-export async function PUT(req: Request, { params }: { params: Promise<{ pageId: string }> }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ pageId: string }> },
+) {
   const session = await getSession();
   if (!session?.user?.id) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+    });
   }
 
   const { pageId } = await params;
@@ -19,7 +24,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ pageId: 
   const page = await loadOwnedPage(pageId, session.user.id);
 
   if (!page) {
-    return new Response(JSON.stringify({ error: 'Page not found' }), { status: 404 });
+    return new Response(JSON.stringify({ error: 'Page not found' }), {
+      status: 404,
+    });
   }
 
   const body: EncyclopediaContent = await req.json();
@@ -28,7 +35,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ pageId: 
   const existing = await db
     .select()
     .from(generatedPages)
-    .where(and(eq(generatedPages.pageId, pageId), eq(generatedPages.type, 'encyclopedia')))
+    .where(
+      and(
+        eq(generatedPages.pageId, pageId),
+        eq(generatedPages.type, 'encyclopedia'),
+      ),
+    )
     .limit(1);
 
   if (existing[0]) {

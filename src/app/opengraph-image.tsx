@@ -22,170 +22,168 @@ const BG = '#0a0805';
 
 export default function OpengraphImage() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: BG,
+        color: GOLD_BRIGHT,
+        fontFamily: 'serif',
+        padding: '48px 64px',
+        position: 'relative',
+      }}
+    >
+      {/* Foil hairline edge — drawn as an inset rect with a faint
+            gold border. Approximates the deck's foil mask trick. */}
       <div
         style={{
-          width: '100%',
-          height: '100%',
+          position: 'absolute',
+          inset: '24px',
+          border: `1px solid ${GOLD}55`,
+          borderRadius: '8px',
           display: 'flex',
-          flexDirection: 'column',
-          background: BG,
-          color: GOLD_BRIGHT,
-          fontFamily: 'serif',
-          padding: '48px 64px',
-          position: 'relative',
+        }}
+      />
+
+      {/* Card header strip — mark left, kicker center, serial right */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingBottom: '20px',
+          borderBottom: `1px dashed ${GOLD}44`,
+          zIndex: 2,
         }}
       >
-        {/* Foil hairline edge — drawn as an inset rect with a faint
-            gold border. Approximates the deck's foil mask trick. */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: '24px',
-            border: `1px solid ${GOLD}55`,
-            borderRadius: '8px',
-            display: 'flex',
-          }}
-        />
-
-        {/* Card header strip — mark left, kicker center, serial right */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingBottom: '20px',
-            borderBottom: `1px dashed ${GOLD}44`,
-            zIndex: 2,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-            <div
-              style={{
-                width: '14px',
-                height: '14px',
-                transform: 'rotate(45deg)',
-                background: GOLD,
-                display: 'flex',
-              }}
-            />
-            <div
-              style={{
-                fontSize: '32px',
-                color: GOLD_BRIGHT,
-                fontStyle: 'italic',
-                fontWeight: 500,
-                display: 'flex',
-              }}
-            >
-              Karte
-            </div>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
           <div
             style={{
-              fontSize: '13px',
-              letterSpacing: '0.32em',
-              color: GOLD,
-              textTransform: 'uppercase',
+              width: '14px',
+              height: '14px',
+              transform: 'rotate(45deg)',
+              background: GOLD,
               display: 'flex',
             }}
-          >
-            Digital Card · Card V2026
-          </div>
+          />
           <div
             style={{
-              fontSize: '20px',
-              color: '#e8dfca99',
-              fontStyle: 'italic',
-              display: 'flex',
-            }}
-          >
-            № 00471
-          </div>
-        </div>
-
-        {/* Body — eyebrow + H1 + sub */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            gap: '24px',
-            zIndex: 2,
-          }}
-        >
-          <div
-            style={{
-              fontSize: '15px',
-              letterSpacing: '0.32em',
-              color: GOLD,
-              textTransform: 'uppercase',
-              display: 'flex',
-            }}
-          >
-            ◆  The link-in-bio, upgraded
-          </div>
-          <div
-            style={{
-              fontSize: '88px',
-              fontWeight: 500,
-              lineHeight: 1,
+              fontSize: '32px',
               color: GOLD_BRIGHT,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              letterSpacing: '-0.025em',
-            }}
-          >
-            <div style={{ display: 'flex' }}>Your link-in-bio,</div>
-            <div
-              style={{
-                display: 'flex',
-                fontStyle: 'italic',
-                color: GOLD,
-                marginTop: '4px',
-              }}
-            >
-              that answers back.
-            </div>
-          </div>
-          <div
-            style={{
-              fontSize: '22px',
-              color: '#e8dfcacc',
               fontStyle: 'italic',
-              maxWidth: '780px',
+              fontWeight: 500,
               display: 'flex',
-              lineHeight: 1.4,
             }}
           >
-            karte · /ˈkartə/ — German for card. This one talks back.
+            Karte
           </div>
         </div>
-
-        {/* Card footer strip */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingTop: '20px',
-            borderTop: `1px dashed ${GOLD}44`,
             fontSize: '13px',
-            letterSpacing: '0.26em',
-            color: `${GOLD}b3`,
+            letterSpacing: '0.32em',
+            color: GOLD,
             textTransform: 'uppercase',
-            zIndex: 2,
+            display: 'flex',
           }}
         >
-          <div style={{ display: 'flex' }}>karte.cc/yourhandle</div>
-          <div style={{ display: 'flex' }}>Free · 60-second import</div>
+          Digital Card · Card V2026
+        </div>
+        <div
+          style={{
+            fontSize: '20px',
+            color: '#e8dfca99',
+            fontStyle: 'italic',
+            display: 'flex',
+          }}
+        >
+          № 00471
         </div>
       </div>
-    ),
+
+      {/* Body — eyebrow + H1 + sub */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          gap: '24px',
+          zIndex: 2,
+        }}
+      >
+        <div
+          style={{
+            fontSize: '15px',
+            letterSpacing: '0.32em',
+            color: GOLD,
+            textTransform: 'uppercase',
+            display: 'flex',
+          }}
+        >
+          ◆ The link-in-bio, upgraded
+        </div>
+        <div
+          style={{
+            fontSize: '88px',
+            fontWeight: 500,
+            lineHeight: 1,
+            color: GOLD_BRIGHT,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            letterSpacing: '-0.025em',
+          }}
+        >
+          <div style={{ display: 'flex' }}>Your link-in-bio,</div>
+          <div
+            style={{
+              display: 'flex',
+              fontStyle: 'italic',
+              color: GOLD,
+              marginTop: '4px',
+            }}
+          >
+            that answers back.
+          </div>
+        </div>
+        <div
+          style={{
+            fontSize: '22px',
+            color: '#e8dfcacc',
+            fontStyle: 'italic',
+            maxWidth: '780px',
+            display: 'flex',
+            lineHeight: 1.4,
+          }}
+        >
+          karte · /ˈkartə/ — German for card. This one talks back.
+        </div>
+      </div>
+
+      {/* Card footer strip */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingTop: '20px',
+          borderTop: `1px dashed ${GOLD}44`,
+          fontSize: '13px',
+          letterSpacing: '0.26em',
+          color: `${GOLD}b3`,
+          textTransform: 'uppercase',
+          zIndex: 2,
+        }}
+      >
+        <div style={{ display: 'flex' }}>karte.cc/yourhandle</div>
+        <div style={{ display: 'flex' }}>Free · 60-second import</div>
+      </div>
+    </div>,
     { ...size },
   );
 }

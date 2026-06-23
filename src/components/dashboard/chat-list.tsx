@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Conversation {
   id: string;
@@ -44,9 +44,7 @@ export function ChatList({ pageId }: { pageId: string }) {
     if (!messagesMap[convId]) {
       setLoadingMessages(convId);
       try {
-        const res = await fetch(
-          `/api/pages/${pageId}/conversations/${convId}`,
-        );
+        const res = await fetch(`/api/pages/${pageId}/conversations/${convId}`);
         const msgs = await res.json();
         setMessagesMap((prev) => ({ ...prev, [convId]: msgs }));
       } catch {
@@ -68,7 +66,10 @@ export function ChatList({ pageId }: { pageId: string }) {
   if (conversations.length === 0) {
     return (
       <div className="rounded-2xl bg-white/[0.02] p-8 text-center">
-        <p className="text-karte-text-3">No conversations yet. Visitors will appear here once they start chatting.</p>
+        <p className="text-karte-text-3">
+          No conversations yet. Visitors will appear here once they start
+          chatting.
+        </p>
       </div>
     );
   }
@@ -98,8 +99,13 @@ export function ChatList({ pageId }: { pageId: string }) {
                     minute: '2-digit',
                   })}
                 </span>
-                <span>{convo.messageCount} message{convo.messageCount !== 1 ? 's' : ''}</span>
-                {convo.visitorId && <span>{convo.visitorId.slice(0, 8)}...</span>}
+                <span>
+                  {convo.messageCount} message
+                  {convo.messageCount !== 1 ? 's' : ''}
+                </span>
+                {convo.visitorId && (
+                  <span>{convo.visitorId.slice(0, 8)}...</span>
+                )}
               </div>
             </div>
             <span className="text-sm text-karte-text-4 sm:ml-3">
@@ -130,9 +136,12 @@ export function ChatList({ pageId }: { pageId: string }) {
                   </div>
                 ))
               )}
-              {!loadingMessages && (messagesMap[convo.id] || []).length === 0 && (
-                <p className="text-xs text-karte-text-4">No messages in this conversation.</p>
-              )}
+              {!loadingMessages &&
+                (messagesMap[convo.id] || []).length === 0 && (
+                  <p className="text-xs text-karte-text-4">
+                    No messages in this conversation.
+                  </p>
+                )}
             </div>
           )}
         </div>

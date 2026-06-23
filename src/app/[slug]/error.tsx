@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect } from "react";
+import Link from 'next/link';
+import { useEffect } from 'react';
 
-import { maybeReloadOnChunkError } from "@/lib/chunk-reload";
-import { captureError } from "@/lib/foundry-monitoring";
+import { maybeReloadOnChunkError } from '@/lib/chunk-reload';
+import { captureError } from '@/lib/foundry-monitoring';
 
 export default function SlugError({
   error,
@@ -16,7 +16,7 @@ export default function SlugError({
   useEffect(() => {
     if (maybeReloadOnChunkError(error)) return;
     console.error(error);
-    captureError(error, { scope: "public-profile", digest: error.digest });
+    captureError(error, { scope: 'public-profile', digest: error.digest });
   }, [error]);
 
   return (

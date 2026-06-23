@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useCallback,useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { renderComponent } from '@/components/public/ai-components/registry';
 import { ChatEmailGate } from '@/components/public/chat-email-gate';
@@ -14,7 +14,10 @@ import {
   feedChunk,
   finishStream,
 } from '@/lib/ai-components/stream-parser';
-import type { LayoutDirectives, RenderableComponent } from '@/lib/ai-components/types';
+import type {
+  LayoutDirectives,
+  RenderableComponent,
+} from '@/lib/ai-components/types';
 import { trackEvent } from '@/lib/analytics';
 import {
   buildRoomShareUrl,
@@ -49,9 +52,18 @@ function ChatLoadingIndicator({ label }: { label: string }) {
     <span className="inline-flex items-center gap-2 py-0.5 text-white/65">
       <span>{label}</span>
       <span className="flex gap-1" aria-hidden="true">
-        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '0ms' }} />
-        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '150ms' }} />
-        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: '300ms' }} />
+        <span
+          className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60"
+          style={{ animationDelay: '0ms' }}
+        />
+        <span
+          className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60"
+          style={{ animationDelay: '150ms' }}
+        />
+        <span
+          className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60"
+          style={{ animationDelay: '300ms' }}
+        />
       </span>
     </span>
   );
@@ -105,7 +117,9 @@ export function ChatWidget({
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const prevOpenRef = useRef(false);
-  const [mode, setMode] = useState<'chat' | 'contact'>(chatEnabled ? 'chat' : 'contact');
+  const [mode, setMode] = useState<'chat' | 'contact'>(
+    chatEnabled ? 'chat' : 'contact',
+  );
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -127,9 +141,15 @@ export function ChatWidget({
   const accentTextColor = getButtonTextColor(accentColor);
   const dmEnabled = dmMode !== 'off';
   const isGuestPreview =
-    !!initialRoomId && historyStatus === 'loaded' && messages.length > 0 && !hasJoined;
+    !!initialRoomId &&
+    historyStatus === 'loaded' &&
+    messages.length > 0 &&
+    !hasJoined;
   const isFirstMessage =
-    mode === 'chat' && chatEnabled && messages.length === 0 && historyStatus !== 'loading';
+    mode === 'chat' &&
+    chatEnabled &&
+    messages.length === 0 &&
+    historyStatus !== 'loading';
   const showPendingAssistant =
     loading && messages[messages.length - 1]?.role === 'user';
   const starterPrompts = [
@@ -265,7 +285,12 @@ export function ChatWidget({
   }, [chatEnabled, initialRoomId, loadRoomHistory]);
 
   useEffect(() => {
-    if (!open || !chatEnabled || mode !== 'chat' || historyAttemptedRef.current) {
+    if (
+      !open ||
+      !chatEnabled ||
+      mode !== 'chat' ||
+      historyAttemptedRef.current
+    ) {
       return;
     }
 
@@ -343,115 +368,148 @@ export function ChatWidget({
     return data.id;
   }
 
-  const sendQuery = useCallback(async (rawQuery: string) => {
-    const query = rawQuery.trim();
-    if (!query || loading) return;
-    if (!visitorEmail) return; // Hard guard — gate UI should prevent this path.
+  const sendQuery = useCallback(
+    async (rawQuery: string) => {
+      const query = rawQuery.trim();
+      if (!query || loading) return;
+      if (!visitorEmail) return; // Hard guard — gate UI should prevent this path.
 
-    const cacheKey = `karte:chat:${slug}:${query}`;
-    const cached = typeof window !== 'undefined' ? window.localStorage.getItem(cacheKey) : null;
-    setInput('');
-    setMessages((prev) => [...prev, { role: 'user', content: query }]);
+      const cacheKey = `karte:chat:${slug}:${query}`;
+      const cached =
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem(cacheKey)
+          : null;
+      setInput('');
+      setMessages((prev) => [...prev, { role: 'user', content: query }]);
 
-    if (cached) {
-      setMessages((prev) => [...prev, { role: 'assistant', content: cached }]);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const convId = await ensureConversation(visitorEmail);
-      void saveMessage(convId, 'user', query);
-
-      const res = await fetch(`/api/chat/${slug}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query,
-          visitorEmail,
-          conversationId: convId,
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Something went wrong' }));
-        const errMsg =
-          res.status === 429
-            ? "You're sending messages too quickly. Please wait a moment and try again."
-            : err.error || 'Something went wrong';
-        setMessages((prev) => [...prev, { role: 'assistant', content: errMsg }]);
-        return;
-      }
-
-      // Streaming marker-protocol response:
-      //   <text> <<<COMPONENTS>>> [json array]
-      // The parser flushes plain text up until the marker boundary
-      // (handling cross-chunk splits), then buffers the JSON tail.
-      // Components materialize on stream-completion.
-      const reader = res.body?.getReader();
-      if (!reader) {
+      if (cached) {
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: 'No response stream.' },
+          { role: 'assistant', content: cached },
         ]);
         return;
       }
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+      setLoading(true);
 
-      const decoder = new TextDecoder();
-      const parser = createStreamParserState();
+      try {
+        const convId = await ensureConversation(visitorEmail);
+        void saveMessage(convId, 'user', query);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const flushed = feedChunk(parser, chunk);
-        if (flushed) {
+        const res = await fetch(`/api/chat/${slug}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query,
+            visitorEmail,
+            conversationId: convId,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res
+            .json()
+            .catch(() => ({ error: 'Something went wrong' }));
+          const errMsg =
+            res.status === 429
+              ? "You're sending messages too quickly. Please wait a moment and try again."
+              : err.error || 'Something went wrong';
+          setMessages((prev) => [
+            ...prev,
+            { role: 'assistant', content: errMsg },
+          ]);
+          return;
+        }
+
+        // Streaming marker-protocol response:
+        //   <text> <<<COMPONENTS>>> [json array]
+        // The parser flushes plain text up until the marker boundary
+        // (handling cross-chunk splits), then buffers the JSON tail.
+        // Components materialize on stream-completion.
+        const reader = res.body?.getReader();
+        if (!reader) {
+          setMessages((prev) => [
+            ...prev,
+            { role: 'assistant', content: 'No response stream.' },
+          ]);
+          return;
+        }
+
+        setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+
+        const decoder = new TextDecoder();
+        const parser = createStreamParserState();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          const flushed = feedChunk(parser, chunk);
+          if (flushed) {
+            setMessages((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              if (last?.role === 'assistant') {
+                updated[updated.length - 1] = {
+                  ...last,
+                  content: last.content + flushed,
+                };
+              }
+              return updated;
+            });
+          }
+        }
+
+        const { flushedText, components, layout } = finishStream(parser);
+        setMessages((prev) => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last?.role === 'assistant') {
+            updated[updated.length - 1] = {
+              ...last,
+              content: last.content + flushedText,
+              components: components.length ? components : undefined,
+              layout: layout ?? undefined,
+            };
+          }
+          return updated;
+        });
+
+        const finalText = parser.text;
+        if (finalText) {
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(cacheKey, finalText);
+          }
+          void saveMessage(convId, 'assistant', finalText);
+        } else {
           setMessages((prev) => {
             const updated = [...prev];
             const last = updated[updated.length - 1];
-            if (last?.role === 'assistant') {
+            if (last?.role === 'assistant' && !last.content.trim()) {
               updated[updated.length - 1] = {
                 ...last,
-                content: last.content + flushed,
+                content: EMPTY_CHAT_RESPONSE_MESSAGE,
+                components: undefined,
+                layout: undefined,
               };
+              return updated;
             }
-            return updated;
+            return [
+              ...updated,
+              { role: 'assistant', content: EMPTY_CHAT_RESPONSE_MESSAGE },
+            ];
           });
+          void saveMessage(convId, 'assistant', EMPTY_CHAT_RESPONSE_MESSAGE);
         }
-      }
-
-      const { flushedText, components, layout } = finishStream(parser);
-      setMessages((prev) => {
-        const updated = [...prev];
-        const last = updated[updated.length - 1];
-        if (last?.role === 'assistant') {
-          updated[updated.length - 1] = {
-            ...last,
-            content: last.content + flushedText,
-            components: components.length ? components : undefined,
-            layout: layout ?? undefined,
-          };
-        }
-        return updated;
-      });
-
-      const finalText = parser.text;
-      if (finalText) {
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(cacheKey, finalText);
-        }
-        void saveMessage(convId, 'assistant', finalText);
-      } else {
+      } catch (err) {
+        captureActionFailure(err, { action: 'chat_send' });
         setMessages((prev) => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
           if (last?.role === 'assistant' && !last.content.trim()) {
             updated[updated.length - 1] = {
               ...last,
-              content: EMPTY_CHAT_RESPONSE_MESSAGE,
+              content: CHAT_SERVICE_UNAVAILABLE_MESSAGE,
               components: undefined,
               layout: undefined,
             };
@@ -459,41 +517,24 @@ export function ChatWidget({
           }
           return [
             ...updated,
-            { role: 'assistant', content: EMPTY_CHAT_RESPONSE_MESSAGE },
+            { role: 'assistant', content: CHAT_SERVICE_UNAVAILABLE_MESSAGE },
           ];
         });
-        void saveMessage(convId, 'assistant', EMPTY_CHAT_RESPONSE_MESSAGE);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      captureActionFailure(err, { action: 'chat_send' });
-      setMessages((prev) => {
-        const updated = [...prev];
-        const last = updated[updated.length - 1];
-        if (last?.role === 'assistant' && !last.content.trim()) {
-          updated[updated.length - 1] = {
-            ...last,
-            content: CHAT_SERVICE_UNAVAILABLE_MESSAGE,
-            components: undefined,
-            layout: undefined,
-          };
-          return updated;
-        }
-        return [
-          ...updated,
-          { role: 'assistant', content: CHAT_SERVICE_UNAVAILABLE_MESSAGE },
-        ];
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [ensureConversation, loading, saveMessage, slug, visitorEmail]);
+    },
+    [ensureConversation, loading, saveMessage, slug, visitorEmail],
+  );
 
   // AskAgain chips fire 'karte:ask-again' on click; this hooks them
   // up to the chat send pipeline without leaking refs across the
   // component boundary.
   useEffect(() => {
     function onAskAgain(e: Event) {
-      const detail = (e as CustomEvent).detail as { question?: string } | undefined;
+      const detail = (e as CustomEvent).detail as
+        | { question?: string }
+        | undefined;
       const q = detail?.question;
       if (typeof q === 'string' && q.trim()) {
         void sendQuery(q);
@@ -528,11 +569,13 @@ export function ChatWidget({
 
   useEffect(() => {
     function handleOpenWidget(event: Event) {
-      const detail = (event as CustomEvent<{
-        mode?: 'chat' | 'contact';
-        prompt?: string;
-        autoSend?: boolean;
-      }>).detail;
+      const detail = (
+        event as CustomEvent<{
+          mode?: 'chat' | 'contact';
+          prompt?: string;
+          autoSend?: boolean;
+        }>
+      ).detail;
       const requestedMode = detail?.mode;
       const prompt = detail?.prompt?.trim();
 
@@ -565,22 +608,23 @@ export function ChatWidget({
     }
 
     window.addEventListener('karte:open-widget', handleOpenWidget);
-    return () => window.removeEventListener('karte:open-widget', handleOpenWidget);
+    return () =>
+      window.removeEventListener('karte:open-widget', handleOpenWidget);
   }, [chatEnabled, dmEnabled, sendQuery, slug]);
 
   const launcherPositionClass =
     position === 'bottom-left' ? 'left-4 sm:left-6' : 'right-4 sm:right-6';
-  const panelPositionClass =
-    expanded
-      ? 'left-3 right-3 sm:left-1/2 sm:right-auto sm:w-[min(760px,calc(100vw-3rem))] sm:-translate-x-1/2'
-      : position === 'bottom-left'
-        ? 'left-3 right-3 sm:right-auto sm:left-6 sm:w-[380px]'
-        : 'left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px]';
+  const panelPositionClass = expanded
+    ? 'left-3 right-3 sm:left-1/2 sm:right-auto sm:w-[min(760px,calc(100vw-3rem))] sm:-translate-x-1/2'
+    : position === 'bottom-left'
+      ? 'left-3 right-3 sm:right-auto sm:left-6 sm:w-[380px]'
+      : 'left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px]';
   const panelHeightClass = expanded
     ? 'h-[min(780px,calc(100vh-4.5rem))] sm:h-[min(780px,calc(100vh-3rem))]'
     : 'h-[min(520px,calc(100vh-6rem))]';
   const showModeTabs = chatEnabled && dmEnabled;
-  const title = mode === 'chat' ? `Chat with ${displayName}` : `DM ${displayName}`;
+  const title =
+    mode === 'chat' ? `Chat with ${displayName}` : `DM ${displayName}`;
 
   if (!chatEnabled && !dmEnabled) {
     return null;
@@ -607,39 +651,40 @@ export function ChatWidget({
         >
           <div className="border-b border-karte-border-strong px-4 py-3">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-karte-text">
-                {title}
-              </h3>
+              <h3 className="text-sm font-semibold text-karte-text">{title}</h3>
               <div className="flex items-center gap-2">
                 {!!initialRoomId && (
                   <span className="rounded-full border border-karte-border-strong bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/50">
                     Invited via link
                   </span>
                 )}
-                {mode === 'chat' && chatEnabled && conversationId && !isGuestPreview && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => void handleShareRoom()}
-                      className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
-                        shareCopied
-                          ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
-                          : 'border-karte-border-strong text-white/70 hover:text-karte-text'
-                      }`}
-                      aria-label="Copy invite link to this chat"
-                    >
-                      {shareCopied ? '✓ Link copied' : 'Share'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={startNewChat}
-                      className="rounded-full border border-karte-border-strong px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:text-karte-text"
-                      aria-label="Start a new chat"
-                    >
-                      New
-                    </button>
-                  </>
-                )}
+                {mode === 'chat' &&
+                  chatEnabled &&
+                  conversationId &&
+                  !isGuestPreview && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => void handleShareRoom()}
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                          shareCopied
+                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+                            : 'border-karte-border-strong text-white/70 hover:text-karte-text'
+                        }`}
+                        aria-label="Copy invite link to this chat"
+                      >
+                        {shareCopied ? '✓ Link copied' : 'Share'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={startNewChat}
+                        className="rounded-full border border-karte-border-strong px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:text-karte-text"
+                        aria-label="Start a new chat"
+                      >
+                        New
+                      </button>
+                    </>
+                  )}
                 {showModeTabs && (
                   <div className="flex rounded-full border border-karte-border-strong bg-white/5 p-1">
                     <button
@@ -674,14 +719,34 @@ export function ChatWidget({
                   title={expanded ? 'Shrink chat' : 'Expand chat'}
                 >
                   {expanded ? (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
                       <path d="M8 3v5H3" />
                       <path d="M16 21v-5h5" />
                       <path d="M3 8l6-6" />
                       <path d="M21 16l-6 6" />
                     </svg>
                   ) : (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
                       <path d="M15 3h6v6" />
                       <path d="M9 21H3v-6" />
                       <path d="M21 3l-7 7" />
@@ -700,9 +765,11 @@ export function ChatWidget({
               </div>
             </div>
             {mode === 'chat' && chatEnabled && conversationId && (
-              <p className={`mt-1.5 text-[10px] leading-4 transition-colors ${shareCopied ? 'text-emerald-400/60' : 'text-white/25'}`}>
+              <p
+                className={`mt-1.5 text-[10px] leading-4 transition-colors ${shareCopied ? 'text-emerald-400/60' : 'text-white/25'}`}
+              >
                 {shareCopied
-                  ? 'Paste that link anywhere to invite someone — they\'ll see the full conversation.'
+                  ? "Paste that link anywhere to invite someone — they'll see the full conversation."
                   : 'Anyone with the link can read this room · no expiry · avoid sensitive info'}
               </p>
             )}
@@ -713,14 +780,17 @@ export function ChatWidget({
               <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
                 {historyStatus === 'loading' && (
                   <div className="mt-8 flex justify-center">
-                    <div className={`${expanded ? 'max-w-[92%]' : 'max-w-[80%]'} rounded-xl border border-karte-border-strong bg-white/5 px-3 py-2 text-sm`}>
+                    <div
+                      className={`${expanded ? 'max-w-[92%]' : 'max-w-[80%]'} rounded-xl border border-karte-border-strong bg-white/5 px-3 py-2 text-sm`}
+                    >
                       <ChatLoadingIndicator label="Loading messages" />
                     </div>
                   </div>
                 )}
                 {historyStatus === 'error' && messages.length === 0 && (
                   <p className="mt-8 text-center text-xs text-white/50">
-                    Couldn&apos;t load this chat room. Start a new conversation below.
+                    Couldn&apos;t load this chat room. Start a new conversation
+                    below.
                   </p>
                 )}
                 {historyStatus !== 'loading' &&
@@ -733,7 +803,8 @@ export function ChatWidget({
                           Ask {displayName} anything
                         </p>
                         <p className="text-sm leading-5 text-white/60 sm:text-xs">
-                          Tap a question below or type your own — you&apos;ll get an answer in seconds.
+                          Tap a question below or type your own — you&apos;ll
+                          get an answer in seconds.
                         </p>
                       </div>
                       <div className="flex w-full flex-wrap justify-center gap-2 pt-1">
@@ -749,7 +820,8 @@ export function ChatWidget({
                         ))}
                       </div>
                       <p className="text-[10px] leading-4 text-white/25">
-                        Anyone with the invite link can read this room · Rooms don&apos;t expire · Avoid sharing sensitive info
+                        Anyone with the invite link can read this room · Rooms
+                        don&apos;t expire · Avoid sharing sensitive info
                       </p>
                     </div>
                   )}
@@ -766,31 +838,46 @@ export function ChatWidget({
                       }`}
                       style={
                         msg.role === 'user'
-                          ? { backgroundColor: accentColor, color: accentTextColor }
+                          ? {
+                              backgroundColor: accentColor,
+                              color: accentTextColor,
+                            }
                           : undefined
                       }
                     >
-                      {msg.content === '' && loading && index === messages.length - 1 ? (
+                      {msg.content === '' &&
+                      loading &&
+                      index === messages.length - 1 ? (
                         <ChatLoadingIndicator label="Thinking" />
                       ) : msg.role === 'assistant' ? (
                         <>
                           <ChatMessageBody content={msg.content} />
-                          {msg.components && msg.components.length > 0 && (() => {
-                            const { components: ordered, density, moodStyle } =
-                              applyLayoutDirectives(msg.components, msg.layout);
-                            if (ordered.length === 0) return null;
-                            const gap =
-                              density === 'compact'
-                                ? 'mt-1.5 space-y-1.5'
-                                : density === 'magazine'
-                                ? 'mt-3 space-y-4'
-                                : 'mt-2 space-y-2';
-                            return (
-                              <div className={gap} style={moodStyle}>
-                                {ordered.map((c, i) => renderComponent(c, i, i))}
-                              </div>
-                            );
-                          })()}
+                          {msg.components &&
+                            msg.components.length > 0 &&
+                            (() => {
+                              const {
+                                components: ordered,
+                                density,
+                                moodStyle,
+                              } = applyLayoutDirectives(
+                                msg.components,
+                                msg.layout,
+                              );
+                              if (ordered.length === 0) return null;
+                              const gap =
+                                density === 'compact'
+                                  ? 'mt-1.5 space-y-1.5'
+                                  : density === 'magazine'
+                                    ? 'mt-3 space-y-4'
+                                    : 'mt-2 space-y-2';
+                              return (
+                                <div className={gap} style={moodStyle}>
+                                  {ordered.map((c, i) =>
+                                    renderComponent(c, i, i),
+                                  )}
+                                </div>
+                              );
+                            })()}
                         </>
                       ) : (
                         msg.content
@@ -800,7 +887,9 @@ export function ChatWidget({
                 ))}
                 {showPendingAssistant && (
                   <div className="flex justify-start">
-                    <div className={`${expanded ? 'max-w-[92%]' : 'max-w-[80%]'} rounded-xl border border-karte-border-strong bg-white/5 px-3 py-2 text-sm`}>
+                    <div
+                      className={`${expanded ? 'max-w-[92%]' : 'max-w-[80%]'} rounded-xl border border-karte-border-strong bg-white/5 px-3 py-2 text-sm`}
+                    >
                       <ChatLoadingIndicator label="Thinking" />
                     </div>
                   </div>
@@ -817,7 +906,10 @@ export function ChatWidget({
                     type="button"
                     onClick={handleJoinChat}
                     className="w-full rounded-xl border border-black/10 px-4 py-2.5 text-sm font-semibold transition hover:brightness-110"
-                    style={{ backgroundColor: accentColor, color: accentTextColor }}
+                    style={{
+                      backgroundColor: accentColor,
+                      color: accentTextColor,
+                    }}
                   >
                     Join chat
                   </button>
@@ -862,7 +954,11 @@ export function ChatWidget({
                           void handleSend();
                         }
                       }}
-                      placeholder={isFirstMessage ? `Ask ${displayName} a question…` : 'Type a message...'}
+                      placeholder={
+                        isFirstMessage
+                          ? `Ask ${displayName} a question…`
+                          : 'Type a message...'
+                      }
                       disabled={loading || historyStatus === 'loading'}
                       className={`min-w-0 flex-1 resize-none rounded-lg border bg-white/5 px-3 py-3 text-base leading-5 text-karte-text placeholder-white/40 outline-none transition focus:border-[#f2c879] sm:py-2 sm:text-sm ${
                         isFirstMessage
@@ -873,11 +969,16 @@ export function ChatWidget({
                     />
                     <button
                       type="submit"
-                      disabled={loading || historyStatus === 'loading' || !input.trim()}
+                      disabled={
+                        loading || historyStatus === 'loading' || !input.trim()
+                      }
                       className={`flex shrink-0 items-center justify-center gap-1.5 self-end rounded-lg border border-black/10 px-4 py-3 text-base font-medium transition-opacity duration-200 ease-[var(--karte-ease)] disabled:opacity-40 sm:px-3 sm:py-2 sm:text-sm ${
                         isFirstMessage && input.trim() ? 'animate-pulse' : ''
                       }`}
-                      style={{ backgroundColor: accentColor, color: accentTextColor }}
+                      style={{
+                        backgroundColor: accentColor,
+                        color: accentTextColor,
+                      }}
                       aria-label="Send message"
                     >
                       <span>Send</span>
@@ -897,7 +998,9 @@ export function ChatWidget({
                       </svg>
                     </button>
                   </div>
-                  <p className="mt-1.5 hidden text-[10px] text-white/25 sm:block">Enter to send · Shift+Enter for newline</p>
+                  <p className="mt-1.5 hidden text-[10px] text-white/25 sm:block">
+                    Enter to send · Shift+Enter for newline
+                  </p>
                 </form>
               )}
             </>

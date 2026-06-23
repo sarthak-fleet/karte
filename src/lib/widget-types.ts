@@ -26,11 +26,7 @@ export type WidgetSize =
  */
 export type WidgetBudget = 'low' | 'medium' | 'high';
 
-export type WidgetResourceType =
-  | 'link'
-  | 'project'
-  | 'section'
-  | 'info-block';
+export type WidgetResourceType = 'link' | 'project' | 'section' | 'info-block';
 
 /**
  * Per-render context. Everything a variant might need that isn't on the

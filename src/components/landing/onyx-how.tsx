@@ -27,7 +27,7 @@ const STEPS: ReadonlyArray<{ i: string; t: string; b: string }> = [
 export function OnyxHow() {
   return (
     <div className="onyx-how">
-      <div className="onyx-eyebrow center">·  HOW IT WORKS  ·</div>
+      <div className="onyx-eyebrow center">· HOW IT WORKS ·</div>
       <h2 className="onyx-h2 center">
         Three steps. <em>One afternoon.</em>
       </h2>

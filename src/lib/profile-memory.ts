@@ -1,8 +1,14 @@
 import { asc, desc, eq } from 'drizzle-orm';
 
 import { db } from '@/db';
-import type { pages} from '@/db/schema';
-import { infoBlocks, links, type PageSettings, projects, timelineEvents } from '@/db/schema';
+import type { pages } from '@/db/schema';
+import {
+  infoBlocks,
+  links,
+  type PageSettings,
+  projects,
+  timelineEvents,
+} from '@/db/schema';
 import { getScrapedContext } from '@/lib/scrape-page-content';
 import { TIMELINE_TYPE_LABELS } from '@/lib/timeline';
 
@@ -81,7 +87,10 @@ function formatSources(sources: ProfileMemorySource[]): string {
     .join('\n\n');
 }
 
-function getModeInstruction(mode: ProfileMemoryMode, settings: PageSettings | null | undefined): string {
+function getModeInstruction(
+  mode: ProfileMemoryMode,
+  settings: PageSettings | null | undefined,
+): string {
   if (mode === 'chat') {
     return [
       'Answer as a helpful profile assistant.',
@@ -98,7 +107,9 @@ function getModeInstruction(mode: ProfileMemoryMode, settings: PageSettings | nu
       'Use neutral language and omit sections that have no evidence.',
       'Do not fabricate dates, birthplace, education, employers, awards, or personal history.',
       style ? `Preferred article style: ${style}.` : '',
-    ].filter(Boolean).join(' ');
+    ]
+      .filter(Boolean)
+      .join(' ');
   }
 
   if (mode === 'newspaper') {
@@ -108,7 +119,9 @@ function getModeInstruction(mode: ProfileMemoryMode, settings: PageSettings | nu
       'Make headlines dramatic, but keep factual claims grounded in the source cards.',
       'If the data is thin, turn the angle into a tasteful profile story rather than making up achievements.',
       tone ? `Preferred newspaper tone: ${tone}.` : '',
-    ].filter(Boolean).join(' ');
+    ]
+      .filter(Boolean)
+      .join(' ');
   }
 
   const tone = settings?.roast?.tone;
@@ -117,47 +130,75 @@ function getModeInstruction(mode: ProfileMemoryMode, settings: PageSettings | nu
     'Punch up at the public profile, not at protected traits, private attributes, trauma, or identity.',
     'If evidence is thin, joke about the profile being mysterious instead of inventing embarrassing facts.',
     tone ? `Preferred roast tone: ${tone}.` : '',
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
-function getModeContext(mode: ProfileMemoryMode, settings: PageSettings | null | undefined): string {
-  if (mode === 'encyclopedia') return cleanText(settings?.encyclopedia?.context, 1600);
-  if (mode === 'newspaper') return cleanText(settings?.newspaper?.context, 1600);
+function getModeContext(
+  mode: ProfileMemoryMode,
+  settings: PageSettings | null | undefined,
+): string {
+  if (mode === 'encyclopedia')
+    return cleanText(settings?.encyclopedia?.context, 1600);
+  if (mode === 'newspaper')
+    return cleanText(settings?.newspaper?.context, 1600);
   if (mode === 'roast') return cleanText(settings?.roast?.context, 1600);
   return '';
 }
 
-function getQuality(page: PageRecord, sources: ProfileMemorySource[]): ProfileMemoryQuality {
-  const memoryCount = sources.filter((source) => source.type === 'memory').length;
-  const projectCount = sources.filter((source) => source.type === 'project').length;
+function getQuality(
+  page: PageRecord,
+  sources: ProfileMemorySource[],
+): ProfileMemoryQuality {
+  const memoryCount = sources.filter(
+    (source) => source.type === 'memory',
+  ).length;
+  const projectCount = sources.filter(
+    (source) => source.type === 'project',
+  ).length;
   const linkCount = sources.filter((source) => source.type === 'link').length;
-  const scrapedCount = sources.filter((source) => source.type === 'scraped').length;
+  const scrapedCount = sources.filter(
+    (source) => source.type === 'scraped',
+  ).length;
 
   const missing: string[] = [];
   const suggestions: string[] = [];
 
   if (!cleanText(page.bio)) {
     missing.push('bio');
-    suggestions.push('Add a concise bio that states who this profile is for and what the person is known for.');
+    suggestions.push(
+      'Add a concise bio that states who this profile is for and what the person is known for.',
+    );
   }
   if (memoryCount < 2) {
     missing.push('memory blocks');
-    suggestions.push('Add at least two memory blocks: one for background and one for current work or FAQs.');
+    suggestions.push(
+      'Add at least two memory blocks: one for background and one for current work or FAQs.',
+    );
   }
   if (projectCount === 0) {
     missing.push('projects');
-    suggestions.push('Add project entries with descriptions so generated modes have concrete material.');
+    suggestions.push(
+      'Add project entries with descriptions so generated modes have concrete material.',
+    );
   }
   if (linkCount === 0) {
     missing.push('links');
-    suggestions.push('Add a primary website, social profile, portfolio, or contact link.');
+    suggestions.push(
+      'Add a primary website, social profile, portfolio, or contact link.',
+    );
   }
   if (scrapedCount === 0) {
-    suggestions.push('Use descriptive link and project text because external page scraping may not add extra context.');
+    suggestions.push(
+      'Use descriptive link and project text because external page scraping may not add extra context.',
+    );
   }
 
   return {
-    hasEnoughForRichGeneration: memoryCount >= 2 && (projectCount > 0 || linkCount > 1 || !!cleanText(page.bio)),
+    hasEnoughForRichGeneration:
+      memoryCount >= 2 &&
+      (projectCount > 0 || linkCount > 1 || !!cleanText(page.bio)),
     sourceCount: sources.length,
     missing,
     suggestions,
@@ -174,21 +215,34 @@ export async function buildProfileMemory({
   query?: string;
 }): Promise<ProfileMemory> {
   const settings = page.pageSettings as PageSettings | null | undefined;
-  const [pageLinks, pageProjects, blocks, timeline, scrapedContext] = await Promise.all([
-    db.select().from(links).where(eq(links.pageId, page.id)).orderBy(asc(links.sortOrder)),
-    db.select().from(projects).where(eq(projects.pageId, page.id)).orderBy(asc(projects.sortOrder)),
-    db.select().from(infoBlocks).where(eq(infoBlocks.pageId, page.id)).orderBy(asc(infoBlocks.sortOrder)),
-    // Timeline events feed every AI surface with dated context.
-    // Includes 'hidden' (in-memory but not on the public timeline)
-    // so the chat can still answer "when did you join X?" even when
-    // the user doesn't want a public pin. Excludes pending-review.
-    db
-      .select()
-      .from(timelineEvents)
-      .where(eq(timelineEvents.pageId, page.id))
-      .orderBy(desc(timelineEvents.sortDate)),
-    getScrapedContext(page.id, page),
-  ]);
+  const [pageLinks, pageProjects, blocks, timeline, scrapedContext] =
+    await Promise.all([
+      db
+        .select()
+        .from(links)
+        .where(eq(links.pageId, page.id))
+        .orderBy(asc(links.sortOrder)),
+      db
+        .select()
+        .from(projects)
+        .where(eq(projects.pageId, page.id))
+        .orderBy(asc(projects.sortOrder)),
+      db
+        .select()
+        .from(infoBlocks)
+        .where(eq(infoBlocks.pageId, page.id))
+        .orderBy(asc(infoBlocks.sortOrder)),
+      // Timeline events feed every AI surface with dated context.
+      // Includes 'hidden' (in-memory but not on the public timeline)
+      // so the chat can still answer "when did you join X?" even when
+      // the user doesn't want a public pin. Excludes pending-review.
+      db
+        .select()
+        .from(timelineEvents)
+        .where(eq(timelineEvents.pageId, page.id))
+        .orderBy(desc(timelineEvents.sortDate)),
+      getScrapedContext(page.id, page),
+    ]);
 
   const sources: ProfileMemorySource[] = [];
   const bio = cleanText(page.bio, 1800);
@@ -217,8 +271,10 @@ export async function buildProfileMemory({
   // needs page.location, etc.) so the AI has the real URLs to put
   // into props instead of inventing them or emitting empty objects.
   const quickActions: string[] = [];
-  if (page.calendarUrl) quickActions.push(`Calendar booking link: ${page.calendarUrl}`);
-  if (page.newsletterUrl) quickActions.push(`Newsletter signup: ${page.newsletterUrl}`);
+  if (page.calendarUrl)
+    quickActions.push(`Calendar booking link: ${page.calendarUrl}`);
+  if (page.newsletterUrl)
+    quickActions.push(`Newsletter signup: ${page.newsletterUrl}`);
   if (page.tipUrl) quickActions.push(`Tip / support link: ${page.tipUrl}`);
   if (page.videoUrl) quickActions.push(`Video embed: ${page.videoUrl}`);
   if (page.location) quickActions.push(`Based in: ${page.location}`);
@@ -265,7 +321,9 @@ export async function buildProfileMemory({
     });
   }
 
-  for (const project of pageProjects.filter((project) => project.enabled !== false)) {
+  for (const project of pageProjects.filter(
+    (project) => project.enabled !== false,
+  )) {
     sources.push({
       id: `project:${project.id}`,
       type: 'project',
@@ -320,7 +378,9 @@ export async function buildProfileMemory({
     `Source quality: ${quality.hasEnoughForRichGeneration ? 'rich enough' : 'thin; stay conservative'}. Missing: ${quality.missing.join(', ') || 'none detected'}.`,
     'Source cards:',
     formatSources(sources),
-  ].filter(Boolean).join('\n\n');
+  ]
+    .filter(Boolean)
+    .join('\n\n');
 
   return {
     pageName: page.displayName,

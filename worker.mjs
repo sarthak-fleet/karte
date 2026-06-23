@@ -11,35 +11,35 @@
 //
 // All non-GET, non-`/` requests pass straight through to OpenNext.
 
-import openNext from "./.open-next/worker.js";
-import { withTiming } from "./timing.mjs";
+import openNext from './.open-next/worker.js';
+import { withTiming } from './timing.mjs';
 
 // Durable Objects must be re-exported from the entry that wrangler.toml
 // points at, otherwise the bindings can't resolve them at deploy time.
 export {
+  BucketCachePurge,
   DOQueueHandler,
   DOShardedTagCache,
-  BucketCachePurge,
-} from "./.open-next/worker.js";
+} from './.open-next/worker.js';
 
-const CACHE_PATH = "/";
+const CACHE_PATH = '/';
 const CACHE_CONTROL =
-  "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800";
+  'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
 
 // Skip cache when ANY of these cookies are present — covers the better-auth
 // session in both prod (__Secure-) and dev variants so signed-in users
 // always see live SSR (e.g. redirect to /library).
-const AUTH_COOKIE_FRAGMENTS = ["session_token", "session-token"];
+const AUTH_COOKIE_FRAGMENTS = ['session_token', 'session-token'];
 
 function hasAuthCookie(request) {
-  const cookie = request.headers.get("cookie");
+  const cookie = request.headers.get('cookie');
   if (!cookie) return false;
   return AUTH_COOKIE_FRAGMENTS.some((c) => cookie.includes(c));
 }
 
 export default {
   fetch: withTiming(async function fetch(request, env, ctx) {
-    if (request.method !== "GET") {
+    if (request.method !== 'GET') {
       return openNext.fetch(request, env, ctx);
     }
     const url = new URL(request.url);
@@ -70,29 +70,29 @@ export default {
       // page browsers already hold in cache.
       if (assetResp.status === 304) {
         const headers = new Headers(assetResp.headers);
-        headers.set("Cache-Control", CACHE_CONTROL);
-        headers.set("x-edge-cache", "ASSET");
+        headers.set('Cache-Control', CACHE_CONTROL);
+        headers.set('x-edge-cache', 'ASSET');
         return new Response(null, { status: 304, headers });
       }
       if (assetResp.ok && assetResp.body) {
-        const acceptEnc = request.headers.get("accept-encoding") ?? "";
-        const wantsGzip = acceptEnc.includes("gzip");
+        const acceptEnc = request.headers.get('accept-encoding') ?? '';
+        const wantsGzip = acceptEnc.includes('gzip');
         const headers = new Headers(assetResp.headers);
-        headers.set("Cache-Control", CACHE_CONTROL);
-        headers.set("x-edge-cache", "ASSET");
+        headers.set('Cache-Control', CACHE_CONTROL);
+        headers.set('x-edge-cache', 'ASSET');
 
-        if (wantsGzip && !headers.has("content-encoding")) {
-          headers.set("content-encoding", "gzip");
-          headers.delete("content-length");
+        if (wantsGzip && !headers.has('content-encoding')) {
+          headers.set('content-encoding', 'gzip');
+          headers.delete('content-length');
           // `Vary: Accept-Encoding` so a future no-encoding client
           // gets a separately negotiated entry.
-          const vary = headers.get("vary");
+          const vary = headers.get('vary');
           headers.set(
-            "vary",
-            vary ? `${vary}, Accept-Encoding` : "Accept-Encoding",
+            'vary',
+            vary ? `${vary}, Accept-Encoding` : 'Accept-Encoding',
           );
           return new Response(
-            assetResp.body.pipeThrough(new CompressionStream("gzip")),
+            assetResp.body.pipeThrough(new CompressionStream('gzip')),
             {
               status: assetResp.status,
               statusText: assetResp.statusText,
@@ -103,7 +103,7 @@ export default {
               // gzip-accepting browser received double-compressed bytes
               // — i.e. a garbled landing page. Verified against local
               // workerd; Cloudflare's own asset server sets the same.
-              encodeBody: "manual",
+              encodeBody: 'manual',
             },
           );
         }
@@ -120,15 +120,15 @@ export default {
     const cached = await cache.match(request);
     if (cached) {
       const hit = new Response(cached.body, cached);
-      hit.headers.set("x-edge-cache", "HIT");
+      hit.headers.set('x-edge-cache', 'HIT');
       return hit;
     }
 
     const response = await openNext.fetch(request, env, ctx);
 
     // Only cache 2xx HTML responses — never error pages or redirects.
-    const contentType = response.headers.get("content-type") ?? "";
-    if (response.status !== 200 || !contentType.includes("text/html")) {
+    const contentType = response.headers.get('content-type') ?? '';
+    if (response.status !== 200 || !contentType.includes('text/html')) {
       return response;
     }
 
@@ -140,7 +140,7 @@ export default {
     // the same Uint8Array sidesteps the streaming edge case entirely.
     const body = await response.arrayBuffer();
     const headers = new Headers(response.headers);
-    headers.set("Cache-Control", CACHE_CONTROL);
+    headers.set('Cache-Control', CACHE_CONTROL);
 
     const cacheable = new Response(body, {
       status: response.status,
@@ -154,7 +154,7 @@ export default {
       statusText: response.statusText,
       headers,
     });
-    clientResponse.headers.set("x-edge-cache", "MISS");
+    clientResponse.headers.set('x-edge-cache', 'MISS');
     return clientResponse;
   }),
 };

@@ -12,9 +12,9 @@ export default function ComponentsStorybookPage() {
         </h1>
         <p className="mt-3 max-w-2xl text-[14.5px] leading-[1.6] text-karte-text-3">
           When a visitor chats with your page, the AI returns a structured
-          response — prose plus zero or more of these components, picked from
-          a closed catalog. Each card below is a live render with sample
-          data so you can see exactly what shows up.
+          response — prose plus zero or more of these components, picked from a
+          closed catalog. Each card below is a live render with sample data so
+          you can see exactly what shows up.
         </p>
         <p className="mt-2 max-w-2xl text-[13px] leading-[1.55] text-karte-text-4">
           Components inherit your page&rsquo;s accent color via CSS variables.

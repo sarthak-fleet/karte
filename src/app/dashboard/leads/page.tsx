@@ -3,9 +3,17 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { db, ensureProjectsTable } from '@/db';
-import { contactSubmissions, conversations, messages, pageEvents } from '@/db/schema';
+import {
+  contactSubmissions,
+  conversations,
+  messages,
+  pageEvents,
+} from '@/db/schema';
 import { getCurrentPage, getSession } from '@/lib/auth-server';
-import { type QualifiedLead,qualifyVisitorLeads } from '@/lib/lead-qualification';
+import {
+  type QualifiedLead,
+  qualifyVisitorLeads,
+} from '@/lib/lead-qualification';
 
 function formatDate(value: Date | null) {
   if (!value) {
@@ -38,22 +46,37 @@ function tierClasses(tier: QualifiedLead['tier']) {
 
 function sourceBadge(lead: QualifiedLead) {
   if (lead.contactCount > 0 && lead.conversationCount > 0) {
-    return { label: 'Chat + contact', tone: 'border-violet-300/30 bg-violet-300/10 text-violet-100' };
+    return {
+      label: 'Chat + contact',
+      tone: 'border-violet-300/30 bg-violet-300/10 text-violet-100',
+    };
   }
   if (lead.contactCount > 0) {
-    return { label: 'From contact form', tone: 'border-emerald-300/30 bg-emerald-300/10 text-emerald-100' };
+    return {
+      label: 'From contact form',
+      tone: 'border-emerald-300/30 bg-emerald-300/10 text-emerald-100',
+    };
   }
   if (lead.conversationCount > 0) {
-    return { label: 'From chat', tone: 'border-sky-300/30 bg-sky-300/10 text-sky-100' };
+    return {
+      label: 'From chat',
+      tone: 'border-sky-300/30 bg-sky-300/10 text-sky-100',
+    };
   }
   return null;
 }
 
 function metricLabel(lead: QualifiedLead) {
   const parts = [
-    lead.contactCount > 0 ? `${lead.contactCount} DM${lead.contactCount === 1 ? '' : 's'}` : '',
-    lead.conversationCount > 0 ? `${lead.conversationCount} chat${lead.conversationCount === 1 ? '' : 's'}` : '',
-    lead.eventCount > 0 ? `${lead.eventCount} event${lead.eventCount === 1 ? '' : 's'}` : '',
+    lead.contactCount > 0
+      ? `${lead.contactCount} DM${lead.contactCount === 1 ? '' : 's'}`
+      : '',
+    lead.conversationCount > 0
+      ? `${lead.conversationCount} chat${lead.conversationCount === 1 ? '' : 's'}`
+      : '',
+    lead.eventCount > 0
+      ? `${lead.eventCount} event${lead.eventCount === 1 ? '' : 's'}`
+      : '',
   ].filter(Boolean);
 
   return parts.join(' / ') || 'No tracked signals';
@@ -129,7 +152,9 @@ export default async function LeadsPage() {
   const averageScore =
     leads.length === 0
       ? 0
-      : Math.round(leads.reduce((total, lead) => total + lead.score, 0) / leads.length);
+      : Math.round(
+          leads.reduce((total, lead) => total + lead.score, 0) / leads.length,
+        );
 
   return (
     <div className="space-y-6">
@@ -137,7 +162,8 @@ export default async function LeadsPage() {
         <div>
           <h1 className="text-2xl font-bold text-karte-text">Lead Radar</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-karte-text-3">
-            Qualified visitors from direct messages, chat transcripts, and tracked profile activity.
+            Qualified visitors from direct messages, chat transcripts, and
+            tracked profile activity.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -163,12 +189,13 @@ export default async function LeadsPage() {
           { label: 'Warm', value: warmCount },
           { label: 'Avg score', value: averageScore },
         ].map((metric) => (
-          <div
-            key={metric.label}
-            className="rounded-2xl bg-white/[0.025] p-5"
-          >
-            <p className="text-xs uppercase tracking-[0.22em] text-karte-text-4">{metric.label}</p>
-            <p className="mt-3 text-3xl font-semibold text-karte-text">{metric.value}</p>
+          <div key={metric.label} className="rounded-2xl bg-white/[0.025] p-5">
+            <p className="text-xs uppercase tracking-[0.22em] text-karte-text-4">
+              {metric.label}
+            </p>
+            <p className="mt-3 text-3xl font-semibold text-karte-text">
+              {metric.value}
+            </p>
           </div>
         ))}
       </div>
@@ -176,7 +203,8 @@ export default async function LeadsPage() {
       {leads.length === 0 ? (
         <div className="rounded-2xl bg-white/[0.02] p-8 text-center">
           <p className="text-karte-text-3">
-            No qualified leads yet. Visitors will appear here once they chat, click, or send a message.
+            No qualified leads yet. Visitors will appear here once they chat,
+            click, or send a message.
           </p>
         </div>
       ) : (
@@ -189,8 +217,12 @@ export default async function LeadsPage() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-semibold text-karte-text">{lead.name}</h2>
-                    <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${tierClasses(lead.tier)}`}>
+                    <h2 className="text-lg font-semibold text-karte-text">
+                      {lead.name}
+                    </h2>
+                    <span
+                      className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${tierClasses(lead.tier)}`}
+                    >
                       {lead.tier}
                     </span>
                     <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-karte-text">
@@ -198,23 +230,24 @@ export default async function LeadsPage() {
                     </span>
                     {(() => {
                       const badge = sourceBadge(lead);
-                      return badge
-                        ? (
-                          <span
-                            className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${badge.tone}`}
-                          >
-                            {badge.label}
-                          </span>
-                        )
-                        : null;
+                      return badge ? (
+                        <span
+                          className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${badge.tone}`}
+                        >
+                          {badge.label}
+                        </span>
+                      ) : null;
                     })()}
                   </div>
                   <p className="mt-1 text-sm text-karte-text-3">
-                    {lead.email ?? lead.visitorId ?? 'Anonymous visitor'} / {metricLabel(lead)}
+                    {lead.email ?? lead.visitorId ?? 'Anonymous visitor'} /{' '}
+                    {metricLabel(lead)}
                   </p>
                 </div>
                 <div className="text-left lg:text-right">
-                  <p className="text-sm font-medium text-karte-text">{lead.nextAction}</p>
+                  <p className="text-sm font-medium text-karte-text">
+                    {lead.nextAction}
+                  </p>
                   <p className="mt-1 text-xs text-karte-text-4">
                     Last seen {formatDate(lead.lastSeenAt)}
                   </p>

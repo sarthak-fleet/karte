@@ -30,7 +30,8 @@ export function NavProgress() {
       const href = anchor.getAttribute('href');
       if (!href) return;
       // External / mailto / hash-only / new-tab links skip the bar
-      if (href.startsWith('http') && !href.startsWith(window.location.origin)) return;
+      if (href.startsWith('http') && !href.startsWith(window.location.origin))
+        return;
       if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
       if (href.startsWith('#')) return;
       if (anchor.target === '_blank') return;

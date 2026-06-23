@@ -50,8 +50,14 @@ export default async function DashboardPage() {
     inboxMessages,
   ] = await Promise.all([
     db.select({ id: links.id }).from(links).where(eq(links.pageId, page.id)),
-    db.select({ id: projects.id }).from(projects).where(eq(projects.pageId, page.id)),
-    db.select({ id: infoBlocks.id }).from(infoBlocks).where(eq(infoBlocks.pageId, page.id)),
+    db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.pageId, page.id)),
+    db
+      .select({ id: infoBlocks.id })
+      .from(infoBlocks)
+      .where(eq(infoBlocks.pageId, page.id)),
     db
       .select({ type: generatedPages.type })
       .from(generatedPages)
@@ -68,9 +74,7 @@ export default async function DashboardPage() {
   ]);
 
   const readyModeCount = new Set(
-    readyGeneratedPages
-      .filter((item) => item.type)
-      .map((item) => item.type),
+    readyGeneratedPages.filter((item) => item.type).map((item) => item.type),
   ).size;
 
   const setupItems = [
@@ -138,14 +142,13 @@ export default async function DashboardPage() {
           { label: 'Profile Modes', value: readyModeCount },
           { label: 'Inbox', value: inboxMessages.length },
         ].map((metric) => (
-          <div
-            key={metric.label}
-            className="rounded-2xl bg-white/[0.025] p-5"
-          >
+          <div key={metric.label} className="rounded-2xl bg-white/[0.025] p-5">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-karte-text-4">
               {metric.label}
             </p>
-            <p className="mt-3 text-3xl font-bold text-karte-text">{metric.value}</p>
+            <p className="mt-3 text-3xl font-bold text-karte-text">
+              {metric.value}
+            </p>
           </div>
         ))}
       </div>
@@ -158,7 +161,9 @@ export default async function DashboardPage() {
       <div className="rounded-2xl bg-white/[0.02] p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-karte-text">Launch Checklist</h2>
+            <h2 className="text-xl font-semibold text-karte-text">
+              Launch Checklist
+            </h2>
             <p className="mt-1 text-sm text-karte-text-3">
               {completedCount} of {setupItems.length} core setup steps complete.
             </p>
@@ -166,7 +171,9 @@ export default async function DashboardPage() {
           <div className="h-2 rounded-full bg-white/10 sm:w-48">
             <div
               className="h-2 rounded-full bg-cyan-300"
-              style={{ width: `${(completedCount / setupItems.length) * 100}%` }}
+              style={{
+                width: `${(completedCount / setupItems.length) * 100}%`,
+              }}
             />
           </div>
         </div>
@@ -178,7 +185,9 @@ export default async function DashboardPage() {
               href={item.href}
               className="flex items-center justify-between rounded-xl border border-karte-border-strong bg-black/20 px-4 py-3 transition hover:border-white/25 hover:bg-white/[0.04]"
             >
-              <span className="text-sm font-medium text-karte-text">{item.label}</span>
+              <span className="text-sm font-medium text-karte-text">
+                {item.label}
+              </span>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-medium ${
                   item.done

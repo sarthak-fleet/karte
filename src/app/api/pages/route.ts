@@ -55,7 +55,10 @@ export async function POST(req: Request) {
 
   if (!isValidSlug(slug)) {
     return NextResponse.json(
-      { error: 'Slug must be 3-50 chars, lowercase alphanumeric and hyphens only' },
+      {
+        error:
+          'Slug must be 3-50 chars, lowercase alphanumeric and hyphens only',
+      },
       { status: 400 },
     );
   }
@@ -106,10 +109,7 @@ export async function POST(req: Request) {
   }
 
   // Check slug uniqueness
-  const existing = await db
-    .select()
-    .from(pages)
-    .where(eq(pages.slug, slug));
+  const existing = await db.select().from(pages).where(eq(pages.slug, slug));
 
   if (existing.length > 0) {
     return NextResponse.json(

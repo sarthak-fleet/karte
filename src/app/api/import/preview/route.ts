@@ -10,7 +10,8 @@ import { isValidUrl } from '@/lib/validation';
  * Rate-limited per IP.
  */
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const { ok } = rateLimit(`import-preview:${ip}`, {
     windowMs: 60_000,
     maxRequests: 5,
@@ -27,10 +28,14 @@ export async function POST(req: Request) {
   }
 
   const record = (body ?? {}) as Record<string, unknown>;
-  const sourceUrl = typeof record.sourceUrl === 'string' ? record.sourceUrl.trim() : '';
+  const sourceUrl =
+    typeof record.sourceUrl === 'string' ? record.sourceUrl.trim() : '';
 
   if (!isValidUrl(sourceUrl) || isBlockedUrl(sourceUrl)) {
-    return NextResponse.json({ error: 'Enter a valid public URL' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Enter a valid public URL' },
+      { status: 400 },
+    );
   }
 
   try {
@@ -41,10 +46,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ links: trimmed });
   } catch (error) {
     if (error instanceof ImportError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
     }
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to import links' },
+      {
+        error:
+          error instanceof Error ? error.message : 'Failed to import links',
+      },
       { status: 502 },
     );
   }

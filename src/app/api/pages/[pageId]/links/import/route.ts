@@ -5,8 +5,8 @@ import { db } from '@/db';
 import { links } from '@/db/schema';
 import { loadOwnedPage, requireUser } from '@/lib/api-auth';
 import {
-  type ImportedLink,
   ImportError,
+  type ImportedLink,
   isBlockedUrl,
   MAX_IMPORT_LINKS,
   parseSource,
@@ -34,9 +34,13 @@ export async function POST(
   const mode = body.mode === 'import' ? 'import' : 'preview';
 
   if (mode === 'preview') {
-    const sourceUrl = typeof body.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
+    const sourceUrl =
+      typeof body.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
     if (!isValidUrl(sourceUrl) || isBlockedUrl(sourceUrl)) {
-      return NextResponse.json({ error: 'Enter a valid public URL' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Enter a valid public URL' },
+        { status: 400 },
+      );
     }
 
     try {
@@ -44,10 +48,16 @@ export async function POST(
       return NextResponse.json({ links: importedLinks });
     } catch (error) {
       if (error instanceof ImportError) {
-        return NextResponse.json({ error: error.message }, { status: error.status });
+        return NextResponse.json(
+          { error: error.message },
+          { status: error.status },
+        );
       }
       return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Failed to import links' },
+        {
+          error:
+            error instanceof Error ? error.message : 'Failed to import links',
+        },
         { status: 502 },
       );
     }
@@ -58,7 +68,10 @@ export async function POST(
     .map((item): ImportedLink | null => {
       if (!item || typeof item !== 'object') return null;
       const record = item as Record<string, unknown>;
-      const title = typeof record.title === 'string' ? record.title.trim().slice(0, MAX_TITLE_LENGTH) : '';
+      const title =
+        typeof record.title === 'string'
+          ? record.title.trim().slice(0, MAX_TITLE_LENGTH)
+          : '';
       const url = typeof record.url === 'string' ? record.url.trim() : '';
       if (!title || !isValidUrl(url) || isBlockedUrl(url)) return null;
       return { title, url };
@@ -67,7 +80,10 @@ export async function POST(
     .slice(0, MAX_IMPORT_LINKS);
 
   if (importedLinks.length === 0) {
-    return NextResponse.json({ error: 'No valid links selected' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'No valid links selected' },
+      { status: 400 },
+    );
   }
 
   const existingLinks = await db

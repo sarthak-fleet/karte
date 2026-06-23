@@ -1,15 +1,9 @@
 'use client';
 
 import posthog from 'posthog-js';
-import { useCallback, useRef,useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
-import {
-  Badge,
-  Button,
-  Card,
-  Input,
-  Label,
-} from '@/components/ui';
+import { Badge, Button, Card, Input, Label } from '@/components/ui';
 import { trackCoreAction } from '@/lib/analytics-events';
 import type { EncyclopediaContent } from '@/lib/generated-page-types';
 
@@ -141,7 +135,11 @@ export function EncyclopediaEditor({
   // ── Regenerate ──────────────────────────────────────────────────────
 
   async function handleRegenerate() {
-    if (!confirm('This will replace all your edits with a fresh AI generation. Continue?')) {
+    if (
+      !confirm(
+        'This will replace all your edits with a fresh AI generation. Continue?',
+      )
+    ) {
       return;
     }
 
@@ -185,10 +183,12 @@ export function EncyclopediaEditor({
         {/* Article Body (Novel Editor) */}
         <Card>
           <div className="mb-3">
-            <h3 className="text-sm font-medium text-karte-text">Article Body</h3>
+            <h3 className="text-sm font-medium text-karte-text">
+              Article Body
+            </h3>
             <p className="mb-2 text-xs text-karte-text-3">
-              Write your encyclopedia article. Use / for slash commands (headings, lists, quotes).
-              Select text for formatting options.
+              Write your encyclopedia article. Use / for slash commands
+              (headings, lists, quotes). Select text for formatting options.
             </p>
           </div>
           <NovelEditor
@@ -207,7 +207,12 @@ export function EncyclopediaEditor({
                 Key facts displayed in the sidebar info panel
               </p>
             </div>
-            <Button variant="secondary" size="sm" type="button" onClick={addInfoboxRow}>
+            <Button
+              variant="secondary"
+              size="sm"
+              type="button"
+              onClick={addInfoboxRow}
+            >
               + Add Row
             </Button>
           </div>
@@ -264,7 +269,8 @@ export function EncyclopediaEditor({
         <Card>
           <Label htmlFor="categoryInput">Categories</Label>
           <p className="mb-2 text-xs text-karte-text-3">
-            Tags for the article. Type and press Enter or click Add. Comma-separated values also work.
+            Tags for the article. Type and press Enter or click Add.
+            Comma-separated values also work.
           </p>
 
           {content.categories.length > 0 && (
@@ -297,7 +303,12 @@ export function EncyclopediaEditor({
               placeholder="e.g. Software Engineer, Open Source"
               className="flex-1"
             />
-            <Button variant="secondary" size="sm" type="button" onClick={addCategory}>
+            <Button
+              variant="secondary"
+              size="sm"
+              type="button"
+              onClick={addCategory}
+            >
               Add
             </Button>
           </div>
@@ -305,10 +316,7 @@ export function EncyclopediaEditor({
 
         {/* Actions */}
         <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-          <Button
-            onClick={handleSave}
-            disabled={saving || regenerating}
-          >
+          <Button onClick={handleSave} disabled={saving || regenerating}>
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
           <Button
@@ -321,9 +329,7 @@ export function EncyclopediaEditor({
           {message && (
             <p
               className={`text-sm ${
-                message.includes('success')
-                  ? 'text-green-400'
-                  : 'text-red-400'
+                message.includes('success') ? 'text-green-400' : 'text-red-400'
               }`}
             >
               {message}

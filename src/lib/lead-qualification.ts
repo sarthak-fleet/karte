@@ -66,7 +66,8 @@ const BUYING_INTENT_PATTERNS = [
   /\b(price|pricing|budget|timeline|deadline|proposal)\b/i,
 ];
 
-const QUESTION_PATTERN = /\b(can|could|would|how|what|when|where|why|interested|available)\b/i;
+const QUESTION_PATTERN =
+  /\b(can|could|would|how|what|when|where|why|interested|available)\b/i;
 
 function toDate(value: DateLike) {
   if (!value) {
@@ -94,7 +95,11 @@ function clampScore(score: number) {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-function getBucketId(prefix: string, visitorId: string | null, fallback: string) {
+function getBucketId(
+  prefix: string,
+  visitorId: string | null,
+  fallback: string,
+) {
   return visitorId ? `visitor:${visitorId}` : `${prefix}:${fallback}`;
 }
 
@@ -184,7 +189,11 @@ export function qualifyVisitorLeads({
   }
 
   for (const conversation of conversations) {
-    const bucketId = getBucketId('conversation', conversation.visitorId, conversation.id);
+    const bucketId = getBucketId(
+      'conversation',
+      conversation.visitorId,
+      conversation.id,
+    );
     const bucket = ensureBucket(bucketId, conversation.visitorId);
     bucket.conversations.push(conversation);
     if (conversation.visitorEmail && !bucket.conversationEmail) {
@@ -213,7 +222,9 @@ export function qualifyVisitorLeads({
 
   return [...buckets.values()]
     .map((bucket) => {
-      const userMessages = bucket.messages.filter((message) => message.role === 'user');
+      const userMessages = bucket.messages.filter(
+        (message) => message.role === 'user',
+      );
       const contact = [...bucket.contacts].sort(
         (a, b) => dateTime(b.createdAt) - dateTime(a.createdAt),
       )[0];
@@ -227,7 +238,9 @@ export function qualifyVisitorLeads({
 
       if (bucket.contacts.length > 0) {
         score += contact?.senderType === 'email' ? 35 : 24;
-        reasons.push(contact?.senderType === 'email' ? 'verified contact' : 'anonymous DM');
+        reasons.push(
+          contact?.senderType === 'email' ? 'verified contact' : 'anonymous DM',
+        );
       } else if (bucket.conversationEmail) {
         // Chat-derived email: lead capture via the chat gate.
         score += 28;
@@ -241,10 +254,14 @@ export function qualifyVisitorLeads({
 
       if (userMessages.length > 0) {
         score += Math.min(30, 10 + userMessages.length * 4);
-        reasons.push(`${userMessages.length} chat message${userMessages.length === 1 ? '' : 's'}`);
+        reasons.push(
+          `${userMessages.length} chat message${userMessages.length === 1 ? '' : 's'}`,
+        );
       }
 
-      const intentHits = BUYING_INTENT_PATTERNS.filter((pattern) => pattern.test(allText)).length;
+      const intentHits = BUYING_INTENT_PATTERNS.filter((pattern) =>
+        pattern.test(allText),
+      ).length;
       if (intentHits > 0) {
         score += 12 + intentHits * 6;
         reasons.push('high-intent wording');
@@ -256,11 +273,17 @@ export function qualifyVisitorLeads({
       }
 
       const eventScore = bucket.events.reduce((total, event) => {
-        if (event.eventType === 'contact_submit' || event.eventType === 'dm_submit') {
+        if (
+          event.eventType === 'contact_submit' ||
+          event.eventType === 'dm_submit'
+        ) {
           return total + 12;
         }
 
-        if (event.eventType === 'chat_cta_click' || event.eventType === 'hook_open') {
+        if (
+          event.eventType === 'chat_cta_click' ||
+          event.eventType === 'hook_open'
+        ) {
           return total + 5;
         }
 
@@ -276,7 +299,9 @@ export function qualifyVisitorLeads({
       }, 0);
       if (eventScore > 0) {
         score += Math.min(20, eventScore);
-        reasons.push(`${bucket.events.length} tracked event${bucket.events.length === 1 ? '' : 's'}`);
+        reasons.push(
+          `${bucket.events.length} tracked event${bucket.events.length === 1 ? '' : 's'}`,
+        );
       }
 
       const lastSeenAt = latestDate([
@@ -285,7 +310,10 @@ export function qualifyVisitorLeads({
         ...bucket.messages.map((item) => item.createdAt),
         ...bucket.events.map((item) => item.createdAt),
       ]);
-      if (lastSeenAt && Date.now() - lastSeenAt.getTime() <= 1000 * 60 * 60 * 24 * 7) {
+      if (
+        lastSeenAt &&
+        Date.now() - lastSeenAt.getTime() <= 1000 * 60 * 60 * 24 * 7
+      ) {
         score += 8;
         reasons.push('recent activity');
       }
@@ -298,12 +326,15 @@ export function qualifyVisitorLeads({
           .slice(0, 4),
       );
       const resolvedEmail =
-        (contact?.senderType === 'email' ? contact.email : null)
-        ?? bucket.conversationEmail
-        ?? null;
-      const resolvedName = contact?.name
-        || (resolvedEmail ? resolvedEmail.split('@')[0] : null)
-        || (bucket.visitorId ? `Visitor ${bucket.visitorId.slice(0, 8)}` : 'Anonymous visitor');
+        (contact?.senderType === 'email' ? contact.email : null) ??
+        bucket.conversationEmail ??
+        null;
+      const resolvedName =
+        contact?.name ||
+        (resolvedEmail ? resolvedEmail.split('@')[0] : null) ||
+        (bucket.visitorId
+          ? `Visitor ${bucket.visitorId.slice(0, 8)}`
+          : 'Anonymous visitor');
 
       const lead: QualifiedLead = {
         id: bucket.id,
@@ -319,7 +350,12 @@ export function qualifyVisitorLeads({
         conversationCount: bucket.conversations.length,
         userMessageCount: userMessages.length,
         eventCount: bucket.events.length,
-        preview: contact?.message || userMessages.sort((a, b) => dateTime(b.createdAt) - dateTime(a.createdAt))[0]?.content || null,
+        preview:
+          contact?.message ||
+          userMessages.sort(
+            (a, b) => dateTime(b.createdAt) - dateTime(a.createdAt),
+          )[0]?.content ||
+          null,
         sourceLabels,
       };
 

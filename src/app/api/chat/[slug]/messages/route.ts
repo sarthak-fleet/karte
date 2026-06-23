@@ -2,7 +2,7 @@ import { and, asc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import { conversations, messages,pages } from '@/db/schema';
+import { conversations, messages, pages } from '@/db/schema';
 import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
 
 export async function POST(

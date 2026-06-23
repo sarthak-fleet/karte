@@ -15,8 +15,7 @@ export async function GET(
   if ('error' in auth) return auth.error;
 
   const page = await loadOwnedPage(pageId, auth.userId);
-  if (!page)
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!page) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const pageLinks = await db
     .select()
@@ -36,14 +35,14 @@ export async function POST(
   if ('error' in auth) return auth.error;
 
   const page = await loadOwnedPage(pageId, auth.userId);
-  if (!page)
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!page) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const body = await req.json();
   const title = typeof body.title === 'string' ? body.title.trim() : '';
   const url = typeof body.url === 'string' ? body.url.trim() : '';
   const icon = typeof body.icon === 'string' ? body.icon.trim() : '';
-  const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl.trim() : '';
+  const imageUrl =
+    typeof body.imageUrl === 'string' ? body.imageUrl.trim() : '';
   const bodyText = typeof body.body === 'string' ? body.body.trim() : '';
 
   if (!title || !url) {
@@ -58,7 +57,10 @@ export async function POST(
   }
 
   if (title.length > MAX_TITLE_LENGTH) {
-    return NextResponse.json({ error: 'Title too long (max 100 chars)' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Title too long (max 100 chars)' },
+      { status: 400 },
+    );
   }
 
   // Auto-increment sortOrder

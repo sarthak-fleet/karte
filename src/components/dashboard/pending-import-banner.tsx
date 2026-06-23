@@ -95,14 +95,18 @@ export function PendingImportBanner() {
     try {
       const pagesRes = await fetch('/api/pages');
       if (!pagesRes.ok) {
-        throw new Error('We couldn’t find your Karte page yet. Save your profile first.');
+        throw new Error(
+          'We couldn’t find your Karte page yet. Save your profile first.',
+        );
       }
       const pagesData = (await pagesRes.json()) as Array<{ id: string }>;
       const pageId = Array.isArray(pagesData) ? pagesData[0]?.id : undefined;
 
       if (!pageId) {
         setStatus('error');
-        setMessage('Save your profile first — then come back to import your links.');
+        setMessage(
+          'Save your profile first — then come back to import your links.',
+        );
         return;
       }
 
@@ -128,7 +132,9 @@ export function PendingImportBanner() {
       setMessage(
         count > 0
           ? `Imported ${count} link${count === 1 ? '' : 's'}${
-              data.skipped ? ` (skipped ${data.skipped} duplicate${data.skipped === 1 ? '' : 's'})` : ''
+              data.skipped
+                ? ` (skipped ${data.skipped} duplicate${data.skipped === 1 ? '' : 's'})`
+                : ''
             }. Refresh the Links tab to see them.`
           : 'These links were already on your page — nothing to add.',
       );

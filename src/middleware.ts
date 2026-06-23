@@ -79,10 +79,13 @@ export async function middleware(request: NextRequest) {
 
     const slug = await resolveSlugForHost(host);
     if (!slug) {
-      return new NextResponse('This domain is not connected to a published page.', {
-        status: 404,
-        headers: { 'content-type': 'text/plain; charset=utf-8' },
-      });
+      return new NextResponse(
+        'This domain is not connected to a published page.',
+        {
+          status: 404,
+          headers: { 'content-type': 'text/plain; charset=utf-8' },
+        },
+      );
     }
 
     const url = request.nextUrl.clone();
@@ -93,7 +96,10 @@ export async function middleware(request: NextRequest) {
     return res;
   }
 
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !hasSessionCookie(request)) {
+  if (
+    request.nextUrl.pathname.startsWith('/dashboard') &&
+    !hasSessionCookie(request)
+  ) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

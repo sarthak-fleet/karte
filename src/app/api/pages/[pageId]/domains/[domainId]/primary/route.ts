@@ -22,7 +22,8 @@ export async function POST(
   const domain = await db.query.pageDomains.findFirst({
     where: and(eq(pageDomains.id, domainId), eq(pageDomains.pageId, pageId)),
   });
-  if (!domain) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!domain)
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   if (domain.status !== 'verified') {
     return NextResponse.json(

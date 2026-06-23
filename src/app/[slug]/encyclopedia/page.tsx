@@ -8,7 +8,7 @@ import { getSession } from '@/lib/auth-server';
 import { normalizeEncyclopediaContent } from '@/lib/encyclopedia-compat';
 import { resolveThemeConfig } from '@/lib/themes';
 
-import { getGeneratedPage,getPageBySlug } from '../_lib/get-page-data';
+import { getGeneratedPage, getPageBySlug } from '../_lib/get-page-data';
 
 export default async function EncyclopediaPage({
   params,
@@ -26,10 +26,7 @@ export default async function EncyclopediaPage({
 
   // Visitors see a generating-in-progress placeholder rather than 404 while
   // background generation finishes.
-  if (
-    generatedPage?.status === 'generating' &&
-    !generatedPage.content
-  ) {
+  if (generatedPage?.status === 'generating' && !generatedPage.content) {
     const session = await getSession().catch(() => null);
     const isOwner = session?.user?.id === page.userId;
     if (!isOwner) {

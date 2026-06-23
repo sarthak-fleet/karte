@@ -22,7 +22,9 @@ export async function PUT(
 ) {
   const session = await getSession();
   if (!session?.user?.id) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+    });
   }
 
   const { pageId } = await params;
@@ -31,11 +33,14 @@ export async function PUT(
   const page = await loadOwnedPage(pageId, session.user.id);
 
   if (!page) {
-    return new Response(JSON.stringify({ error: 'Page not found' }), { status: 404 });
+    return new Response(JSON.stringify({ error: 'Page not found' }), {
+      status: 404,
+    });
   }
 
   const body = await req.json();
-  const { encyclopediaEnabled, roastEnabled, newspaperEnabled, pageSettings } = body;
+  const { encyclopediaEnabled, roastEnabled, newspaperEnabled, pageSettings } =
+    body;
 
   // Detect off → on transitions so we can fire background generation only
   // when a mode is first turned on. If content already exists in 'ready'
@@ -77,7 +82,9 @@ export async function PUT(
       const [existing] = await db
         .select()
         .from(generatedPages)
-        .where(and(eq(generatedPages.pageId, pageId), eq(generatedPages.type, mode)))
+        .where(
+          and(eq(generatedPages.pageId, pageId), eq(generatedPages.type, mode)),
+        )
         .limit(1);
 
       // Skip if already-generated content is present.

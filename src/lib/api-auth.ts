@@ -23,7 +23,9 @@ export async function requireUser(): Promise<
 > {
   const session = await getSession();
   if (!session?.user?.id) {
-    return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+    return {
+      error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+    };
   }
   return { user: session.user, userId: session.user.id };
 }

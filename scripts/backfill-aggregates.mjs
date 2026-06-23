@@ -10,10 +10,14 @@ function loadDotenv() {
     const text = readFileSync(envPath, 'utf8');
     for (const line of text.split(/\r?\n/)) {
       const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+      if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('='))
+        continue;
       const index = trimmed.indexOf('=');
       const key = trimmed.slice(0, index).trim();
-      const value = trimmed.slice(index + 1).trim().replace(/^["']|["']$/g, '');
+      const value = trimmed
+        .slice(index + 1)
+        .trim()
+        .replace(/^["']|["']$/g, '');
       if (key && process.env[key] === undefined) process.env[key] = value;
     }
   } catch {
@@ -32,25 +36,13 @@ async function main() {
   }
 
   const client = createClient({ url, authToken });
-
-  console.log('Starting backfill of analytics aggregates...');
-
-  // 1. Ensure tables exist (optional but safe)
-  // These should already be created by ensureProjectsTable if the app ran,
-  // but we can't be sure in a script environment.
-  // Actually, we'll assume they exist or let it fail if not.
-
-  // 2. Clear existing aggregates to avoid duplicates if re-running
-  console.log('Clearing existing aggregates...');
   await client.execute('DELETE FROM dailyStats');
   await client.execute('DELETE FROM dailyResourceStats');
   await client.execute('DELETE FROM dailyVisitorEvents');
-
-  // 3. Fetch all events
-  console.log('Fetching all pageEvents...');
-  const eventsResult = await client.execute('SELECT * FROM pageEvents ORDER BY createdAt ASC');
+  const eventsResult = await client.execute(
+    'SELECT * FROM pageEvents ORDER BY createdAt ASC',
+  );
   const events = eventsResult.rows;
-  console.log(`Processing ${events.length} events...`);
 
   let count = 0;
   for (const event of events) {
@@ -79,7 +71,7 @@ async function main() {
             visitorId,
             date,
             eventType,
-            resourceId || null
+            resourceId || null,
           ],
         });
         isNewVisitor = true;
@@ -111,7 +103,7 @@ async function main() {
           resourceLabel || null,
           isNewVisitor ? 1 : 0,
           isNewVisitor ? 1 : 0,
-          resourceLabel || null
+          resourceLabel || null,
         ],
       });
     } else {
@@ -127,18 +119,15 @@ async function main() {
           date,
           effectiveEventType,
           isNewVisitor ? 1 : 0,
-          isNewVisitor ? 1 : 0
+          isNewVisitor ? 1 : 0,
         ],
       });
     }
 
     count++;
     if (count % 100 === 0) {
-      console.log(`Processed ${count}/${events.length} events...`);
     }
   }
-
-  console.log('Backfill complete!');
 }
 
 main().catch((err) => {

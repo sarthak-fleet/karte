@@ -83,12 +83,25 @@ export function ProfileHero({
       .filter(Boolean)
       .slice(0, 2)
       .map((part) => part[0]?.toUpperCase() ?? '')
-      .join('') || firstName[0]?.toUpperCase() || 'K';
+      .join('') ||
+    firstName[0]?.toUpperCase() ||
+    'K';
 
   const quickActions: QuickAction[] = [];
-  if (calendarUrl) quickActions.push({ label: calendarLabel(calendarUrl), url: calendarUrl, icon: '📅' });
-  if (newsletterUrl) quickActions.push({ label: 'Subscribe to newsletter', url: newsletterUrl, icon: '✉︎' });
-  if (tipUrl) quickActions.push({ label: tipLabel(tipUrl), url: tipUrl, icon: '☕' });
+  if (calendarUrl)
+    quickActions.push({
+      label: calendarLabel(calendarUrl),
+      url: calendarUrl,
+      icon: '📅',
+    });
+  if (newsletterUrl)
+    quickActions.push({
+      label: 'Subscribe to newsletter',
+      url: newsletterUrl,
+      icon: '✉︎',
+    });
+  if (tipUrl)
+    quickActions.push({ label: tipLabel(tipUrl), url: tipUrl, icon: '☕' });
 
   return (
     <aside

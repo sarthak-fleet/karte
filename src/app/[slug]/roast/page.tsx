@@ -7,7 +7,12 @@ import { getSession } from '@/lib/auth-server';
 import type { RoastContent } from '@/lib/generated-page-types';
 import { resolveThemeConfig } from '@/lib/themes';
 
-import { getGeneratedPage, getPageBySlug, getPageLinks, getPageProjects } from '../_lib/get-page-data';
+import {
+  getGeneratedPage,
+  getPageBySlug,
+  getPageLinks,
+  getPageProjects,
+} from '../_lib/get-page-data';
 
 export default async function RoastPage({
   params,

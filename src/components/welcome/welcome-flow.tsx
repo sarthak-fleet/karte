@@ -37,7 +37,11 @@ function readPendingImport(): PendingImportPayload | null {
     const raw = window.localStorage.getItem(PENDING_IMPORT_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<PendingImportPayload>;
-    if (!parsed || typeof parsed.sourceUrl !== 'string' || !Array.isArray(parsed.links)) {
+    if (
+      !parsed ||
+      typeof parsed.sourceUrl !== 'string' ||
+      !Array.isArray(parsed.links)
+    ) {
       return null;
     }
     const cleanLinks = parsed.links.filter(
@@ -87,7 +91,9 @@ export function WelcomeFlow() {
       }),
     })
       .then(async (res) => {
-        const data = (await res.json().catch(() => ({}))) as Partial<WelcomeResult> & {
+        const data = (await res
+          .json()
+          .catch(() => ({}))) as Partial<WelcomeResult> & {
           error?: string;
         };
         if (!res.ok) {
@@ -159,36 +165,39 @@ function LoadingState({ phase }: { phase: Phase }) {
       </p>
 
       <div className="mt-8 space-y-3">
-        {(['Provisioning your page', 'Reading the links', 'Teaching it your voice'] as const).map(
-          (label, i) => {
-            const completed =
-              phase === 'generating' ? i < 1 : false;
-            const active = phase === 'generating' ? i >= 1 : i === 0;
-            return (
-              <div
-                key={label}
-                className="flex items-center gap-3 text-[14px] text-karte-text-3"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`block h-2 w-2 rounded-full ${
-                    completed
-                      ? 'bg-karte-accent'
-                      : active
+        {(
+          [
+            'Provisioning your page',
+            'Reading the links',
+            'Teaching it your voice',
+          ] as const
+        ).map((label, i) => {
+          const completed = phase === 'generating' ? i < 1 : false;
+          const active = phase === 'generating' ? i >= 1 : i === 0;
+          return (
+            <div
+              key={label}
+              className="flex items-center gap-3 text-[14px] text-karte-text-3"
+            >
+              <span
+                aria-hidden="true"
+                className={`block h-2 w-2 rounded-full ${
+                  completed
+                    ? 'bg-karte-accent'
+                    : active
                       ? 'bg-karte-accent/60'
                       : 'bg-white/[0.10]'
-                  }`}
-                  style={
-                    active
-                      ? { animation: 'karte-pulse 1.4s ease-in-out infinite' }
-                      : undefined
-                  }
-                />
-                <span className={active ? 'text-karte-text' : ''}>{label}…</span>
-              </div>
-            );
-          },
-        )}
+                }`}
+                style={
+                  active
+                    ? { animation: 'karte-pulse 1.4s ease-in-out infinite' }
+                    : undefined
+                }
+              />
+              <span className={active ? 'text-karte-text' : ''}>{label}…</span>
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-10 grid gap-3 sm:grid-cols-2">
@@ -267,21 +276,23 @@ function ReadyState({ result }: { result: WelcomeResult }) {
             &ldquo;{result.cards.headline}&rdquo;
           </p>
           <p className="mt-3 text-[12.5px] text-karte-text-4">
-            Auto-rewritten by AI every day. Newspaper mode draws a full
-            front page from your stuff.
+            Auto-rewritten by AI every day. Newspaper mode draws a full front
+            page from your stuff.
           </p>
         </Card>
 
         <Card eyebrow="A gentle roast">
           <p
             className="text-[19px] font-normal leading-[1.3] tracking-[-0.01em] text-karte-text"
-            style={{ fontFamily: 'var(--font-instrument-serif), serif', fontStyle: 'italic' }}
+            style={{
+              fontFamily: 'var(--font-instrument-serif), serif',
+              fontStyle: 'italic',
+            }}
           >
             &ldquo;{result.cards.roast}&rdquo;
           </p>
           <p className="mt-3 text-[12.5px] text-karte-text-4">
-            Roast mode is one of four AI modes. Tune the tone in
-            settings.
+            Roast mode is one of four AI modes. Tune the tone in settings.
           </p>
         </Card>
 
@@ -299,8 +310,8 @@ function ReadyState({ result }: { result: WelcomeResult }) {
             ))}
           </ul>
           <p className="mt-4 text-[12.5px] text-karte-text-4">
-            Your page&rsquo;s chat answers these 24/7. You can edit the
-            answers anytime in Data.
+            Your page&rsquo;s chat answers these 24/7. You can edit the answers
+            anytime in Data.
           </p>
         </Card>
       </div>
@@ -313,7 +324,10 @@ function ReadyState({ result }: { result: WelcomeResult }) {
           </p>
           <p className="mt-1 text-[13px] text-karte-text-3">
             Your live profile is at{' '}
-            <span className="font-mono text-karte-text">karte.cc/{result.slug}</span>.
+            <span className="font-mono text-karte-text">
+              karte.cc/{result.slug}
+            </span>
+            .
           </p>
         </div>
         <div className="flex gap-3">

@@ -10,7 +10,7 @@ interface RateLimitOptions {
 
 export function rateLimit(
   key: string,
-  opts?: RateLimitOptions
+  opts?: RateLimitOptions,
 ): { ok: boolean; remaining: number } {
   const windowMs = opts?.windowMs ?? DEFAULT_WINDOW_MS;
   const maxRequests = opts?.maxRequests ?? DEFAULT_MAX_REQUESTS;

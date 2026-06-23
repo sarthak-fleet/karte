@@ -4,7 +4,8 @@ import { test } from 'vitest';
 // Re-implementation mirror of src/lib/hostname.ts kept identical so this test
 // runs without a TS compile step. If src/lib/hostname.ts changes, mirror here.
 
-const HOSTNAME_RE = /^(?=.{1,253}$)(?!-)(?:[a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,63}$/;
+const HOSTNAME_RE =
+  /^(?=.{1,253}$)(?!-)(?:[a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,63}$/;
 const MULTI_PART_PUBLIC_SUFFIXES = new Set([
   'co.uk',
   'org.uk',
@@ -107,7 +108,10 @@ test('normalizeHostname strips www prefix and trailing dot', () => {
 
 test('normalizeHostname extracts host from URL', () => {
   assert.equal(normalizeHostname('https://example.com/path'), 'example.com');
-  assert.equal(normalizeHostname('http://sub.example.co.uk'), 'sub.example.co.uk');
+  assert.equal(
+    normalizeHostname('http://sub.example.co.uk'),
+    'sub.example.co.uk',
+  );
 });
 
 test('normalizeHostname rejects ports, paths, and bad input', () => {
@@ -117,7 +121,7 @@ test('normalizeHostname rejects ports, paths, and bad input', () => {
   assert.equal(normalizeHostname('example.com/x'), null);
   assert.equal(normalizeHostname('not a host'), null);
   assert.equal(normalizeHostname('-leading.com'), null);
-  assert.equal(normalizeHostname('a'.repeat(254) + '.com'), null);
+  assert.equal(normalizeHostname(`${'a'.repeat(254)}.com`), null);
   assert.equal(normalizeHostname(null), null);
   assert.equal(normalizeHostname(123), null);
 });

@@ -1,5 +1,11 @@
-import { copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import {
+  copyFile,
+  mkdir,
+  readdir,
+  readFile,
+  writeFile,
+} from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 
 const PROTECTED_PREFIXES = ['_next/', 'cdn-cgi/', 'BUILD_ID'];
@@ -57,26 +63,20 @@ export async function runOverlay(opts = {}) {
   }
 
   const files = await walk(astroDist);
-  let copied = 0;
-  let skipped = 0;
+  let _copied = 0;
+  let _skipped = 0;
   for (const { src, rel } of files) {
     if (PROTECTED_PREFIXES.some((p) => rel.startsWith(p))) {
-      skipped += 1;
+      _skipped += 1;
       continue;
     }
     if (rel === '_headers') {
-      const merged = await mergeHeaders(src, join(target, '_headers'));
-      console.log(
-        `[overlay-astro] merged _headers (Astro wins for /)${merged ? '' : ' — no Astro headers found'}`,
-      );
+      const _merged = await mergeHeaders(src, join(target, '_headers'));
       continue;
     }
     const dest = join(target, rel);
     await mkdir(dirname(dest), { recursive: true });
     await copyFile(src, dest);
-    copied += 1;
+    _copied += 1;
   }
-  console.log(
-    `[overlay-astro] copied ${copied} file(s) from ${astroDist} → ${target}, skipped ${skipped} protected path(s)`,
-  );
 }

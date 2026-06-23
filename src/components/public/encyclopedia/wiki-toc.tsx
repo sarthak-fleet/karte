@@ -57,7 +57,9 @@ export function WikiTocFromHtml({ html, accentColor }: WikiTocFromHtmlProps) {
 
   useEffect(() => {
     const ids = headings.map((h) => h.id);
-    const elements = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    const elements = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
     if (elements.length === 0) return;
 
     const observer = new IntersectionObserver(
@@ -70,7 +72,9 @@ export function WikiTocFromHtml({ html, accentColor }: WikiTocFromHtmlProps) {
       { rootMargin: '-80px 0px -60% 0px', threshold: 0 },
     );
 
-    elements.forEach((el) => observer.observe(el));
+    elements.forEach((el) => {
+      observer.observe(el);
+    });
     return () => observer.disconnect();
   }, [headings]);
 
@@ -114,7 +118,9 @@ export function WikiTocFromHtml({ html, accentColor }: WikiTocFromHtmlProps) {
                     fontFamily: 'sans-serif',
                   }}
                 >
-                  <span className="mr-1.5 tabular-nums text-[#202122]">{i + 1}</span>
+                  <span className="mr-1.5 tabular-nums text-[#202122]">
+                    {i + 1}
+                  </span>
                   <span className={isActive ? '' : 'hover:underline'}>
                     {heading.text}
                   </span>

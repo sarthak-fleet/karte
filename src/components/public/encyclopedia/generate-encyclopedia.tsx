@@ -12,7 +12,11 @@ interface GenerateEncyclopediaProps {
   accentColor: string;
 }
 
-export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncyclopediaProps) {
+export function GenerateEncyclopedia({
+  pageId,
+  slug,
+  accentColor,
+}: GenerateEncyclopediaProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +31,9 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({ error: 'Something went wrong' }));
+        const data = await res
+          .json()
+          .catch(() => ({ error: 'Something went wrong' }));
         throw new Error(data.error || 'Failed to generate encyclopedia');
       }
 
@@ -84,7 +90,10 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
               </div>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {['Summary', 'Work', 'Projects', 'Context'].map((label) => (
-                  <div key={label} className="rounded-lg border border-gray-200 bg-[#f8f9fa] p-3">
+                  <div
+                    key={label}
+                    className="rounded-lg border border-gray-200 bg-[#f8f9fa] p-3"
+                  >
                     <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-karte-text-4">
                       {label}
                     </p>
@@ -141,9 +150,24 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
             >
               {loading ? (
                 <>
-                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="h-4 w-4 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Drafting article
                 </>
@@ -156,9 +180,15 @@ export function GenerateEncyclopedia({ pageId, slug, accentColor }: GenerateEncy
           <div className="rounded-xl border border-gray-200 bg-[#f8f9fa] p-4">
             <div className="h-3 w-28 rounded-full bg-karte-bg/70" />
             <div className="mt-5 space-y-2">
-              <div className={`h-2 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`} />
-              <div className={`h-2 w-10/12 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`} />
-              <div className={`h-2 w-8/12 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`} />
+              <div
+                className={`h-2 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`}
+              />
+              <div
+                className={`h-2 w-10/12 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`}
+              />
+              <div
+                className={`h-2 w-8/12 rounded-full bg-gray-300 ${loading ? 'animate-pulse' : ''}`}
+              />
             </div>
             <div
               className={`mt-5 h-20 rounded-lg border border-gray-200 bg-white ${loading ? 'animate-pulse' : ''}`}

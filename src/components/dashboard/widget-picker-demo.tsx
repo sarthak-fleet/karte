@@ -16,8 +16,16 @@ import { pickLinkVariants, pickProjectVariants } from '@/lib/widget-picker';
 // the LayoutRenderer ships.
 export async function WidgetPickerDemo({ pageId }: { pageId: string }) {
   const [linkRows, projectRows] = await Promise.all([
-    db.select().from(links).where(eq(links.pageId, pageId)).orderBy(links.sortOrder),
-    db.select().from(projects).where(eq(projects.pageId, pageId)).orderBy(projects.sortOrder),
+    db
+      .select()
+      .from(links)
+      .where(eq(links.pageId, pageId))
+      .orderBy(links.sortOrder),
+    db
+      .select()
+      .from(projects)
+      .where(eq(projects.pageId, pageId))
+      .orderBy(projects.sortOrder),
   ]);
 
   const linkData: LinkCardData[] = linkRows.map((l) => ({
@@ -70,9 +78,9 @@ export async function WidgetPickerDemo({ pageId }: { pageId: string }) {
         <p className="mt-2 max-w-2xl text-[13px] leading-[1.55] text-karte-text-3">
           We run the same heuristic the AI Revamp endpoint will use. For each
           link / project, the picker looks at the data available (image? body?
-          description?) and picks the variant that gives it the right amount
-          of focus. Heroes are capped at one per content type so the page
-          stays balanced.
+          description?) and picks the variant that gives it the right amount of
+          focus. Heroes are capped at one per content type so the page stays
+          balanced.
         </p>
       </div>
 
@@ -101,7 +109,9 @@ export async function WidgetPickerDemo({ pageId }: { pageId: string }) {
                       {pick.reason}
                     </p>
                   </div>
-                  <div className="min-w-0">{variant.render(pick.data, ctx)}</div>
+                  <div className="min-w-0">
+                    {variant.render(pick.data, ctx)}
+                  </div>
                 </div>
               );
             })}
@@ -134,7 +144,9 @@ export async function WidgetPickerDemo({ pageId }: { pageId: string }) {
                       {pick.reason}
                     </p>
                   </div>
-                  <div className="min-w-0">{variant.render(pick.data, ctx)}</div>
+                  <div className="min-w-0">
+                    {variant.render(pick.data, ctx)}
+                  </div>
                 </div>
               );
             })}

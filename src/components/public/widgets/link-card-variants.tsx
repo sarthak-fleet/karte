@@ -85,7 +85,11 @@ function pathByHost(host: string): { d: string; viewBox?: string } | null {
       d: 'M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z',
     };
   }
-  if (h.includes('cal.com') || h.includes('calendly') || h.includes('savvycal')) {
+  if (
+    h.includes('cal.com') ||
+    h.includes('calendly') ||
+    h.includes('savvycal')
+  ) {
     return {
       viewBox: '0 0 24 24',
       d: 'M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9z',
@@ -182,7 +186,9 @@ const lineVariant: WidgetVariant<LinkCardData> = {
         data-track-id={data.id || data.url}
         data-track-label={data.title}
         className="group flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.025] px-4 py-3 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.05]"
-        style={ctx.accentColor ? { borderColor: `${ctx.accentColor}1f` } : undefined}
+        style={
+          ctx.accentColor ? { borderColor: `${ctx.accentColor}1f` } : undefined
+        }
       >
         {userIcon ? (
           <span

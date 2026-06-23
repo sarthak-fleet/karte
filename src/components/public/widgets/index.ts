@@ -18,8 +18,12 @@ import {
 } from './project-card-variants';
 
 export type { LinkCardData, ProjectCardData };
-export { linkCardVariants, linkCardVariantsById };
-export { projectCardVariants, projectCardVariantsById };
+export {
+  linkCardVariants,
+  linkCardVariantsById,
+  projectCardVariants,
+  projectCardVariantsById,
+};
 
 /**
  * Full catalog of every variant the renderer knows about, flattened

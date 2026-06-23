@@ -115,11 +115,13 @@ function SectionCard({
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-karte-text-2">
               {section.content}
             </p>
-            {section.type === 'cta' && section.buttonLabel && section.buttonUrl && (
-              <p className="mt-3 text-sm text-blue-300">
-                Button: {section.buttonLabel} - {section.buttonUrl}
-              </p>
-            )}
+            {section.type === 'cta' &&
+              section.buttonLabel &&
+              section.buttonUrl && (
+                <p className="mt-3 text-sm text-blue-300">
+                  Button: {section.buttonLabel} - {section.buttonUrl}
+                </p>
+              )}
           </div>
         </div>
 
@@ -169,9 +171,7 @@ function SectionCard({
 }
 
 function sortSections(items: Section[]) {
-  return [...items].sort(
-    (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
-  );
+  return [...items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 }
 
 export function SectionEditor({
@@ -182,7 +182,9 @@ export function SectionEditor({
   initialSections: Section[];
 }) {
   const router = useRouter();
-  const [sections, setSections] = useState<Section[]>(sortSections(initialSections));
+  const [sections, setSections] = useState<Section[]>(
+    sortSections(initialSections),
+  );
   const [editingId, setEditingId] = useState<string | null>(null);
   const [type, setType] = useState<PageSectionType>('text');
   const [title, setTitle] = useState('');
@@ -203,7 +205,7 @@ export function SectionEditor({
   );
 
   const activeSection = activeId
-    ? sections.find((s) => s.id === activeId) ?? null
+    ? (sections.find((s) => s.id === activeId) ?? null)
     : null;
   const activeIndex = activeId
     ? sections.findIndex((s) => s.id === activeId)
@@ -322,7 +324,9 @@ export function SectionEditor({
       const saved = (await response.json()) as Section;
       if (editingId) {
         setSections((prev) =>
-          sortSections(prev.map((section) => (section.id === saved.id ? saved : section))),
+          sortSections(
+            prev.map((section) => (section.id === saved.id ? saved : section)),
+          ),
         );
       } else {
         setSections((prev) => sortSections([...prev, saved]));
@@ -363,7 +367,9 @@ export function SectionEditor({
       <div>
         {editingId && (
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm font-medium text-karte-text">Editing section</p>
+            <p className="text-sm font-medium text-karte-text">
+              Editing section
+            </p>
             <button
               type="button"
               onClick={resetForm}
@@ -386,7 +392,11 @@ export function SectionEditor({
                 className="w-full rounded-xl bg-white/[0.045] px-3.5 py-2.5 text-sm text-karte-text outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
               >
                 {PAGE_SECTION_TYPES.map((item) => (
-                  <option key={item.value} value={item.value} className="bg-karte-bg">
+                  <option
+                    key={item.value}
+                    value={item.value}
+                    className="bg-karte-bg"
+                  >
                     {item.label}
                   </option>
                 ))}
@@ -424,7 +434,8 @@ export function SectionEditor({
             )}
             {isBlog && (
               <p className="mb-2 text-xs text-karte-text-4">
-                One post per line using `Title | https://example.com/post | Short description | Date`.
+                One post per line using `Title | https://example.com/post |
+                Short description | Date`.
               </p>
             )}
             <textarea
@@ -436,11 +447,11 @@ export function SectionEditor({
                   ? 'X | https://x.com/yourname\nLinkedIn | https://linkedin.com/in/yourname'
                   : type === 'blog'
                     ? 'Why I am building this | https://example.com/blog/building | A short essay on the product thesis. | Apr 2026\nNotes from launch week | https://example.com/blog/launch | What changed after shipping the first version. | May 2026'
-                  : type === 'testimonial'
-                  ? 'A short testimonial quote...'
-                  : type === 'contact'
-                    ? 'Tell visitors what to send you...'
-                    : 'Section body copy...'
+                    : type === 'testimonial'
+                      ? 'A short testimonial quote...'
+                      : type === 'contact'
+                        ? 'Tell visitors what to send you...'
+                        : 'Section body copy...'
               }
               className="w-full rounded-xl bg-white/[0.045] px-3.5 py-2.5 text-sm text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35"
             />
@@ -480,7 +491,11 @@ export function SectionEditor({
               disabled={saving}
               className="w-full rounded-lg bg-white px-5 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-100 disabled:opacity-50 sm:w-auto"
             >
-              {saving ? 'Saving...' : editingId ? 'Save Section' : 'Add Section'}
+              {saving
+                ? 'Saving...'
+                : editingId
+                  ? 'Save Section'
+                  : 'Add Section'}
             </button>
           </div>
         </form>
@@ -488,7 +503,9 @@ export function SectionEditor({
 
       {sections.length === 0 ? (
         <div className="rounded-2xl bg-white/[0.02] p-8 text-center">
-          <p className="text-karte-text-3">No sections yet. Add the first one above.</p>
+          <p className="text-karte-text-3">
+            No sections yet. Add the first one above.
+          </p>
         </div>
       ) : (
         <DndContext

@@ -14,25 +14,33 @@ function isBlockedUrl(urlStr: string): boolean {
     const { hostname } = new URL(urlStr);
     const lower = hostname.toLowerCase();
 
-    if (lower === 'localhost' || lower.endsWith('.local') || lower.endsWith('.internal'))
+    if (
+      lower === 'localhost' ||
+      lower.endsWith('.local') ||
+      lower.endsWith('.internal')
+    )
       return true;
-    if (lower.includes('metadata') || lower.includes('internal'))
-      return true;
+    if (lower.includes('metadata') || lower.includes('internal')) return true;
 
     // Check if hostname is an IP address
     const ipv4 = lower.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
     if (ipv4) {
       const [, a, b] = ipv4.map(Number);
-      if (a === 127) return true;                          // 127.0.0.0/8
-      if (a === 10) return true;                           // 10.0.0.0/8
-      if (a === 172 && b >= 16 && b <= 31) return true;   // 172.16.0.0/12
-      if (a === 192 && b === 168) return true;             // 192.168.0.0/16
-      if (a === 169 && b === 254) return true;             // 169.254.0.0/16
-      if (a === 0) return true;                            // 0.0.0.0/8
+      if (a === 127) return true; // 127.0.0.0/8
+      if (a === 10) return true; // 10.0.0.0/8
+      if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
+      if (a === 192 && b === 168) return true; // 192.168.0.0/16
+      if (a === 169 && b === 254) return true; // 169.254.0.0/16
+      if (a === 0) return true; // 0.0.0.0/8
     }
 
     // IPv6 loopback / link-local
-    if (lower === '[::1]' || lower.startsWith('[fe80:') || lower.startsWith('[fc') || lower.startsWith('[fd'))
+    if (
+      lower === '[::1]' ||
+      lower.startsWith('[fe80:') ||
+      lower.startsWith('[fc') ||
+      lower.startsWith('[fd')
+    )
       return true;
 
     return false;
@@ -63,13 +71,13 @@ export async function scrapeUrls(
   if (unique.length === 0) return [];
 
   const results = await Promise.allSettled(
-    unique.map((url) => scrapeSingleUrl(url, options))
+    unique.map((url) => scrapeSingleUrl(url, options)),
   );
 
   return results
     .filter(
       (r): r is PromiseFulfilledResult<ScrapedPage | null> =>
-        r.status === 'fulfilled' && r.value !== null
+        r.status === 'fulfilled' && r.value !== null,
     )
     .map((r) => r.value!);
 }
@@ -84,12 +92,20 @@ async function scrapeSingleUrl(
 
     if (isBlockedUrl(fullUrl)) return null;
 
-    const html = await fetchText(fullUrl, options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-    const extracted = html ? pageFromHtml(url, html, options.maxContentLength) : null;
+    const html = await fetchText(
+      fullUrl,
+      options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+    );
+    const extracted = html
+      ? pageFromHtml(url, html, options.maxContentLength)
+      : null;
     if (extracted && hasUsefulContent(extracted)) return extracted;
 
     if (options.useReaderFallback) {
-      const readerText = await fetchReaderText(fullUrl, options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+      const readerText = await fetchReaderText(
+        fullUrl,
+        options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+      );
       if (readerText) {
         return pageFromReader(url, readerText, options.maxContentLength);
       }
@@ -102,7 +118,10 @@ async function scrapeSingleUrl(
   }
 }
 
-async function fetchText(url: string, timeoutMs: number): Promise<string | null> {
+async function fetchText(
+  url: string,
+  timeoutMs: number,
+): Promise<string | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -120,7 +139,10 @@ async function fetchText(url: string, timeoutMs: number): Promise<string | null>
     if (!res.ok) return null;
 
     const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('text/html') && !contentType.includes('text/plain')) {
+    if (
+      !contentType.includes('text/html') &&
+      !contentType.includes('text/plain')
+    ) {
       return null;
     }
 
@@ -130,7 +152,10 @@ async function fetchText(url: string, timeoutMs: number): Promise<string | null>
   }
 }
 
-async function fetchReaderText(url: string, timeoutMs: number): Promise<string | null> {
+async function fetchReaderText(
+  url: string,
+  timeoutMs: number,
+): Promise<string | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   const readerUrl = `https://r.jina.ai/http://r.jina.ai/http://${url}`;
@@ -192,15 +217,15 @@ function pageFromReader(
 }
 
 function hasUsefulContent(page: ScrapedPage): boolean {
-  const content = `${page.title} ${page.description} ${page.content}`.toLowerCase();
-  const isShell = (
+  const content =
+    `${page.title} ${page.description} ${page.content}`.toLowerCase();
+  const isShell =
     content.includes('enable javascript') ||
     content.includes('just a moment') ||
     content.includes('sign in') ||
     content.includes('log in') ||
     content.includes('abs.twimg.com') ||
-    content.includes('responsive-web/client-web')
-  );
+    content.includes('responsive-web/client-web');
   if (isShell) return false;
   return page.content.length > 220;
 }
@@ -212,13 +237,13 @@ function extractTitle(html: string): string {
 
 function extractMetaDescription(html: string): string {
   const match = html.match(
-    /<meta\s+[^>]*name\s*=\s*["']description["'][^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*\/?>/i
+    /<meta\s+[^>]*name\s*=\s*["']description["'][^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*\/?>/i,
   );
   if (match) return decodeEntities(match[1].trim());
 
   // Try reversed attribute order: content before name
   const match2 = html.match(
-    /<meta\s+[^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*name\s*=\s*["']description["'][^>]*\/?>/i
+    /<meta\s+[^>]*content\s*=\s*["']([\s\S]*?)["'][^>]*name\s*=\s*["']description["'][^>]*\/?>/i,
   );
   return match2 ? decodeEntities(match2[1].trim()) : '';
 }
@@ -292,7 +317,9 @@ export interface ScrapedCache {
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-export function isCacheValid(cache: ScrapedCache | null): cache is ScrapedCache {
-  if (!cache || !cache.scrapedAt || !Array.isArray(cache.data)) return false;
+export function isCacheValid(
+  cache: ScrapedCache | null,
+): cache is ScrapedCache {
+  if (!cache?.scrapedAt || !Array.isArray(cache.data)) return false;
   return Date.now() - cache.scrapedAt < CACHE_TTL_MS;
 }

@@ -33,7 +33,10 @@ export function ImportedLinkPreview({
           <p className="mt-2 text-sm text-karte-text-3">
             {links.length} link{links.length === 1 ? '' : 's'} imported
             {sourceUrl ? (
-              <span className="text-karte-text-4"> · from {hostnameFromUrl(sourceUrl, sourceUrl)}</span>
+              <span className="text-karte-text-4">
+                {' '}
+                · from {hostnameFromUrl(sourceUrl, sourceUrl)}
+              </span>
             ) : null}
           </p>
         </div>
@@ -41,11 +44,7 @@ export function ImportedLinkPreview({
 
       <div className="mx-auto max-w-md space-y-3">
         {links.map((item) => (
-          <LinkCard
-            key={item.url}
-            title={item.title}
-            url={item.url}
-          />
+          <LinkCard key={item.url} title={item.title} url={item.url} />
         ))}
       </div>
     </div>

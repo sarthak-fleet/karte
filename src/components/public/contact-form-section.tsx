@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent,useState } from 'react';
+import { type FormEvent, useState } from 'react';
 
 import type { DmMode } from '@/db/schema';
 import { authClient } from '@/lib/auth-client';
@@ -41,10 +41,10 @@ export function ContactFormSection({
     const usesVerifiedEmail = requireVerifiedEmail && dmMode === 'email';
 
     if (
-      (!isAnonymous && !usesVerifiedEmail && (!trimmedName || !trimmedEmail))
-      || (usesVerifiedEmail && !session?.user?.email)
-      || !trimmedMessage
-      || loading
+      (!isAnonymous && !usesVerifiedEmail && (!trimmedName || !trimmedEmail)) ||
+      (usesVerifiedEmail && !session?.user?.email) ||
+      !trimmedMessage ||
+      loading
     ) {
       return;
     }
@@ -61,12 +61,12 @@ export function ContactFormSection({
           name: isAnonymous
             ? 'Anonymous'
             : usesVerifiedEmail
-              ? session?.user?.name ?? trimmedName
+              ? (session?.user?.name ?? trimmedName)
               : trimmedName,
           email: isAnonymous
             ? ''
             : usesVerifiedEmail
-              ? session?.user?.email ?? trimmedEmail
+              ? (session?.user?.email ?? trimmedEmail)
               : trimmedEmail,
           message: trimmedMessage,
           visitorId: getOrCreateVisitorId(),
@@ -87,8 +87,10 @@ export function ContactFormSection({
       setFeedback('Message sent. You should hear back soon.');
     } catch (error) {
       setStatus('error');
-      setFeedback(error instanceof Error ? error.message : 'Failed to send message');
-  } finally {
+      setFeedback(
+        error instanceof Error ? error.message : 'Failed to send message',
+      );
+    } finally {
       setLoading(false);
     }
   }
@@ -107,7 +109,9 @@ export function ContactFormSection({
     >
       {needsVerifiedSession ? (
         <div className="rounded-xl border border-karte-border-strong bg-white/[0.04] p-4">
-          <p className="text-sm font-medium text-karte-text">Verify your email</p>
+          <p className="text-sm font-medium text-karte-text">
+            Verify your email
+          </p>
           <p className="mt-1 text-xs leading-5 text-white/55">
             Sign in with Google so the profile owner can see your verified
             sender identity before you message them.
@@ -118,7 +122,10 @@ export function ContactFormSection({
             onClick={() => {
               const callbackURL =
                 typeof window === 'undefined' ? '/' : window.location.pathname;
-              void authClient.signIn.social({ provider: 'google', callbackURL });
+              void authClient.signIn.social({
+                provider: 'google',
+                callbackURL,
+              });
             }}
             className="mt-3 w-full rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-gray-900 transition hover:bg-gray-100 disabled:opacity-50"
           >

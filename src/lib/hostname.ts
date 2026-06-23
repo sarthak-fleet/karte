@@ -2,13 +2,17 @@
  * Pure hostname helpers shared between middleware, server libs, and tests.
  * No `server-only` import — safe to use anywhere.
  */
-const HOSTNAME_RE = /^(?=.{1,253}$)(?!-)(?:[a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,63}$/;
+const HOSTNAME_RE =
+  /^(?=.{1,253}$)(?!-)(?:[a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,63}$/;
 
 /**
  * Extracts a display hostname from a full URL, stripping a leading `www.`.
  * Returns `fallback` (default `''`) when the input is empty or not a valid URL.
  */
-export function hostnameFromUrl(url: string | null | undefined, fallback = ''): string {
+export function hostnameFromUrl(
+  url: string | null | undefined,
+  fallback = '',
+): string {
   if (!url) return fallback;
   try {
     return new URL(url).hostname.replace(/^www\./, '');
@@ -17,7 +21,9 @@ export function hostnameFromUrl(url: string | null | undefined, fallback = ''): 
   }
 }
 
-export function normalizeHostname(input: string | null | undefined): string | null {
+export function normalizeHostname(
+  input: string | null | undefined,
+): string | null {
   if (typeof input !== 'string') return null;
   let host = input.trim().toLowerCase();
   if (!host) return null;
@@ -76,7 +82,10 @@ function isApexHostname(hostname: string): boolean {
   return false;
 }
 
-export function isAppHost(host: string, appHost: string | null | undefined): boolean {
+export function isAppHost(
+  host: string,
+  appHost: string | null | undefined,
+): boolean {
   if (!host) return false;
   const normalized = host.toLowerCase().split(':')[0];
   if (normalized === 'localhost') return true;

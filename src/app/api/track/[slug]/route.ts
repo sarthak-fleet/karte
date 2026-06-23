@@ -41,7 +41,9 @@ export async function POST(
   }
 
   const body = await req.json().catch(() => ({}));
-  const eventType = (typeof body.eventType === 'string' ? body.eventType : '') as EventType;
+  const eventType = (
+    typeof body.eventType === 'string' ? body.eventType : ''
+  ) as EventType;
 
   const cookieStore = await cookies();
   const visitorCookie = cookieStore.get('lc_vid');
@@ -49,7 +51,8 @@ export async function POST(
     typeof body.visitorId === 'string' && body.visitorId.trim()
       ? body.visitorId.trim()
       : null;
-  const visitorId = visitorCookie?.value || bodyVisitorId || crypto.randomUUID();
+  const visitorId =
+    visitorCookie?.value || bodyVisitorId || crypto.randomUUID();
 
   const resourceType =
     typeof body.resourceType === 'string' && body.resourceType.trim()
@@ -64,7 +67,9 @@ export async function POST(
       ? body.resourceLabel.trim()
       : null;
   const metadata =
-    body.metadata && typeof body.metadata === 'object' && !Array.isArray(body.metadata)
+    body.metadata &&
+    typeof body.metadata === 'object' &&
+    !Array.isArray(body.metadata)
       ? (body.metadata as Record<string, unknown>)
       : null;
 

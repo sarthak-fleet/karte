@@ -1,11 +1,11 @@
 'use client';
 
-import { type CSSProperties,useCallback, useRef } from 'react';
+import { type CSSProperties, useCallback, useRef } from 'react';
 
 interface OnyxCardProps {
-  idx: string;         // e.g. "i", "ii", "iii" — appears as "card i / v" indicator
-  serial: string;      // e.g. "№ 00471" — appears in the header right
-  kicker: string;      // e.g. "DIGITAL CARD · CARD V2026" — header centered label
+  idx: string; // e.g. "i", "ii", "iii" — appears as "card i / v" indicator
+  serial: string; // e.g. "№ 00471" — appears in the header right
+  kicker: string; // e.g. "DIGITAL CARD · CARD V2026" — header centered label
   footL: React.ReactNode; // footer left content
   footR: React.ReactNode; // footer right content
   children: React.ReactNode; // card body
@@ -23,7 +23,14 @@ interface OnyxCardProps {
  *
  * Ported from Claude Design handoff bundle (variations/onyx.jsx).
  */
-export function OnyxCard({ idx, serial, kicker, footL, footR, children }: OnyxCardProps) {
+export function OnyxCard({
+  idx,
+  serial,
+  kicker,
+  footL,
+  footR,
+  children,
+}: OnyxCardProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   // Track the cursor's position over the card and feed it into the
@@ -57,14 +64,24 @@ export function OnyxCard({ idx, serial, kicker, footL, footR, children }: OnyxCa
     >
       <div className="onyx-screen-sheen" />
       <div className="onyx-screen-foil" />
-      <div className="onyx-screen-corner tl" aria-hidden="true">◆</div>
-      <div className="onyx-screen-corner tr" aria-hidden="true">◆</div>
-      <div className="onyx-screen-corner bl" aria-hidden="true">◆</div>
-      <div className="onyx-screen-corner br" aria-hidden="true">◆</div>
+      <div className="onyx-screen-corner tl" aria-hidden="true">
+        ◆
+      </div>
+      <div className="onyx-screen-corner tr" aria-hidden="true">
+        ◆
+      </div>
+      <div className="onyx-screen-corner bl" aria-hidden="true">
+        ◆
+      </div>
+      <div className="onyx-screen-corner br" aria-hidden="true">
+        ◆
+      </div>
 
       <header className="onyx-screen-head">
         <div className="onyx-screen-mark">
-          <span className="onyx-screen-diamond" aria-hidden="true">◆</span>
+          <span className="onyx-screen-diamond" aria-hidden="true">
+            ◆
+          </span>
           <span className="onyx-screen-brand">Karte</span>
         </div>
         <div className="onyx-screen-kicker">{kicker}</div>
@@ -79,7 +96,9 @@ export function OnyxCard({ idx, serial, kicker, footL, footR, children }: OnyxCa
         <span>{footR}</span>
       </footer>
 
-      <div className="onyx-screen-idx" aria-hidden="true">card {idx} / vi</div>
+      <div className="onyx-screen-idx" aria-hidden="true">
+        card {idx} / vi
+      </div>
     </div>
   );
 }

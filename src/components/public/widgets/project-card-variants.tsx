@@ -34,7 +34,9 @@ const lineVariant: WidgetVariant<ProjectCardData> = {
       data-track-id={data.id || data.url}
       data-track-label={data.title}
       className="group flex w-full items-center justify-between gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.05]"
-      style={ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined}
+      style={
+        ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined
+      }
     >
       <span className="truncate text-base font-semibold text-karte-text">
         {data.title}
@@ -70,7 +72,9 @@ const squareVariant: WidgetVariant<ProjectCardData> = {
       data-track-id={data.id || data.url}
       data-track-label={data.title}
       className="group relative flex aspect-square w-full flex-col justify-end overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18]"
-      style={ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined}
+      style={
+        ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined
+      }
     >
       <SafeImage
         src={data.imageUrl}
@@ -115,7 +119,9 @@ const wideVariant: WidgetVariant<ProjectCardData> = {
       data-track-id={data.id || data.url}
       data-track-label={data.title}
       className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all duration-200 ease-[var(--karte-ease)] hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.04]"
-      style={ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined}
+      style={
+        ctx.accentColor ? { borderColor: `${ctx.accentColor}28` } : undefined
+      }
     >
       <SafeImage
         src={data.imageUrl}
@@ -242,12 +248,9 @@ const heroVariant: WidgetVariant<ProjectCardData> = {
   },
 };
 
-export const projectCardVariants: ReadonlyArray<WidgetVariant<ProjectCardData>> = [
-  lineVariant,
-  squareVariant,
-  wideVariant,
-  heroVariant,
-];
+export const projectCardVariants: ReadonlyArray<
+  WidgetVariant<ProjectCardData>
+> = [lineVariant, squareVariant, wideVariant, heroVariant];
 
 export const projectCardVariantsById = Object.freeze(
   Object.fromEntries(projectCardVariants.map((v) => [v.id, v])),

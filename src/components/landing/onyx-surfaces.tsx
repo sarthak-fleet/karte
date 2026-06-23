@@ -8,16 +8,16 @@
  * would be a feature claim we can't back.
  */
 const SURFACES: ReadonlyArray<{ i: string; t: string; b: string }> = [
-  { i: 'i.',   t: 'Chat',         b: 'Your AI version, on call.' },
-  { i: 'ii.',  t: 'Encyclopedia', b: 'The official record.' },
-  { i: 'iii.', t: 'Newspaper',    b: 'Above the fold.' },
-  { i: 'iv.',  t: 'Roast',        b: 'Built for screenshots.' },
+  { i: 'i.', t: 'Chat', b: 'Your AI version, on call.' },
+  { i: 'ii.', t: 'Encyclopedia', b: 'The official record.' },
+  { i: 'iii.', t: 'Newspaper', b: 'Above the fold.' },
+  { i: 'iv.', t: 'Roast', b: 'Built for screenshots.' },
 ];
 
 export function OnyxSurfaces() {
   return (
     <div className="onyx-surfaces">
-      <div className="onyx-eyebrow center">·  THE FLIP  ·</div>
+      <div className="onyx-eyebrow center">· THE FLIP ·</div>
       <h2 className="onyx-h2 center">
         One memory.
         <br />

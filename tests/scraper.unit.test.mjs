@@ -10,7 +10,12 @@ function isBlockedUrl(urlStr) {
     const { hostname } = new URL(urlStr);
     const lower = hostname.toLowerCase();
 
-    if (lower === 'localhost' || lower.endsWith('.local') || lower.endsWith('.internal')) return true;
+    if (
+      lower === 'localhost' ||
+      lower.endsWith('.local') ||
+      lower.endsWith('.internal')
+    )
+      return true;
     if (lower.includes('metadata') || lower.includes('internal')) return true;
 
     const ipv4 = lower.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
@@ -24,7 +29,13 @@ function isBlockedUrl(urlStr) {
       if (a === 0) return true;
     }
 
-    if (lower === '[::1]' || lower.startsWith('[fe80:') || lower.startsWith('[fc') || lower.startsWith('[fd')) return true;
+    if (
+      lower === '[::1]' ||
+      lower.startsWith('[fe80:') ||
+      lower.startsWith('[fc') ||
+      lower.startsWith('[fd')
+    )
+      return true;
 
     return false;
   } catch {
@@ -55,15 +66,15 @@ function extractDomain(url) {
 }
 
 function hasUsefulContent(page) {
-  const content = `${page.title} ${page.description} ${page.content}`.toLowerCase();
-  const isShell = (
+  const content =
+    `${page.title} ${page.description} ${page.content}`.toLowerCase();
+  const isShell =
     content.includes('enable javascript') ||
     content.includes('just a moment') ||
     content.includes('sign in') ||
     content.includes('log in') ||
     content.includes('abs.twimg.com') ||
-    content.includes('responsive-web/client-web')
-  );
+    content.includes('responsive-web/client-web');
   if (isShell) return false;
   return page.content.length > 220;
 }
@@ -133,15 +144,27 @@ test('extractDomain accepts full and bare URLs', () => {
 
 test('hasUsefulContent rejects login-wall + JS-required shells', () => {
   assert.equal(
-    hasUsefulContent({ title: 'Sign in', description: '', content: 'Sign in to continue' }),
+    hasUsefulContent({
+      title: 'Sign in',
+      description: '',
+      content: 'Sign in to continue',
+    }),
     false,
   );
   assert.equal(
-    hasUsefulContent({ title: 'JS required', description: '', content: 'Please enable JavaScript' }),
+    hasUsefulContent({
+      title: 'JS required',
+      description: '',
+      content: 'Please enable JavaScript',
+    }),
     false,
   );
   assert.equal(
-    hasUsefulContent({ title: 'Just a moment...', description: '', content: 'cf challenge' }),
+    hasUsefulContent({
+      title: 'Just a moment...',
+      description: '',
+      content: 'cf challenge',
+    }),
     false,
   );
 });

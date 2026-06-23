@@ -27,7 +27,10 @@ function getFromAddress() {
   return { email: address, name };
 }
 
-export async function sendAgentAuthCode(email: string, code: string): Promise<void> {
+export async function sendAgentAuthCode(
+  email: string,
+  code: string,
+): Promise<void> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://karte.cc';
   const from = getFromAddress();
   const subject = `${code} is your Karte agent sign-in code`;

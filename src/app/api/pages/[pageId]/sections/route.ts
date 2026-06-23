@@ -69,7 +69,10 @@ export async function POST(
   const enabled = body.enabled !== undefined ? Boolean(body.enabled) : true;
 
   if (!isPageSectionType(type)) {
-    return NextResponse.json({ error: 'Invalid section type' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid section type' },
+      { status: 400 },
+    );
   }
 
   if (!title) {

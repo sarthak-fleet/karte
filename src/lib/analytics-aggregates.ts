@@ -1,7 +1,11 @@
 import { sql } from 'drizzle-orm';
 
 import { db } from '@/db';
-import { dailyResourceStats, dailyStats, dailyVisitorEvents } from '@/db/schema';
+import {
+  dailyResourceStats,
+  dailyStats,
+  dailyVisitorEvents,
+} from '@/db/schema';
 
 export type TrackEventParams = {
   pageId: string;

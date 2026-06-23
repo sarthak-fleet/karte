@@ -176,13 +176,11 @@ export function ProjectEditor({
   );
 
   const activeProject = activeId
-    ? projects.find((p) => p.id === activeId) ?? null
+    ? (projects.find((p) => p.id === activeId) ?? null)
     : null;
 
   function normalizeProjects(items: Project[]) {
-    return [...items].sort(
-      (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
-    );
+    return [...items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   }
 
   async function persistOrder(nextProjects: Project[]) {
@@ -326,7 +324,11 @@ export function ProjectEditor({
           disabled={loading || uploadingImage}
           className="w-full rounded-lg bg-white px-6 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-100 disabled:opacity-50 sm:w-auto"
         >
-          {uploadingImage ? 'Uploading image...' : loading ? 'Adding...' : 'Add Project'}
+          {uploadingImage
+            ? 'Uploading image...'
+            : loading
+              ? 'Adding...'
+              : 'Add Project'}
         </button>
       </form>
 

@@ -13,7 +13,10 @@ import { getSession } from '@/lib/auth-server';
 function sanitizeSlug(value: string | string[] | undefined): string {
   const raw = Array.isArray(value) ? value[0] : value;
   if (!raw) return '';
-  return raw.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40);
+  return raw
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '')
+    .slice(0, 40);
 }
 
 export default async function CreatePage({

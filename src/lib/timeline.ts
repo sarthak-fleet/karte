@@ -26,10 +26,12 @@ export const TIMELINE_TYPE_LABELS: Record<TimelineEventType, string> = {
 export const TIMELINE_TYPE_OPTIONS: ReadonlyArray<{
   value: TimelineEventType;
   label: string;
-}> = (Object.keys(TIMELINE_TYPE_LABELS) as TimelineEventType[]).map((value) => ({
-  value,
-  label: TIMELINE_TYPE_LABELS[value],
-}));
+}> = (Object.keys(TIMELINE_TYPE_LABELS) as TimelineEventType[]).map(
+  (value) => ({
+    value,
+    label: TIMELINE_TYPE_LABELS[value],
+  }),
+);
 
 // Parse a user-supplied when label into a sortable Date. Supports:
 //   "2025" → Jan 1, 2025
@@ -40,18 +42,30 @@ export const TIMELINE_TYPE_OPTIONS: ReadonlyArray<{
 // Falls back to today's date when nothing parses; the user can correct
 // later. Never returns Invalid Date.
 const MONTHS: Record<string, number> = {
-  jan: 0, january: 0,
-  feb: 1, february: 1,
-  mar: 2, march: 2,
-  apr: 3, april: 3,
+  jan: 0,
+  january: 0,
+  feb: 1,
+  february: 1,
+  mar: 2,
+  march: 2,
+  apr: 3,
+  april: 3,
   may: 4,
-  jun: 5, june: 5,
-  jul: 6, july: 6,
-  aug: 7, august: 7,
-  sep: 8, sept: 8, september: 8,
-  oct: 9, october: 9,
-  nov: 10, november: 10,
-  dec: 11, december: 11,
+  jun: 5,
+  june: 5,
+  jul: 6,
+  july: 6,
+  aug: 7,
+  august: 7,
+  sep: 8,
+  sept: 8,
+  september: 8,
+  oct: 9,
+  october: 9,
+  nov: 10,
+  november: 10,
+  dec: 11,
+  december: 11,
 };
 
 export function parseWhenLabel(label: string): Date {
@@ -60,7 +74,7 @@ export function parseWhenLabel(label: string): Date {
 
   // Native parse first (catches ISO + most browser-recognized formats).
   const native = new Date(trimmed);
-  if (!isNaN(native.getTime())) return native;
+  if (!Number.isNaN(native.getTime())) return native;
 
   // YYYY or YYYY-MM
   const ym = trimmed.match(/^(\d{4})(?:-(\d{1,2}))?$/);
@@ -78,7 +92,7 @@ export function parseWhenLabel(label: string): Date {
     const month = MONTHS[monthWord[1]];
     const day = monthWord[2] ? parseInt(monthWord[2], 10) : 1;
     const year = Number(monthWord[3]);
-    if (month !== undefined && !isNaN(year)) {
+    if (month !== undefined && !Number.isNaN(year)) {
       return new Date(year, month, day || 1);
     }
   }
@@ -91,8 +105,18 @@ export function parseWhenLabel(label: string): Date {
 // auto-import flow (v2) where we get ISO dates.
 export function formatWhenLabel(date: Date): string {
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
   return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 }

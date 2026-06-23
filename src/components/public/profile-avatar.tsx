@@ -36,7 +36,7 @@ export function ProfileAvatar({
   // react-hooks/set-state-in-effect). Status is fully derived from
   // the current src plus its recorded load outcome.
   const [outcomes, setOutcomes] = useState<Record<string, Outcome>>({});
-  const outcome: Outcome = src ? outcomes[src] ?? 'pending' : 'error';
+  const outcome: Outcome = src ? (outcomes[src] ?? 'pending') : 'error';
   const status: 'loading' | 'loaded' | 'error' =
     outcome === 'loaded' ? 'loaded' : outcome === 'error' ? 'error' : 'loading';
 

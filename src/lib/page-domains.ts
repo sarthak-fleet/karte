@@ -26,7 +26,11 @@ export async function resolveSlugForHost(host: string): Promise<string | null> {
 
   await ensureProjectsTable();
   const rows = await db
-    .select({ slug: pages.slug, published: pages.published, status: pageDomains.status })
+    .select({
+      slug: pages.slug,
+      published: pages.published,
+      status: pageDomains.status,
+    })
     .from(pageDomains)
     .innerJoin(pages, eq(pages.id, pageDomains.pageId))
     .where(eq(pageDomains.hostname, normalized))
@@ -72,10 +76,7 @@ export async function findConflictingDomain(hostname: string): Promise<{
  */
 export async function listPageDomains(pageId: string) {
   await ensureProjectsTable();
-  return db
-    .select()
-    .from(pageDomains)
-    .where(eq(pageDomains.pageId, pageId));
+  return db.select().from(pageDomains).where(eq(pageDomains.pageId, pageId));
 }
 
 /**

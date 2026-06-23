@@ -38,5 +38,7 @@ export function isPageSectionType(value: string): value is PageSectionType {
 }
 
 export function getPageSectionLabel(type: string) {
-  return PAGE_SECTION_TYPES.find((section) => section.value === type)?.label ?? type;
+  return (
+    PAGE_SECTION_TYPES.find((section) => section.value === type)?.label ?? type
+  );
 }

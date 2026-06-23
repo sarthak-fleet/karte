@@ -6,7 +6,9 @@ export type AgentCapability = {
 
 export const MAX_AGENT_CAPABILITIES = 20;
 
-export function normalizeAgentCapabilities(value: unknown): AgentCapability[] | null {
+export function normalizeAgentCapabilities(
+  value: unknown,
+): AgentCapability[] | null {
   if (value === undefined || value === null) return null;
   if (!Array.isArray(value)) return null;
 
@@ -17,7 +19,8 @@ export function normalizeAgentCapabilities(value: unknown): AgentCapability[] | 
     const id = typeof record.id === 'string' ? record.id.trim() : '';
     const description =
       typeof record.description === 'string' ? record.description.trim() : '';
-    const label = typeof record.label === 'string' ? record.label.trim() : undefined;
+    const label =
+      typeof record.label === 'string' ? record.label.trim() : undefined;
 
     if (!id || !description) return null;
     normalized.push({

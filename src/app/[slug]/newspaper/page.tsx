@@ -8,7 +8,7 @@ import { getSession } from '@/lib/auth-server';
 import type { NewspaperContent } from '@/lib/generated-page-types';
 import { resolveThemeConfig } from '@/lib/themes';
 
-import { getGeneratedPage,getPageBySlug } from '../_lib/get-page-data';
+import { getGeneratedPage, getPageBySlug } from '../_lib/get-page-data';
 
 export default async function NewspaperPage({
   params,
@@ -31,10 +31,7 @@ export default async function NewspaperPage({
 
   // Generating-in-progress placeholder for visitors so they don't hit 404
   // while a background generation finishes.
-  if (
-    !existingNewspaper &&
-    generatedPage?.status === 'generating'
-  ) {
+  if (!existingNewspaper && generatedPage?.status === 'generating') {
     const session = await getSession().catch(() => null);
     const isOwner = session?.user?.id === page.userId;
     if (!isOwner) {

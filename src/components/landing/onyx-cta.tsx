@@ -33,7 +33,7 @@ export function OnyxCta() {
 
   return (
     <div className="onyx-cta">
-      <div className="onyx-eyebrow center">·  CLAIM YOUR NAME  ·</div>
+      <div className="onyx-eyebrow center">· CLAIM YOUR NAME ·</div>
       <h2 className="onyx-cta-h">
         Build the profile
         <br />
@@ -60,9 +60,7 @@ export function OnyxCta() {
           Claim <span aria-hidden="true">→</span>
         </button>
       </form>
-      <div className="onyx-cta-fine">
-        Free · no card · 60-second import.
-      </div>
+      <div className="onyx-cta-fine">Free · no card · 60-second import.</div>
     </div>
   );
 }

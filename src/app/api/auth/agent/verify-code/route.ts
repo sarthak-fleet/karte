@@ -13,7 +13,8 @@ import { hashSecret } from '@/lib/agent-crypto';
 import { isValidEmail } from '@/lib/validation';
 
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
   let body: { email?: unknown; code?: unknown; keyName?: unknown };
   try {
@@ -22,7 +23,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const email =
+    typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   const code = typeof body.code === 'string' ? body.code.trim() : '';
   const keyName =
     typeof body.keyName === 'string' && body.keyName.trim()
@@ -30,18 +32,27 @@ export async function POST(req: Request) {
       : `agent-${crypto.randomUUID().slice(0, 8)}`;
 
   if (!isValidEmail(email)) {
-    return NextResponse.json({ error: 'A valid email is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'A valid email is required' },
+      { status: 400 },
+    );
   }
 
   if (!/^\d{6}$/.test(code)) {
-    return NextResponse.json({ error: 'A 6-digit code is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'A 6-digit code is required' },
+      { status: 400 },
+    );
   }
 
   const rateLimits = checkAgentAuthRateLimits(ip, email);
   if (!rateLimits.ok) {
     return NextResponse.json(
       { error: rateLimits.error, retry_after: rateLimits.retryAfter },
-      { status: rateLimits.status, headers: { 'Retry-After': String(rateLimits.retryAfter) } },
+      {
+        status: rateLimits.status,
+        headers: { 'Retry-After': String(rateLimits.retryAfter) },
+      },
     );
   }
 
@@ -49,7 +60,10 @@ export async function POST(req: Request) {
   if (!keyBudget.ok) {
     return NextResponse.json(
       { error: keyBudget.error, retry_after: keyBudget.retryAfter },
-      { status: keyBudget.status, headers: { 'Retry-After': String(keyBudget.retryAfter) } },
+      {
+        status: keyBudget.status,
+        headers: { 'Retry-After': String(keyBudget.retryAfter) },
+      },
     );
   }
 
@@ -71,13 +85,17 @@ export async function POST(req: Request) {
     const [activeCode] = await db
       .select()
       .from(agentAuthCodes)
-      .where(and(eq(agentAuthCodes.email, email), gt(agentAuthCodes.expiresAt, now)))
+      .where(
+        and(eq(agentAuthCodes.email, email), gt(agentAuthCodes.expiresAt, now)),
+      )
       .limit(1);
 
     if (activeCode) {
       const attempts = (activeCode.attempts ?? 0) + 1;
       if (attempts >= AGENT_AUTH_LIMITS.verifyAttemptsPerCode) {
-        await db.delete(agentAuthCodes).where(eq(agentAuthCodes.id, activeCode.id));
+        await db
+          .delete(agentAuthCodes)
+          .where(eq(agentAuthCodes.id, activeCode.id));
       } else {
         await db
           .update(agentAuthCodes)
@@ -86,7 +104,10 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ error: 'Invalid or expired code' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'Invalid or expired code' },
+      { status: 401 },
+    );
   }
 
   await db.delete(agentAuthCodes).where(eq(agentAuthCodes.email, email));

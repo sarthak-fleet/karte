@@ -24,7 +24,8 @@ function limitResponse(error: string, retryAfter: number, status: number) {
 }
 
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
   let body: { email?: unknown };
   try {
@@ -33,19 +34,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const email =
+    typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   if (!isValidEmail(email)) {
-    return NextResponse.json({ error: 'A valid email is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'A valid email is required' },
+      { status: 400 },
+    );
   }
 
   const rateLimits = checkAgentAuthRateLimits(ip, email);
   if (!rateLimits.ok) {
-    return limitResponse(rateLimits.error, rateLimits.retryAfter, rateLimits.status);
+    return limitResponse(
+      rateLimits.error,
+      rateLimits.retryAfter,
+      rateLimits.status,
+    );
   }
 
   const dailyBudget = await assertAgentAuthDailyBudget();
   if (!dailyBudget.ok) {
-    return limitResponse(dailyBudget.error, dailyBudget.retryAfter, dailyBudget.status);
+    return limitResponse(
+      dailyBudget.error,
+      dailyBudget.retryAfter,
+      dailyBudget.status,
+    );
   }
 
   const cooldown = await assertAgentAuthEmailCooldown(email);
@@ -74,7 +87,10 @@ export async function POST(req: Request) {
   } catch (error) {
     await db.delete(agentAuthCodes).where(eq(agentAuthCodes.id, codeId));
     console.error('[agent-auth] failed to send code email', error);
-    return NextResponse.json({ error: 'Could not send sign-in email' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Could not send sign-in email' },
+      { status: 502 },
+    );
   }
 
   await recordAgentAuthSend(email, ipHash);
@@ -85,6 +101,7 @@ export async function POST(req: Request) {
   return NextResponse.json({
     ok: true,
     expires_in_seconds: CODE_TTL_MS / 1000,
-    message: 'If that email can receive Karte agent mail, a sign-in code was sent.',
+    message:
+      'If that email can receive Karte agent mail, a sign-in code was sent.',
   });
 }

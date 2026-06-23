@@ -44,7 +44,9 @@ export default async function DomainsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-bold text-karte-text">Custom Domains</h1>
+      <h1 className="mb-1 text-2xl font-bold text-karte-text">
+        Custom Domains
+      </h1>
       <p className="mb-6 text-sm text-karte-text-3">
         Connect a domain you own to your published profile. Slug routes (
         <code className="rounded bg-white/10 px-1">/{page.slug}</code>) keep

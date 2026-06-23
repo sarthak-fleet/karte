@@ -10,10 +10,7 @@ import {
   Textarea,
   Toggle,
 } from '@/components/ui';
-import {
-  CHAT_POSITIONS,
-  type ChatPosition,
-} from '@/lib/themes';
+import { CHAT_POSITIONS, type ChatPosition } from '@/lib/themes';
 
 interface ChatSettingsProps {
   pageId: string;
@@ -129,9 +126,7 @@ export function ChatSettings({
           {message && (
             <p
               className={`text-sm ${
-                message.includes('success')
-                  ? 'text-green-400'
-                  : 'text-red-400'
+                message.includes('success') ? 'text-green-400' : 'text-red-400'
               }`}
             >
               {message}

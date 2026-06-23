@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { maybeReloadOnChunkError } from "@/lib/chunk-reload";
-import { captureError } from "@/lib/foundry-monitoring";
+import { maybeReloadOnChunkError } from '@/lib/chunk-reload';
+import { captureError } from '@/lib/foundry-monitoring';
 
 export default function DashboardError({
   error,
@@ -15,7 +15,7 @@ export default function DashboardError({
   useEffect(() => {
     if (maybeReloadOnChunkError(error)) return;
     console.error(error);
-    captureError(error, { scope: "dashboard", digest: error.digest });
+    captureError(error, { scope: 'dashboard', digest: error.digest });
   }, [error]);
 
   return (

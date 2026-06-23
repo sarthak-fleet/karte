@@ -1,6 +1,6 @@
-import "./globals.css";
+import './globals.css';
 
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import {
   Geist,
   Geist_Mono,
@@ -8,11 +8,11 @@ import {
   Inter,
   JetBrains_Mono,
   Playfair_Display,
-} from "next/font/google";
+} from 'next/font/google';
 
-import { AnalyticsProvider } from "@/components/posthog-provider";
-import { PageAnalyticsTracker } from "@/components/public/page-analytics-tracker";
-import { VitalsReporter } from "@/components/VitalsReporter";
+import { AnalyticsProvider } from '@/components/posthog-provider';
+import { PageAnalyticsTracker } from '@/components/public/page-analytics-tracker';
+import { VitalsReporter } from '@/components/VitalsReporter';
 
 // preload: false on the dashboard/app fonts — they aren't used on the
 // LCP path (which is the Onyx landing deck). Browsers still fetch them
@@ -22,22 +22,22 @@ import { VitalsReporter } from "@/components/VitalsReporter";
 // paint the hero. psi-swarm flagged 7 font preloads as part of the 1.6s
 // render delay on karte.cc /.
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
   preload: false,
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
   preload: false,
 });
 
 const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: "italic",
+  variable: '--font-instrument-serif',
+  subsets: ['latin'],
+  weight: '400',
+  style: 'italic',
   preload: false,
 });
 
@@ -47,53 +47,53 @@ const instrumentSerif = Instrument_Serif({
 // body/UI. JetBrains is used only for the agent-spec labels deep in
 // the deck — preload skipped to save a request on the LCP path.
 const playfairDisplay = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  variable: '--font-playfair',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
 });
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  variable: '--font-inter',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  variable: '--font-jetbrains',
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
   preload: false,
 });
 
-const SITE_URL = "https://karte.cc";
+const SITE_URL = 'https://karte.cc';
 const SITE_DESCRIPTION =
-  "Your digital card on the open web — links, projects, bio, and an AI version of you. One page, one link: karte.cc/yourhandle.";
+  'Your digital card on the open web — links, projects, bio, and an AI version of you. One page, one link: karte.cc/yourhandle.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Karte — Your digital card",
-    template: "%s — Karte",
+    default: 'Karte — Your digital card',
+    template: '%s — Karte',
   },
   description: SITE_DESCRIPTION,
-  applicationName: "Karte",
+  applicationName: 'Karte',
   keywords: [
-    "link in bio",
-    "personal website",
-    "digital card",
-    "Linktree alternative",
+    'link in bio',
+    'personal website',
+    'digital card',
+    'Linktree alternative',
   ],
   openGraph: {
-    type: "website",
+    type: 'website',
     url: SITE_URL,
-    siteName: "Karte",
-    title: "Karte — Your digital card",
+    siteName: 'Karte',
+    title: 'Karte — Your digital card',
     description: SITE_DESCRIPTION,
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Karte — Your digital card",
+    card: 'summary_large_image',
+    title: 'Karte — Your digital card',
     description: SITE_DESCRIPTION,
   },
 };

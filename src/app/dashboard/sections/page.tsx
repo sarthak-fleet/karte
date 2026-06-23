@@ -1,4 +1,4 @@
-import { asc,eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
 import { SectionEditor } from '@/components/dashboard/section-editor';
@@ -35,7 +35,8 @@ export default async function SectionsPage() {
     <div>
       <h1 className="mb-1 text-2xl font-bold text-karte-text">Sections</h1>
       <p className="mb-6 text-sm text-karte-text-3">
-        Build and reorder structured content blocks, including blog posts, for the public page.
+        Build and reorder structured content blocks, including blog posts, for
+        the public page.
       </p>
       <SectionEditor pageId={page.id} initialSections={sections} />
     </div>

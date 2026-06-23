@@ -5,7 +5,12 @@ interface WikiInfoboxProps {
   accentColor: string;
 }
 
-export function WikiInfobox({ infobox, displayName, avatarUrl, accentColor }: WikiInfoboxProps) {
+export function WikiInfobox({
+  infobox,
+  displayName,
+  avatarUrl,
+  accentColor,
+}: WikiInfoboxProps) {
   const entries = Object.entries(infobox);
 
   return (
@@ -27,7 +32,10 @@ export function WikiInfobox({ infobox, displayName, avatarUrl, accentColor }: Wi
       <tbody>
         {avatarUrl && (
           <tr>
-            <td colSpan={2} className="border border-[#a2a9b1] bg-[#f8f9fa] p-3 text-center">
+            <td
+              colSpan={2}
+              className="border border-[#a2a9b1] bg-[#f8f9fa] p-3 text-center"
+            >
               <img
                 src={avatarUrl}
                 alt={displayName}

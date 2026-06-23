@@ -9,7 +9,8 @@
 
 const baseUrl = (() => {
   const idx = process.argv.indexOf('--base-url');
-  if (idx !== -1 && process.argv[idx + 1]) return process.argv[idx + 1].replace(/\/$/, '');
+  if (idx !== -1 && process.argv[idx + 1])
+    return process.argv[idx + 1].replace(/\/$/, '');
   return (process.env.KARTE_BASE_URL || 'https://karte.cc').replace(/\/$/, '');
 })();
 
@@ -18,7 +19,6 @@ const failures = [];
 async function check(name, fn) {
   try {
     await fn();
-    console.log(`ok  ${name}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`fail ${name}: ${message}`);
@@ -42,14 +42,17 @@ async function fetchJson(path, init) {
     json = body;
   }
   if (!res.ok) {
-    throw new Error(`${res.status} ${typeof json === 'object' ? JSON.stringify(json) : body}`);
+    throw new Error(
+      `${res.status} ${typeof json === 'object' ? JSON.stringify(json) : body}`,
+    );
   }
   return json;
 }
 
 await check('GET /skill.md', async () => {
   const text = await fetchText('/skill.md');
-  if (!text.includes('Skill version:')) throw new Error('missing skill version header');
+  if (!text.includes('Skill version:'))
+    throw new Error('missing skill version header');
 });
 
 await check('GET /llms.txt', async () => {
@@ -66,7 +69,8 @@ await check('GET /.well-known/skills/index.json', async () => {
 
 await check('GET /skills/karte/install.sh', async () => {
   const text = await fetchText('/skills/karte/install.sh');
-  if (!text.includes('skill.md')) throw new Error('install script missing skill fetch');
+  if (!text.includes('skill.md'))
+    throw new Error('install script missing skill fetch');
 });
 
 await check('GET /atlas-demo/agent.json or 404 before seed', async () => {
@@ -105,12 +109,9 @@ if (smokeEmail && smokeCode) {
     });
   }
 } else {
-  console.log('skip auth flow (set KARTE_SMOKE_EMAIL + KARTE_SMOKE_CODE to run)');
 }
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} check(s) failed against ${baseUrl}`);
   process.exit(1);
 }
-
-console.log(`\nAll smoke checks passed for ${baseUrl}`);

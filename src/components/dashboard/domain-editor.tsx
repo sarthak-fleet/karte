@@ -9,8 +9,18 @@ import { useState } from 'react';
 // docs/plans/custom-domains-migration.md is complete.
 const CUSTOM_DOMAINS_LIVE = false;
 
-type Verification = { type: string; domain: string; value: string; reason?: string };
-type DnsInstruction = { type: 'A' | 'CNAME'; name: string; value: string; note?: string };
+type Verification = {
+  type: string;
+  domain: string;
+  value: string;
+  reason?: string;
+};
+type DnsInstruction = {
+  type: 'A' | 'CNAME';
+  name: string;
+  value: string;
+  note?: string;
+};
 
 export type DomainRow = {
   id: string;
@@ -49,7 +59,11 @@ export function DomainEditor({
   const [primaryingId, setPrimaryingId] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  const [verifyToast, setVerifyToast] = useState<{ id: string; kind: 'ok' | 'err'; text: string } | null>(null);
+  const [verifyToast, setVerifyToast] = useState<{
+    id: string;
+    kind: 'ok' | 'err';
+    text: string;
+  } | null>(null);
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -60,8 +74,7 @@ export function DomainEditor({
       window.setTimeout(() => {
         setCopiedKey((k) => (k === key ? null : k));
       }, 1500);
-    } catch {
-    }
+    } catch {}
   }
 
   function flashToast(id: string, kind: 'ok' | 'err', text: string) {
@@ -97,9 +110,12 @@ export function DomainEditor({
     setVerifyingId(domainId);
     const prevStatus = domains.find((d) => d.id === domainId)?.status;
     try {
-      const res = await fetch(`/api/pages/${pageId}/domains/${domainId}/verify`, {
-        method: 'POST',
-      });
+      const res = await fetch(
+        `/api/pages/${pageId}/domains/${domainId}/verify`,
+        {
+          method: 'POST',
+        },
+      );
       const json = await res.json();
       if (!res.ok) {
         flashToast(domainId, 'err', json.error ?? 'Verification failed');
@@ -125,9 +141,12 @@ export function DomainEditor({
     setError(null);
     setPrimaryingId(domainId);
     try {
-      const res = await fetch(`/api/pages/${pageId}/domains/${domainId}/primary`, {
-        method: 'POST',
-      });
+      const res = await fetch(
+        `/api/pages/${pageId}/domains/${domainId}/primary`,
+        {
+          method: 'POST',
+        },
+      );
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(json.error ?? 'Failed to set primary');
@@ -171,7 +190,8 @@ export function DomainEditor({
       >
         <label className="flex flex-1 flex-col gap-1.5 text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
           <span>
-            <span className="text-karte-accent/80">·</span> Add a custom hostname
+            <span className="text-karte-accent/80">·</span> Add a custom
+            hostname
           </span>
           <input
             type="text"
@@ -205,7 +225,8 @@ export function DomainEditor({
             const isVerifying = verifyingId === d.id;
             const isPrimarying = primaryingId === d.id;
             const isRemoving = removingId === d.id;
-            const toast = verifyToast && verifyToast.id === d.id ? verifyToast : null;
+            const toast =
+              verifyToast && verifyToast.id === d.id ? verifyToast : null;
 
             return (
               <li
@@ -289,7 +310,9 @@ export function DomainEditor({
                 </div>
 
                 {d.errorMessage && (
-                  <p className="mt-3 text-[12px] text-rose-200">{d.errorMessage}</p>
+                  <p className="mt-3 text-[12px] text-rose-200">
+                    {d.errorMessage}
+                  </p>
                 )}
 
                 <ValidationSections
@@ -630,7 +653,13 @@ function NotifyCard() {
       // Fire-and-forget. Use the PostHog client if the provider has mounted it.
       // We don't await — UI feedback is immediate.
       if (typeof window !== 'undefined') {
-        const ph = (window as unknown as { posthog?: { capture?: (e: string, p?: Record<string, unknown>) => void } }).posthog;
+        const ph = (
+          window as unknown as {
+            posthog?: {
+              capture?: (e: string, p?: Record<string, unknown>) => void;
+            };
+          }
+        ).posthog;
         ph?.capture?.('custom_domain_interest', {
           source: 'dashboard/domains',
         });

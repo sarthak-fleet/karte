@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback,useState } from 'react';
+import { useCallback, useState } from 'react';
 
 type Props = {
   hasKey: boolean;
@@ -28,7 +28,9 @@ export function AiKeySettings({
   const [aiConfigured, setAiConfigured] = useState(hasAiConfig);
 
   // Model discovery
-  const [discoveredModels, setDiscoveredModels] = useState<{ id: string; name?: string }[]>([]);
+  const [discoveredModels, setDiscoveredModels] = useState<
+    { id: string; name?: string }[]
+  >([]);
   const [loadingModels, setLoadingModels] = useState(false);
 
   // Shared state
@@ -139,7 +141,9 @@ export function AiKeySettings({
     <div className="space-y-6">
       {/* Document Index Key (SaaS Maker — for RAG/chat) */}
       <div className="rounded-2xl bg-white/[0.02] p-6">
-        <h2 className="mb-1 text-lg font-semibold text-karte-text">Document Index Key</h2>
+        <h2 className="mb-1 text-lg font-semibold text-karte-text">
+          Document Index Key
+        </h2>
         <p className="mb-4 text-sm text-karte-text-3">
           {configured
             ? 'Your document index key is configured. Enter a new key to update it.'
@@ -151,7 +155,9 @@ export function AiKeySettings({
             type="password"
             value={aiKey}
             onChange={(e) => setAiKey(e.target.value)}
-            placeholder={configured ? '••••••••••••••••' : 'Enter your document index key'}
+            placeholder={
+              configured ? '••••••••••••••••' : 'Enter your document index key'
+            }
             className="flex-1 rounded-lg border border-karte-border-strong bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-gray-500 outline-none focus:border-white/30"
           />
           <button
@@ -172,19 +178,23 @@ export function AiKeySettings({
 
       {/* Custom AI Endpoint */}
       <div className="rounded-2xl bg-white/[0.02] p-6">
-        <h2 className="mb-1 text-lg font-semibold text-karte-text">AI Endpoint</h2>
+        <h2 className="mb-1 text-lg font-semibold text-karte-text">
+          AI Endpoint
+        </h2>
         <p className="mb-4 text-sm text-karte-text-3">
           {isUsingDefaultAi
             ? 'Karte AI is configured by default. Add your own endpoint only if you want to override it.'
             : aiConfigured
-            ? 'Your AI endpoint is configured. Update any field below.'
-            : 'Connect any OpenAI-compatible endpoint to power AI features.'}
+              ? 'Your AI endpoint is configured. Update any field below.'
+              : 'Connect any OpenAI-compatible endpoint to power AI features.'}
         </p>
 
         <div className="space-y-3">
           {/* Endpoint URL */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-karte-text-3">Endpoint URL</label>
+            <label className="mb-1 block text-xs font-medium text-karte-text-3">
+              Endpoint URL
+            </label>
             <input
               type="text"
               value={endpointUrl}
@@ -196,19 +206,25 @@ export function AiKeySettings({
 
           {/* API Key */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-karte-text-3">API Key</label>
+            <label className="mb-1 block text-xs font-medium text-karte-text-3">
+              API Key
+            </label>
             <input
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder={aiConfigured ? '••••••••••••••••' : 'Enter your API key'}
+              placeholder={
+                aiConfigured ? '••••••••••••••••' : 'Enter your API key'
+              }
               className="w-full rounded-lg border border-karte-border-strong bg-white/5 px-3 py-2 text-sm text-karte-text placeholder-gray-500 outline-none focus:border-white/30"
             />
           </div>
 
           {/* Model */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-karte-text-3">Model</label>
+            <label className="mb-1 block text-xs font-medium text-karte-text-3">
+              Model
+            </label>
             <div className="flex gap-2">
               {discoveredModels.length > 0 ? (
                 <select
@@ -233,7 +249,9 @@ export function AiKeySettings({
               )}
               <button
                 onClick={handleDiscoverModels}
-                disabled={loadingModels || !endpointUrl.trim() || !apiKey.trim()}
+                disabled={
+                  loadingModels || !endpointUrl.trim() || !apiKey.trim()
+                }
                 className="shrink-0 rounded-lg border border-karte-border-strong px-3 py-2 text-xs font-medium text-karte-text-2 transition hover:border-white/30 hover:text-karte-text disabled:opacity-50"
               >
                 {loadingModels ? 'Loading...' : 'Discover'}
@@ -252,7 +270,12 @@ export function AiKeySettings({
           {/* Save button */}
           <button
             onClick={handleSaveAiConfig}
-            disabled={saving || !endpointUrl.trim() || !model.trim() || (!aiConfigured && !apiKey.trim())}
+            disabled={
+              saving ||
+              !endpointUrl.trim() ||
+              !model.trim() ||
+              (!aiConfigured && !apiKey.trim())
+            }
             className="w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-100 disabled:opacity-50 sm:w-auto"
           >
             {saving ? 'Saving...' : 'Save AI Config'}
@@ -261,13 +284,16 @@ export function AiKeySettings({
 
         {!aiConfigured && (
           <p className="mt-3 text-xs text-yellow-400/80">
-            AI features (roast, newspaper, encyclopedia, chat) require an AI endpoint.
+            AI features (roast, newspaper, encyclopedia, chat) require an AI
+            endpoint.
           </p>
         )}
       </div>
 
       {message && (
-        <p className={`text-sm ${message.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
+        <p
+          className={`text-sm ${message.includes('success') ? 'text-green-400' : 'text-red-400'}`}
+        >
           {message}
         </p>
       )}

@@ -151,7 +151,10 @@ export function SocialIconRow({
                 <path d={brandGlyph.d} />
               </svg>
             ) : (
-              <DomainIconFallback host={fallbackHost} accentColor={accentColor} />
+              <DomainIconFallback
+                host={fallbackHost}
+                accentColor={accentColor}
+              />
             )}
           </a>
         );

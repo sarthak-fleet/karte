@@ -13,7 +13,10 @@ function getVerdict(score: number): string {
   return 'Elite';
 }
 
-export function RoastScoreCard({ vibeScore, accentColor }: RoastScoreCardProps) {
+export function RoastScoreCard({
+  vibeScore,
+  accentColor,
+}: RoastScoreCardProps) {
   const radius = 50;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (vibeScore / 100) * circumference;
@@ -55,7 +58,10 @@ export function RoastScoreCard({ vibeScore, accentColor }: RoastScoreCardProps) 
           <div className="absolute inset-0 flex items-center justify-center">
             <span
               className="text-4xl font-black"
-              style={{ color: '#f9ff00', textShadow: `3px 3px 0 ${accentColor}` }}
+              style={{
+                color: '#f9ff00',
+                textShadow: `3px 3px 0 ${accentColor}`,
+              }}
             >
               {vibeScore}
             </span>
@@ -64,9 +70,7 @@ export function RoastScoreCard({ vibeScore, accentColor }: RoastScoreCardProps) 
         <p className="text-sm font-black uppercase tracking-widest text-karte-text">
           Vibe Score
         </p>
-        <p
-          className="border-2 border-white bg-white px-3 py-1 text-lg font-black uppercase text-black"
-        >
+        <p className="border-2 border-white bg-white px-3 py-1 text-lg font-black uppercase text-black">
           {getVerdict(vibeScore)}
         </p>
       </div>

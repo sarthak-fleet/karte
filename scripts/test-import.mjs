@@ -15,9 +15,18 @@ const MAX_TITLE_LENGTH = 100;
 const MAX_IMPORT_LINKS = 30;
 
 const BLOCKED_LABELS = new Set([
-  'cookie', 'cookies', 'privacy', 'privacy policy', 'terms',
-  'terms of service', 'sign in', 'log in', 'login', 'sign up',
-  'get started', 'report',
+  'cookie',
+  'cookies',
+  'privacy',
+  'privacy policy',
+  'terms',
+  'terms of service',
+  'sign in',
+  'log in',
+  'login',
+  'sign up',
+  'get started',
+  'report',
 ]);
 
 const BLOCKED_ASSET_HOSTS = new Set([
@@ -29,30 +38,53 @@ const BLOCKED_ASSET_HOSTS = new Set([
 ]);
 
 const ASSET_EXTENSIONS = new Set([
-  '.css', '.js', '.mjs', '.woff', '.woff2', '.ttf', '.otf',
-  '.webp', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.map',
+  '.css',
+  '.js',
+  '.mjs',
+  '.woff',
+  '.woff2',
+  '.ttf',
+  '.otf',
+  '.webp',
+  '.svg',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.ico',
+  '.map',
 ]);
 
 const ASSET_HOST_SUFFIXES = ['.youtube-nocookie.com'];
 
 function decodeEntities(text) {
   return text
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
     .replace(/&#x27;/g, "'")
     .replace(/&#(\d+);/g, (_, c) => String.fromCharCode(Number(c)))
     .replace(/&nbsp;/g, ' ');
 }
 
 function stripTags(value) {
-  return decodeEntities(value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+  return decodeEntities(
+    value
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim(),
+  );
 }
 
 function dedupeAdjacentWords(value) {
   const tokens = value.split(/\s+/).filter(Boolean);
   const out = [];
   for (const t of tokens) {
-    if (out.length && out[out.length - 1].toLowerCase() === t.toLowerCase()) continue;
+    if (out.length && out[out.length - 1].toLowerCase() === t.toLowerCase())
+      continue;
     out.push(t);
   }
   return out.join(' ');
@@ -62,7 +94,11 @@ function titleFromUrl(url) {
   try {
     const parsed = new URL(url);
     const host = parsed.hostname.replace(/^www\./, '');
-    const path = parsed.pathname.split('/').filter(Boolean).slice(-1)[0]?.replace(/[-_]+/g, ' ');
+    const path = parsed.pathname
+      .split('/')
+      .filter(Boolean)
+      .slice(-1)[0]
+      ?.replace(/[-_]+/g, ' ');
     return (path || host).slice(0, MAX_TITLE_LENGTH);
   } catch {
     return 'Imported link';
@@ -70,9 +106,13 @@ function titleFromUrl(url) {
 }
 
 function cleanTitle(value, url) {
-  const stripped = stripTags(value).replace(/\s+/g, ' ').replace(/^↗\s*/, '').trim();
+  const stripped = stripTags(value)
+    .replace(/\s+/g, ' ')
+    .replace(/^↗\s*/, '')
+    .trim();
   const title = dedupeAdjacentWords(stripped);
-  if (!title || BLOCKED_LABELS.has(title.toLowerCase())) return titleFromUrl(url);
+  if (!title || BLOCKED_LABELS.has(title.toLowerCase()))
+    return titleFromUrl(url);
   return title.slice(0, MAX_TITLE_LENGTH);
 }
 
@@ -80,7 +120,8 @@ function isBlockedUrl(urlStr) {
   try {
     const { hostname } = new URL(urlStr);
     const h = hostname.toLowerCase();
-    if (h === 'localhost' || h.endsWith('.local') || h.endsWith('.internal')) return true;
+    if (h === 'localhost' || h.endsWith('.local') || h.endsWith('.internal'))
+      return true;
     if (h.includes('metadata') || h.includes('internal')) return true;
     const ipv4 = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
     if (ipv4) {
@@ -91,7 +132,9 @@ function isBlockedUrl(urlStr) {
       if (a === 169 && b === 254) return true;
     }
     return false;
-  } catch { return true; }
+  } catch {
+    return true;
+  }
 }
 
 function isAssetUrl(urlStr) {
@@ -104,7 +147,9 @@ function isAssetUrl(urlStr) {
     const dot = p.lastIndexOf('.');
     if (dot >= 0 && ASSET_EXTENSIONS.has(p.slice(dot))) return true;
     return false;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 function normalizeUrl(rawUrl, sourceUrl) {
@@ -113,11 +158,19 @@ function normalizeUrl(rawUrl, sourceUrl) {
     if (!['http:', 'https:'].includes(url.protocol)) return null;
     if (isBlockedUrl(url.toString())) return null;
     if (isAssetUrl(url.toString())) return null;
-    for (const p of ['utm_source','utm_medium','utm_campaign','utm_term','utm_content']) {
+    for (const p of [
+      'utm_source',
+      'utm_medium',
+      'utm_campaign',
+      'utm_term',
+      'utm_content',
+    ]) {
       url.searchParams.delete(p);
     }
     return url.toString();
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function isUsefulLink(item, sourceHost) {
@@ -128,16 +181,27 @@ function isUsefulLink(item, sourceHost) {
     if (BLOCKED_LABELS.has(label)) return false;
     if (label.length < 2) return false;
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 function registrableDomain(hostname) {
-  const parts = hostname.toLowerCase().replace(/^www\./, '').split('.');
+  const parts = hostname
+    .toLowerCase()
+    .replace(/^www\./, '')
+    .split('.');
   if (parts.length <= 2) return parts.join('.');
   return parts.slice(-2).join('.');
 }
 
-async function fetchSource(url, { allowCrossDomainRedirect = false, accept = 'text/html,application/xhtml+xml' } = {}) {
+async function fetchSource(
+  url,
+  {
+    allowCrossDomainRedirect = false,
+    accept = 'text/html,application/xhtml+xml',
+  } = {},
+) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
@@ -147,18 +211,24 @@ async function fetchSource(url, { allowCrossDomainRedirect = false, accept = 'te
       redirect: 'follow',
     });
     if (res.status === 403) {
-      throw new Error('This page blocks automated imports. Try copying your links manually.');
+      throw new Error(
+        'This page blocks automated imports. Try copying your links manually.',
+      );
     }
     if (!res.ok) throw new Error(`Import source returned ${res.status}`);
     if (!allowCrossDomainRedirect) {
       const inputHost = new URL(url).hostname;
       const finalHost = new URL(res.url).hostname;
       if (registrableDomain(inputHost) !== registrableDomain(finalHost)) {
-        throw new Error('This page redirects to a different domain — refusing import.');
+        throw new Error(
+          'This page redirects to a different domain — refusing import.',
+        );
       }
     }
     return { body: await res.text(), finalUrl: res.url };
-  } finally { clearTimeout(timeout); }
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 // --- generic ---
@@ -213,7 +283,11 @@ function linktreeParse(html, sourceUrl) {
   const m = /<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i.exec(html);
   if (!m) return genericParse(html, sourceUrl);
   let json;
-  try { json = JSON.parse(m[1]); } catch { return genericParse(html, sourceUrl); }
+  try {
+    json = JSON.parse(m[1]);
+  } catch {
+    return genericParse(html, sourceUrl);
+  }
   const links = json?.props?.pageProps?.account?.links;
   if (!Array.isArray(links)) return genericParse(html, sourceUrl);
   const sourceHost = new URL(sourceUrl).hostname.replace(/^www\./, '');
@@ -235,7 +309,9 @@ function stanParse(html, sourceUrl) {
   const m = /window\.__NUXT__\s*=\s*([\s\S]*?)<\/script>/i.exec(html);
   if (!m) return [];
   const sourceHost = new URL(sourceUrl).hostname.replace(/^www\./, '');
-  const found = (m[1].match(/https?:(?:\\u002F\\u002F|\/\/)[^"'\\<>\s)]+/gi) ?? []).map((s) => s.replace(/\\u002F/gi, '/'));
+  const found = (
+    m[1].match(/https?:(?:\\u002F\\u002F|\/\/)[^"'\\<>\s)]+/gi) ?? []
+  ).map((s) => s.replace(/\\u002F/gi, '/'));
   const seen = new Set();
   const out = [];
   for (const raw of found) {
@@ -258,7 +334,12 @@ async function linkinBioParse(_html, sourceUrl) {
     `https://api-prod.linkin.bio/api/v2/pages?nickname=${encodeURIComponent(slug)}`,
     { allowCrossDomainRedirect: true, accept: 'application/json' },
   );
-  let parsed; try { parsed = JSON.parse(body); } catch { return []; }
+  let parsed;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return [];
+  }
   const page = parsed?.linkinbio_page;
   if (!page) return [];
   const sourceHost = new URL(sourceUrl).hostname.replace(/^www\./, '');
@@ -285,7 +366,9 @@ async function linkinBioParse(_html, sourceUrl) {
     } else if (block.block_type === 'social_link_list') {
       for (const s of d.social_links || []) {
         if (s.enabled === false) continue;
-        const t = s.platform ? s.platform.charAt(0).toUpperCase() + s.platform.slice(1) : '';
+        const t = s.platform
+          ? s.platform.charAt(0).toUpperCase() + s.platform.slice(1)
+          : '';
         push(s.url, t);
         if (out.length >= MAX_IMPORT_LINKS) break;
       }
@@ -300,9 +383,12 @@ async function linkinBioParse(_html, sourceUrl) {
 function pickParser(url) {
   try {
     const host = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
-    if (host === 'linktr.ee' || host.endsWith('.linktr.ee')) return ['linktree', linktreeParse, false];
-    if (host === 'linkin.bio' || host.endsWith('.linkin.bio')) return ['linkin-bio', linkinBioParse, true];
-    if (host === 'stan.store' || host.endsWith('.stan.store')) return ['stan', stanParse, false];
+    if (host === 'linktr.ee' || host.endsWith('.linktr.ee'))
+      return ['linktree', linktreeParse, false];
+    if (host === 'linkin.bio' || host.endsWith('.linkin.bio'))
+      return ['linkin-bio', linkinBioParse, true];
+    if (host === 'stan.store' || host.endsWith('.stan.store'))
+      return ['stan', stanParse, false];
   } catch {}
   return ['generic', genericParse, false];
 }
@@ -335,11 +421,15 @@ async function main() {
       for (const link of links.slice(0, 8)) {
         process.stdout.write(`  - ${link.title}  →  ${link.url}\n`);
       }
-      if (links.length > 8) process.stdout.write(`  ... +${links.length - 8} more\n`);
+      if (links.length > 8)
+        process.stdout.write(`  ... +${links.length - 8} more\n`);
     } catch (err) {
       process.stdout.write(`  ERROR: ${err.message}\n`);
     }
   }
 }
 
-main().catch((err) => { console.error(err); process.exit(1); });
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

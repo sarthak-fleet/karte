@@ -13,7 +13,7 @@ import {
   handleCommandNavigation,
   StarterKit,
 } from 'novel';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // ── Slash command items ─────────────────────────────────────────────────────
 
@@ -24,7 +24,12 @@ const slashItems = createSuggestionItems([
     icon: <span className="text-xs font-bold">H2</span>,
     searchTerms: ['heading', 'h2', 'section'],
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .setNode('heading', { level: 2 })
+        .run();
     },
   },
   {
@@ -33,7 +38,12 @@ const slashItems = createSuggestionItems([
     icon: <span className="text-xs font-bold">H3</span>,
     searchTerms: ['heading', 'h3', 'subsection'],
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .setNode('heading', { level: 3 })
+        .run();
     },
   },
   {
@@ -193,7 +203,9 @@ export function NovelEditor({ initialContent, onUpdate }: NovelEditorProps) {
                 </span>
                 <div>
                   <p className="font-medium text-karte-text">{item.title}</p>
-                  <p className="text-xs text-karte-text-4">{item.description}</p>
+                  <p className="text-xs text-karte-text-4">
+                    {item.description}
+                  </p>
                 </div>
               </EditorCommandItem>
             ))}

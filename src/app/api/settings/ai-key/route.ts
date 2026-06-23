@@ -47,7 +47,10 @@ export async function PUT(req: Request) {
   // RAG indexing now goes only through the shared knowledgebase Worker.
   if (aiKey !== undefined) {
     if (!aiKey?.trim()) {
-      return NextResponse.json({ error: 'AI key is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'AI key is required' },
+        { status: 400 },
+      );
     }
 
     let indexId = user.smIndexId;
@@ -55,7 +58,10 @@ export async function PUT(req: Request) {
       try {
         indexId = await ensureProfileMemoryIndex(auth.userId);
       } catch {
-        return NextResponse.json({ error: 'Failed to initialize chat index' }, { status: 502 });
+        return NextResponse.json(
+          { error: 'Failed to initialize chat index' },
+          { status: 502 },
+        );
       }
     }
 
@@ -64,8 +70,13 @@ export async function PUT(req: Request) {
   }
 
   // Handle custom AI endpoint config
-  if (aiEndpointUrl !== undefined || aiApiKey !== undefined || aiModel !== undefined) {
-    if (aiEndpointUrl !== undefined) updates.aiEndpointUrl = aiEndpointUrl?.trim() || null;
+  if (
+    aiEndpointUrl !== undefined ||
+    aiApiKey !== undefined ||
+    aiModel !== undefined
+  ) {
+    if (aiEndpointUrl !== undefined)
+      updates.aiEndpointUrl = aiEndpointUrl?.trim() || null;
     if (aiApiKey !== undefined) updates.aiApiKey = aiApiKey?.trim() || null;
     if (aiModel !== undefined) updates.aiModel = aiModel?.trim() || null;
   }
@@ -74,10 +85,7 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'No updates provided' }, { status: 400 });
   }
 
-  await db
-    .update(users)
-    .set(updates)
-    .where(eq(users.id, auth.userId));
+  await db.update(users).set(updates).where(eq(users.id, auth.userId));
 
   return NextResponse.json({ success: true });
 }

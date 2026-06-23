@@ -1,6 +1,7 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+
 import sitemap from '@astrojs/sitemap';
+import { defineConfig } from 'astro/config';
 
 // Mirrors fleet/sarthakagrawal/astro.config.mjs, which is the reference
 // 360 ms-LCP Astro setup. Pure static output (no SSR adapter) — the

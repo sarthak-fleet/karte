@@ -40,7 +40,8 @@ export const PROFILE_VARIANTS: ProfileVariant[] = [
     audience: 'Recruiters, customers, and collaborators who need trust signals',
     eyebrow: 'Work worth checking',
     primaryCta: 'Ask about proof',
-    hypothesis: 'Leading with credibility should lift outbound clicks to projects and links.',
+    hypothesis:
+      'Leading with credibility should lift outbound clicks to projects and links.',
     promptOne: (firstName) => `What proof shows ${firstName} is good?`,
     promptTwo: 'Which project should I open first?',
   },
@@ -50,7 +51,8 @@ export const PROFILE_VARIANTS: ProfileVariant[] = [
     audience: 'Visitors who are more likely to ask than browse',
     eyebrow: 'Ask before you scroll',
     primaryCta: 'Ask the profile',
-    hypothesis: 'Making chat the primary action should lift chat CTA and DM conversions.',
+    hypothesis:
+      'Making chat the primary action should lift chat CTA and DM conversions.',
     promptOne: (firstName) => `What should I ask ${firstName}?`,
     promptTwo: 'Summarize this profile for me.',
   },
@@ -60,7 +62,8 @@ export const PROFILE_VARIANTS: ProfileVariant[] = [
     audience: 'Technical peers and operators evaluating current work',
     eyebrow: 'Built and shipped',
     primaryCta: 'Explore builds',
-    hypothesis: 'A build-focused frame should lift project-card and technical link clicks.',
+    hypothesis:
+      'A build-focused frame should lift project-card and technical link clicks.',
     promptOne: (firstName) => `What is ${firstName} shipping right now?`,
     promptTwo: 'Show me the most technical work here.',
   },
@@ -76,11 +79,19 @@ const CONVERSION_EVENTS = new Set([
 ]);
 
 export function getProfileVariant(value?: string | null) {
-  return PROFILE_VARIANTS.find((variant) => variant.id === value) ?? PROFILE_VARIANTS[0];
+  return (
+    PROFILE_VARIANTS.find((variant) => variant.id === value) ??
+    PROFILE_VARIANTS[0]
+  );
 }
 
-export function buildVariantPreviewUrl(slug: string, variantId: ProfileVariantId) {
-  return variantId === 'baseline' ? `/${slug}` : `/${slug}?variant=${variantId}`;
+export function buildVariantPreviewUrl(
+  slug: string,
+  variantId: ProfileVariantId,
+) {
+  return variantId === 'baseline'
+    ? `/${slug}`
+    : `/${slug}?variant=${variantId}`;
 }
 
 export function summarizeVariantAnalytics(events: VariantEvent[]) {
@@ -114,8 +125,11 @@ export function summarizeVariantAnalytics(events: VariantEvent[]) {
   }
 
   for (const summary of summaries.values()) {
-    summary.conversionRate = summary.views > 0 ? summary.conversions / summary.views : 0;
+    summary.conversionRate =
+      summary.views > 0 ? summary.conversions / summary.views : 0;
   }
 
-  return [...summaries.values()].sort((a, b) => b.conversionRate - a.conversionRate);
+  return [...summaries.values()].sort(
+    (a, b) => b.conversionRate - a.conversionRate,
+  );
 }

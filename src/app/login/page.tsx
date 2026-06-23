@@ -55,7 +55,12 @@ export default async function LoginPage() {
           <div className="rounded-3xl border border-karte-border bg-karte-surface p-6">
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-karte-accent">
-                <svg aria-hidden="true" viewBox="0 0 32 32" fill="none" className="h-6 w-6">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  className="h-6 w-6"
+                >
                   <path
                     d="M8 7 h16 a4 4 0 0 1 4 4 v9 a4 4 0 0 1 -4 4 h-9 l-4 4 v-4 h-3 a4 4 0 0 1 -4 -4 v-9 a4 4 0 0 1 4 -4 Z"
                     fill="#0a0a0a"
@@ -72,7 +77,9 @@ export default async function LoginPage() {
                 >
                   Karte
                 </p>
-                <p className="text-[12px] text-karte-text-4">Creator dashboard</p>
+                <p className="text-[12px] text-karte-text-4">
+                  Creator dashboard
+                </p>
               </div>
             </div>
 

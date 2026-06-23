@@ -55,10 +55,7 @@ export async function POST(
   const body = await req.json().catch(() => ({}));
   const hostname = normalizeHostname(body?.hostname);
   if (!hostname) {
-    return NextResponse.json(
-      { error: 'Invalid hostname' },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid hostname' }, { status: 400 });
   }
 
   if (isAppHost(hostname, getAppHost())) {
@@ -80,7 +77,8 @@ export async function POST(
     status: 'error' as const,
     verification: [],
     configured: true,
-    errorMessage: err instanceof Error ? err.message : 'Domain provider request failed',
+    errorMessage:
+      err instanceof Error ? err.message : 'Domain provider request failed',
   }));
 
   const now = new Date();

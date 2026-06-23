@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 // Decompresses a Claude Design "standalone HTML" export into its
 // original source files. The export ships JSX/CSS/etc. as
 // gzip+base64-encoded entries inside two script tags:
@@ -8,13 +9,15 @@
 // Usage:
 //   node scripts/extract-claude-design.mjs <input.html> <out-dir>
 
-import { gunzipSync } from 'node:zlib';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { gunzipSync } from 'node:zlib';
 
 const [, , inputPath, outDir] = process.argv;
 if (!inputPath || !outDir) {
-  console.error('Usage: node scripts/extract-claude-design.mjs <input.html> <out-dir>');
+  console.error(
+    'Usage: node scripts/extract-claude-design.mjs <input.html> <out-dir>',
+  );
   process.exit(1);
 }
 
@@ -78,13 +81,5 @@ writeFileSync(
   join(outDir, '_manifest-summary.json'),
   JSON.stringify(summary, null, 2),
 );
-
-console.log(`Wrote ${summary.length} files to ${outDir}`);
-console.log(`Template ${template.length} bytes → ${outDir}/_template.txt`);
-for (const item of summary) {
-  console.log(
-    `  ${item.uuid.slice(0, 8)}  ${item.mime.padEnd(28)}  ${String(
-      item.size,
-    ).padStart(8)}  ${item.file}${item.name ? `  (orig: ${item.name})` : ''}`,
-  );
+for (const _item of summary) {
 }

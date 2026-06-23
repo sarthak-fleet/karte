@@ -80,7 +80,7 @@ function StoryCard({
       </h3>
       {paragraphs.map((para, j) => (
         <p key={j} className="mt-2 text-[13px] leading-relaxed text-stone-700">
-          {para.length > 150 ? para.slice(0, 150) + '...' : para}
+          {para.length > 150 ? `${para.slice(0, 150)}...` : para}
         </p>
       ))}
       <span className="mt-3 inline-block text-[10px] font-bold uppercase tracking-[0.18em] text-karte-text-4">
@@ -90,13 +90,7 @@ function StoryCard({
   );
 }
 
-function TrendingSidebar({
-  facts,
-  mood,
-}: {
-  facts: string[];
-  mood: string;
-}) {
+function TrendingSidebar({ facts, mood }: { facts: string[]; mood: string }) {
   return (
     <aside className="space-y-5">
       <div>
@@ -261,7 +255,11 @@ function NewspaperPageView({
             {page.secondaryStories.slice(0, 2).map((story, i) => (
               <div key={i}>
                 {i > 0 && <hr className="mb-5 border-t border-stone-300" />}
-                <StoryCard headline={story.headline} body={story.body} index={i} />
+                <StoryCard
+                  headline={story.headline}
+                  body={story.body}
+                  index={i}
+                />
               </div>
             ))}
           </div>
@@ -320,7 +318,10 @@ function NewspaperPageView({
           </div>
 
           <div className="md:col-span-4">
-            <TrendingSidebar facts={page.sidebar.facts} mood={page.sidebar.mood} />
+            <TrendingSidebar
+              facts={page.sidebar.facts}
+              mood={page.sidebar.mood}
+            />
           </div>
         </div>
       </div>
@@ -462,10 +463,7 @@ export function NewspaperFrontPage({
 
       {/* Flip container — perspective lets the rotateY animation feel
           like a real page turn rather than a sliding fade. */}
-      <div
-        ref={newspaperRef}
-        className="[perspective:2000px]"
-      >
+      <div ref={newspaperRef} className="[perspective:2000px]">
         <div
           key={currentPage}
           className="newspaper-flip"

@@ -4,7 +4,10 @@
 // stored layoutPlan exists. The AI Revamp endpoint will eventually return
 // the same shape, just with smarter judgement.
 
-import type { LinkCardData, ProjectCardData } from '@/components/public/widgets';
+import type {
+  LinkCardData,
+  ProjectCardData,
+} from '@/components/public/widgets';
 
 export interface PickResult<TData> {
   data: TData;
@@ -47,7 +50,8 @@ export function pickProjectVariants(
 
   return projects.map((project) => {
     const hasImage = !!project.imageUrl;
-    const hasDescription = !!project.description && project.description.length > 20;
+    const hasDescription =
+      !!project.description && project.description.length > 20;
 
     if (hasImage && hasDescription && !heroPicked) {
       heroPicked = true;

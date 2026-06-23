@@ -39,7 +39,8 @@ function pickLinktreeLinks(json: unknown): LinktreeLink[] {
     const value = account?.[key];
     if (Array.isArray(value)) {
       for (const entry of value) {
-        if (entry && typeof entry === 'object') candidates.push(entry as LinktreeLink);
+        if (entry && typeof entry === 'object')
+          candidates.push(entry as LinktreeLink);
       }
     }
   }

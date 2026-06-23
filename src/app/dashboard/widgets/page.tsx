@@ -25,9 +25,9 @@ export default async function WidgetsPage() {
           Profile widgets
         </h1>
         <p className="mt-2 max-w-2xl text-[14px] leading-[1.55] text-karte-text-3">
-          Every content widget that can appear on your public profile. The
-          AI Revamp assistant picks one variant per item — size determines
-          how much focus that piece gets in the layout.
+          Every content widget that can appear on your public profile. The AI
+          Revamp assistant picks one variant per item — size determines how much
+          focus that piece gets in the layout.
         </p>
       </header>
 

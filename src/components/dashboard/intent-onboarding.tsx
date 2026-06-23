@@ -57,8 +57,8 @@ export function IntentOnboarding({
   const [message, setMessage] = useState('');
 
   const selectedOption =
-    INTENT_OPTIONS.find((option) => option.value === selectedIntent)
-    ?? INTENT_OPTIONS[1];
+    INTENT_OPTIONS.find((option) => option.value === selectedIntent) ??
+    INTENT_OPTIONS[1];
 
   async function handleSave() {
     setSaving(true);
@@ -120,7 +120,9 @@ export function IntentOnboarding({
                   : 'border-karte-border-emphasis bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]'
               }`}
             >
-              <p className="text-sm font-semibold text-karte-text">{option.label}</p>
+              <p className="text-sm font-semibold text-karte-text">
+                {option.label}
+              </p>
               <p className="mt-1 text-xs leading-5 text-karte-text-3">
                 {option.description}
               </p>
@@ -146,7 +148,11 @@ export function IntentOnboarding({
       </div>
 
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-        <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full sm:w-auto"
+        >
           {saving ? 'Saving...' : 'Save Focus'}
         </Button>
         {message && (

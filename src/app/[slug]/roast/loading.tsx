@@ -50,8 +50,13 @@ export default function RoastLoading() {
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           {['Red flags', 'Best link', 'Bio autopsy'].map((label) => (
-            <div key={label} className="rotate-1 border-2 border-white bg-[#ff2aa3] p-3 text-black shadow-[5px_5px_0_#f9ff00]">
-              <p className="text-xs font-black uppercase tracking-[0.16em]">{label}</p>
+            <div
+              key={label}
+              className="rotate-1 border-2 border-white bg-[#ff2aa3] p-3 text-black shadow-[5px_5px_0_#f9ff00]"
+            >
+              <p className="text-xs font-black uppercase tracking-[0.16em]">
+                {label}
+              </p>
               <div className="mt-3 h-2 animate-pulse bg-black/35" />
               <div className="mt-2 h-2 w-2/3 animate-pulse bg-black/25" />
             </div>

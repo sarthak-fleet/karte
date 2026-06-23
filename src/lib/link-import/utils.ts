@@ -54,7 +54,12 @@ export function isBlockedUrl(urlStr: string): boolean {
     const { hostname } = new URL(urlStr);
     const lower = hostname.toLowerCase();
 
-    if (lower === 'localhost' || lower.endsWith('.local') || lower.endsWith('.internal')) return true;
+    if (
+      lower === 'localhost' ||
+      lower.endsWith('.local') ||
+      lower.endsWith('.internal')
+    )
+      return true;
     if (lower.includes('metadata') || lower.includes('internal')) return true;
 
     const ipv4 = lower.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
@@ -66,7 +71,12 @@ export function isBlockedUrl(urlStr: string): boolean {
       if (a === 169 && b === 254) return true;
     }
 
-    if (lower === '[::1]' || lower.startsWith('[fe80:') || lower.startsWith('[fc') || lower.startsWith('[fd')) {
+    if (
+      lower === '[::1]' ||
+      lower.startsWith('[fe80:') ||
+      lower.startsWith('[fc') ||
+      lower.startsWith('[fd')
+    ) {
       return true;
     }
 
@@ -81,7 +91,8 @@ export function isAssetUrl(urlStr: string): boolean {
     const url = new URL(urlStr);
     const host = url.hostname.toLowerCase();
     if (BLOCKED_ASSET_HOSTS.has(host)) return true;
-    if (BLOCKED_ASSET_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix))) return true;
+    if (BLOCKED_ASSET_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix)))
+      return true;
 
     const pathname = url.pathname.toLowerCase();
     const dot = pathname.lastIndexOf('.');
@@ -110,7 +121,12 @@ export function decodeEntities(text: string) {
 }
 
 export function stripTags(value: string) {
-  return decodeEntities(value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+  return decodeEntities(
+    value
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim(),
+  );
 }
 
 export function titleFromUrl(url: string) {
@@ -167,7 +183,13 @@ export function normalizeUrl(rawUrl: string, sourceUrl: string): string | null {
     if (isBlockedUrl(url.toString())) return null;
     if (isAssetUrl(url.toString())) return null;
 
-    for (const param of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']) {
+    for (const param of [
+      'utm_source',
+      'utm_medium',
+      'utm_campaign',
+      'utm_term',
+      'utm_content',
+    ]) {
       url.searchParams.delete(param);
     }
 
@@ -203,7 +225,10 @@ export function getSourceHost(sourceUrl: string): string {
  * Good enough for redirect-host guarding without bundling a PSL.
  */
 export function registrableDomain(hostname: string): string {
-  const parts = hostname.toLowerCase().replace(/^www\./, '').split('.');
+  const parts = hostname
+    .toLowerCase()
+    .replace(/^www\./, '')
+    .split('.');
   if (parts.length <= 2) return parts.join('.');
   return parts.slice(-2).join('.');
 }

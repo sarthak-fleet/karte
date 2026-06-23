@@ -2,14 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-import type {
-  TimelineEventStatus,
-  TimelineEventType,
-} from '@/db/schema';
-import {
-  TIMELINE_TYPE_LABELS,
-  TIMELINE_TYPE_OPTIONS,
-} from '@/lib/timeline';
+import type { TimelineEventStatus, TimelineEventType } from '@/db/schema';
+import { TIMELINE_TYPE_LABELS, TIMELINE_TYPE_OPTIONS } from '@/lib/timeline';
 
 interface TimelineEvent {
   id: string;
@@ -108,7 +102,9 @@ export function TimelineEditor({ pageId }: TimelineEditorProps) {
         })),
       );
     } catch (err) {
-      setImportError(err instanceof Error ? err.message : 'Something went wrong.');
+      setImportError(
+        err instanceof Error ? err.message : 'Something went wrong.',
+      );
     } finally {
       setImporting(false);
     }
@@ -275,9 +271,9 @@ export function TimelineEditor({ pageId }: TimelineEditorProps) {
               ◆ Import from text
             </p>
             <p className="mt-2 max-w-md text-[13.5px] leading-[1.55] text-karte-text-3">
-              Paste your LinkedIn experience section, a resume, or any
-              career text. The AI splits it into structured events and
-              you approve before they save.
+              Paste your LinkedIn experience section, a resume, or any career
+              text. The AI splits it into structured events and you approve
+              before they save.
             </p>
           </div>
           {!importOpen && (
@@ -392,12 +388,17 @@ Scaled real-time pipeline from 15k to 200k DAU. Built RAG support agents.`}
                 type="button"
                 onClick={() =>
                   setPreview((prev) =>
-                    prev.map((p) => ({ ...p, selected: !prev.every((x) => x.selected) })),
+                    prev.map((p) => ({
+                      ...p,
+                      selected: !prev.every((x) => x.selected),
+                    })),
                   )
                 }
                 className="text-[12.5px] text-karte-text-3 hover:text-karte-text"
               >
-                {preview.every((p) => p.selected) ? 'Unselect all' : 'Select all'}
+                {preview.every((p) => p.selected)
+                  ? 'Unselect all'
+                  : 'Select all'}
               </button>
               <button
                 type="button"
@@ -431,7 +432,10 @@ Scaled real-time pipeline from 15k to 200k DAU. Built RAG support agents.`}
             <select
               value={form.type}
               onChange={(e) =>
-                setForm((s) => ({ ...s, type: e.target.value as TimelineEventType }))
+                setForm((s) => ({
+                  ...s,
+                  type: e.target.value as TimelineEventType,
+                }))
               }
               className="rounded-xl border border-white/[0.10] bg-black/30 px-3 py-2 text-[14px] text-karte-text outline-none focus:border-karte-accent/40"
             >
@@ -449,7 +453,9 @@ Scaled real-time pipeline from 15k to 200k DAU. Built RAG support agents.`}
             </span>
             <input
               value={form.whenLabel}
-              onChange={(e) => setForm((s) => ({ ...s, whenLabel: e.target.value }))}
+              onChange={(e) =>
+                setForm((s) => ({ ...s, whenLabel: e.target.value }))
+              }
               placeholder="March 2025"
               className="rounded-xl border border-white/[0.10] bg-black/30 px-3 py-2 text-[14px] text-karte-text outline-none focus:border-karte-accent/40"
             />
@@ -474,7 +480,9 @@ Scaled real-time pipeline from 15k to 200k DAU. Built RAG support agents.`}
           </span>
           <input
             value={form.whereLabel}
-            onChange={(e) => setForm((s) => ({ ...s, whereLabel: e.target.value }))}
+            onChange={(e) =>
+              setForm((s) => ({ ...s, whereLabel: e.target.value }))
+            }
             placeholder="VaultWealth · Stanford · Front.Page"
             className="rounded-xl border border-white/[0.10] bg-black/30 px-3 py-2 text-[14px] text-karte-text outline-none focus:border-karte-accent/40"
           />
@@ -533,8 +541,8 @@ Scaled real-time pipeline from 15k to 200k DAU. Built RAG support agents.`}
 
         {!loading && events.length === 0 && (
           <p className="mt-4 text-[14px] text-karte-text-3">
-            No events yet. Add your first one above — try one for each
-            company you have worked at.
+            No events yet. Add your first one above — try one for each company
+            you have worked at.
           </p>
         )}
 
@@ -675,7 +683,10 @@ function EditRow({
         <select
           value={draft.status}
           onChange={(e) =>
-            setDraft({ ...draft, status: e.target.value as TimelineEventStatus })
+            setDraft({
+              ...draft,
+              status: e.target.value as TimelineEventStatus,
+            })
           }
           className="rounded-xl border border-white/[0.10] bg-black/30 px-3 py-1.5 text-[12px] text-karte-text-3"
         >

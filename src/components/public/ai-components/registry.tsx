@@ -10,7 +10,7 @@
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import posthog from 'posthog-js';
-import { type ReactElement,useEffect } from 'react';
+import { type ReactElement, useEffect } from 'react';
 
 import { ComponentBoundary } from '@/components/public/ai-components/component-boundary';
 import { SafeImage } from '@/components/public/safe-image';
@@ -121,7 +121,10 @@ function ArrowLink({
       }}
     >
       {children}
-      <span aria-hidden="true" className="transition-transform group-hover/al:translate-x-0.5">
+      <span
+        aria-hidden="true"
+        className="transition-transform group-hover/al:translate-x-0.5"
+      >
         →
       </span>
     </Tag>
@@ -130,7 +133,10 @@ function ArrowLink({
 
 function trackClick(component: string, value?: string) {
   try {
-    posthog.capture('genui_component_clicked', { component, ...(value ? { value } : {}) });
+    posthog.capture('genui_component_clicked', {
+      component,
+      ...(value ? { value } : {}),
+    });
   } catch {
     // best-effort
   }
@@ -140,7 +146,7 @@ function trackClick(component: string, value?: string) {
 // Suggested follow-up question chips. Clicking submits the chip text
 // as the next chat message via a CustomEvent the widget listens for.
 function AskAgain({ suggestions }: AskAgainProps) {
-  const items = (suggestions ?? []).filter((s) => s && s.trim()).slice(0, 4);
+  const items = (suggestions ?? []).filter((s) => s?.trim()).slice(0, 4);
   if (items.length === 0) return null;
   return (
     <div className="mt-3 flex flex-wrap gap-2">
@@ -163,8 +169,10 @@ function AskAgain({ suggestions }: AskAgainProps) {
           }}
           className="rounded-full border px-3 py-1 text-[11.5px] transition hover:bg-white/[0.04]"
           style={{
-            borderColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 30%, transparent)',
-            color: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 100%, white 0%)',
+            borderColor:
+              'color-mix(in srgb, var(--karte-accent, #c4a46b) 30%, transparent)',
+            color:
+              'color-mix(in srgb, var(--karte-accent, #c4a46b) 100%, white 0%)',
           }}
         >
           {s}
@@ -225,14 +233,26 @@ function BookCallSlot({ url, label, duration }: BookCallSlotProps) {
 function EssayLink({ title, url, excerpt, year, size = 'md' }: EssayLinkProps) {
   // Smaller essays are list-row-feeling; larger essays get more breathing
   // room and a richer excerpt presentation.
-  const titleSize = size === 'sm' ? 'text-[13.5px]' : size === 'lg' ? 'text-[17.5px]' : 'text-[15px]';
-  const excerptSize = size === 'sm' ? 'text-[12px]' : size === 'lg' ? 'text-[14px]' : 'text-[13px]';
+  const titleSize =
+    size === 'sm'
+      ? 'text-[13.5px]'
+      : size === 'lg'
+        ? 'text-[17.5px]'
+        : 'text-[15px]';
+  const excerptSize =
+    size === 'sm'
+      ? 'text-[12px]'
+      : size === 'lg'
+        ? 'text-[14px]'
+        : 'text-[13px]';
   const showExcerpt = size !== 'sm' && excerpt;
   return (
     <div className="my-3">
       <ComponentCard className={SIZE_PADDING[size]}>
         <Eyebrow>Essay {year ? `· ${year}` : ''}</Eyebrow>
-        <p className={`mt-2 ${titleSize} font-semibold leading-tight text-white`}>
+        <p
+          className={`mt-2 ${titleSize} font-semibold leading-tight text-white`}
+        >
           <a
             href={url}
             target="_blank"
@@ -244,7 +264,9 @@ function EssayLink({ title, url, excerpt, year, size = 'md' }: EssayLinkProps) {
           </a>
         </p>
         {showExcerpt && (
-          <p className={`mt-1.5 ${excerptSize} leading-[1.5] text-white/65 italic`}>
+          <p
+            className={`mt-1.5 ${excerptSize} leading-[1.5] text-white/65 italic`}
+          >
             {excerpt}
           </p>
         )}
@@ -262,11 +284,14 @@ const HIRING_LABEL: Record<HiringStatusProps['status'], string> = {
 };
 function HiringStatus({ status, label }: HiringStatusProps) {
   return (
-    <div className="my-3 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[12px] font-medium"
+    <div
+      className="my-3 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[12px] font-medium"
       style={{
-        borderColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 30%, transparent)',
+        borderColor:
+          'color-mix(in srgb, var(--karte-accent, #c4a46b) 30%, transparent)',
         color: 'var(--karte-accent, #c4a46b)',
-        backgroundColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 8%, transparent)',
+        backgroundColor:
+          'color-mix(in srgb, var(--karte-accent, #c4a46b) 8%, transparent)',
       }}
     >
       <span aria-hidden="true">◆</span>
@@ -290,7 +315,9 @@ function LocationCard({ city, timezone, travelStatus }: LocationCardProps) {
           </p>
         )}
         {travelStatus && (
-          <p className="mt-2 text-[13px] italic text-white/70">{travelStatus}</p>
+          <p className="mt-2 text-[13px] italic text-white/70">
+            {travelStatus}
+          </p>
         )}
       </ComponentCard>
     </div>
@@ -299,7 +326,12 @@ function LocationCard({ city, timezone, travelStatus }: LocationCardProps) {
 
 // ── 7. MetricCard ───────────────────────────────────────────────────
 function MetricCard({ value, label, context, size = 'md' }: MetricCardProps) {
-  const valueSize = size === 'sm' ? 'text-[24px]' : size === 'lg' ? 'text-[56px]' : 'text-[40px]';
+  const valueSize =
+    size === 'sm'
+      ? 'text-[24px]'
+      : size === 'lg'
+        ? 'text-[56px]'
+        : 'text-[40px]';
   return (
     <div className="my-3">
       <ComponentCard className={SIZE_PADDING[size]}>
@@ -325,14 +357,41 @@ function MetricCard({ value, label, context, size = 'md' }: MetricCardProps) {
 }
 
 // ── 8. ProjectMini ──────────────────────────────────────────────────
-function ProjectMini({ title, url, description, imageUrl, size = 'md' }: ProjectMiniProps) {
+function ProjectMini({
+  title,
+  url,
+  description,
+  imageUrl,
+  size = 'md',
+}: ProjectMiniProps) {
   // sm — list row · md — default card · lg — hero card with bigger
   // thumbnail and roomier typography.
-  const thumb = size === 'sm' ? 'h-7 w-7' : size === 'lg' ? 'h-14 w-14' : 'h-10 w-10';
-  const thumbText = size === 'sm' ? 'text-[14px]' : size === 'lg' ? 'text-[24px]' : 'text-[18px]';
-  const titleSize = size === 'sm' ? 'text-[13px]' : size === 'lg' ? 'text-[17px]' : 'text-[14.5px]';
-  const descSize = size === 'sm' ? 'text-[11.5px]' : size === 'lg' ? 'text-[14px]' : 'text-[12.5px]';
-  const descLines = size === 'sm' ? 'line-clamp-1' : size === 'lg' ? 'line-clamp-3' : 'line-clamp-2';
+  const thumb =
+    size === 'sm' ? 'h-7 w-7' : size === 'lg' ? 'h-14 w-14' : 'h-10 w-10';
+  const thumbText =
+    size === 'sm'
+      ? 'text-[14px]'
+      : size === 'lg'
+        ? 'text-[24px]'
+        : 'text-[18px]';
+  const titleSize =
+    size === 'sm'
+      ? 'text-[13px]'
+      : size === 'lg'
+        ? 'text-[17px]'
+        : 'text-[14.5px]';
+  const descSize =
+    size === 'sm'
+      ? 'text-[11.5px]'
+      : size === 'lg'
+        ? 'text-[14px]'
+        : 'text-[12.5px]';
+  const descLines =
+    size === 'sm'
+      ? 'line-clamp-1'
+      : size === 'lg'
+        ? 'line-clamp-3'
+        : 'line-clamp-2';
   const gap = size === 'sm' ? 'gap-2' : size === 'lg' ? 'gap-4' : 'gap-3';
 
   const inner = (
@@ -346,7 +405,8 @@ function ProjectMini({ title, url, description, imageUrl, size = 'md' }: Project
             aria-hidden="true"
             className={`flex ${thumb} shrink-0 items-center justify-center rounded-lg ${thumbText}`}
             style={{
-              backgroundColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 12%, transparent)',
+              backgroundColor:
+                'color-mix(in srgb, var(--karte-accent, #c4a46b) 12%, transparent)',
               color: 'var(--karte-accent, #c4a46b)',
             }}
           >
@@ -359,13 +419,18 @@ function ProjectMini({ title, url, description, imageUrl, size = 'md' }: Project
           {title}
         </p>
         {description && (
-          <p className={`mt-1 ${descLines} ${descSize} leading-[1.5] text-white/65`}>
+          <p
+            className={`mt-1 ${descLines} ${descSize} leading-[1.5] text-white/65`}
+          >
             {description}
           </p>
         )}
       </div>
       {url && (
-        <span aria-hidden="true" className="shrink-0 text-white/40 transition group-hover:text-white/70">
+        <span
+          aria-hidden="true"
+          className="shrink-0 text-white/40 transition group-hover:text-white/70"
+        >
           ↗
         </span>
       )}
@@ -396,8 +461,12 @@ function ProjectMini({ title, url, description, imageUrl, size = 'md' }: Project
 // ── 9. QuoteBlock ───────────────────────────────────────────────────
 function QuoteBlock({ quote, attribution }: QuoteBlockProps) {
   return (
-    <figure className="my-3 border-l-2 pl-4"
-      style={{ borderColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 40%, transparent)' }}
+    <figure
+      className="my-3 border-l-2 pl-4"
+      style={{
+        borderColor:
+          'color-mix(in srgb, var(--karte-accent, #c4a46b) 40%, transparent)',
+      }}
     >
       <blockquote
         className="text-[18px] leading-[1.4] italic"
@@ -442,7 +511,10 @@ function RateCard({ tier, price, slots, cta, url }: RateCardProps) {
         )}
         {url && (
           <div className="mt-3 flex justify-end">
-            <ArrowLink href={url} trackAs={{ component: 'RateCard', value: tier }}>
+            <ArrowLink
+              href={url}
+              trackAs={{ component: 'RateCard', value: tier }}
+            >
               {cta || 'Book this slot'}
             </ArrowLink>
           </div>
@@ -454,7 +526,7 @@ function RateCard({ tier, price, slots, cta, url }: RateCardProps) {
 
 // ── 11. StackList ───────────────────────────────────────────────────
 function StackList({ items, label }: StackListProps) {
-  const cleaned = (items ?? []).filter((s) => s && s.trim()).slice(0, 12);
+  const cleaned = (items ?? []).filter((s) => s?.trim()).slice(0, 12);
   if (cleaned.length === 0) return null;
   return (
     <div className="my-3">
@@ -466,8 +538,10 @@ function StackList({ items, label }: StackListProps) {
               key={i}
               className="rounded-md border px-2 py-0.5 font-mono text-[11px] text-white/80"
               style={{
-                borderColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 25%, transparent)',
-                backgroundColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 4%, transparent)',
+                borderColor:
+                  'color-mix(in srgb, var(--karte-accent, #c4a46b) 25%, transparent)',
+                backgroundColor:
+                  'color-mix(in srgb, var(--karte-accent, #c4a46b) 4%, transparent)',
               }}
             >
               {item}
@@ -484,8 +558,14 @@ function TimelineSlice({ events, heading, size = 'md' }: TimelineSliceProps) {
   const maxEvents = size === 'sm' ? 3 : size === 'lg' ? 6 : 5;
   const items = (events ?? []).slice(0, maxEvents);
   if (items.length === 0) return null;
-  const rowSpacing = size === 'sm' ? 'space-y-1.5' : size === 'lg' ? 'space-y-4' : 'space-y-2.5';
-  const titleSize = size === 'sm' ? 'text-[12.5px]' : size === 'lg' ? 'text-[15.5px]' : 'text-[13.5px]';
+  const rowSpacing =
+    size === 'sm' ? 'space-y-1.5' : size === 'lg' ? 'space-y-4' : 'space-y-2.5';
+  const titleSize =
+    size === 'sm'
+      ? 'text-[12.5px]'
+      : size === 'lg'
+        ? 'text-[15.5px]'
+        : 'text-[13.5px]';
   const whereSize = size === 'sm' ? 'text-[11px]' : 'text-[12px]';
   return (
     <div className="my-3">
@@ -493,7 +573,10 @@ function TimelineSlice({ events, heading, size = 'md' }: TimelineSliceProps) {
         <Eyebrow>{heading || 'Recent'}</Eyebrow>
         <ol
           className={`mt-3 ${rowSpacing} border-l pl-4`}
-          style={{ borderColor: 'color-mix(in srgb, var(--karte-accent, #c4a46b) 25%, transparent)' }}
+          style={{
+            borderColor:
+              'color-mix(in srgb, var(--karte-accent, #c4a46b) 25%, transparent)',
+          }}
         >
           {items.map((e, i) => (
             <li key={i} className="relative">
@@ -505,10 +588,14 @@ function TimelineSlice({ events, heading, size = 'md' }: TimelineSliceProps) {
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
                 {e.when}
               </p>
-              <p className={`mt-0.5 ${titleSize} font-medium leading-tight text-white`}>
+              <p
+                className={`mt-0.5 ${titleSize} font-medium leading-tight text-white`}
+              >
                 {e.title}
                 {e.where && (
-                  <span className={`ml-1.5 ${whereSize} font-normal text-white/55`}>
+                  <span
+                    className={`ml-1.5 ${whereSize} font-normal text-white/55`}
+                  >
                     @ {e.where}
                   </span>
                 )}

@@ -12,7 +12,11 @@ interface GenerateNewspaperProps {
   accentColor: string;
 }
 
-export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspaperProps) {
+export function GenerateNewspaper({
+  pageId,
+  slug,
+  accentColor,
+}: GenerateNewspaperProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +31,9 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({ error: 'Generation failed' }));
+        const data = await res
+          .json()
+          .catch(() => ({ error: 'Generation failed' }));
         throw new Error(data.error || 'Failed to generate newspaper');
       }
 
@@ -97,7 +103,9 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
           }
         `}</style>
         <div className="border-b-2 border-[#17130d] pb-4 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.28em]">Special Edition</p>
+          <p className="text-xs font-bold uppercase tracking-[0.28em]">
+            Special Edition
+          </p>
           <h2 className="mt-2 font-serif text-4xl font-black leading-none sm:text-5xl">
             The Profile Times
           </h2>
@@ -178,7 +186,9 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
   return (
     <div className="w-full max-w-2xl border border-[#1c1a14]/30 bg-[#f7f0df] p-5 text-[#17130d] shadow-[0_28px_90px_-55px_rgba(0,0,0,0.75)] sm:p-8">
       <div className="border-b-2 border-[#17130d] pb-4 text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.28em]">Special Edition</p>
+        <p className="text-xs font-bold uppercase tracking-[0.28em]">
+          Special Edition
+        </p>
         <h2 className="mt-2 font-serif text-4xl font-black leading-none sm:text-5xl">
           The Profile Times
         </h2>
@@ -207,9 +217,24 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
           >
             {loading ? (
               <>
-                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                <svg
+                  className="h-4 w-4 animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
                 Sending to press
               </>
@@ -224,9 +249,15 @@ export function GenerateNewspaper({ pageId, slug, accentColor }: GenerateNewspap
           <div className="mt-4 grid grid-cols-2 gap-3">
             {[0, 1, 2, 3].map((item) => (
               <div key={item} className="space-y-2">
-                <div className={`h-2 bg-[#17130d]/60 ${loading ? 'animate-pulse' : ''}`} />
-                <div className={`h-1.5 bg-[#17130d]/25 ${loading ? 'animate-pulse' : ''}`} />
-                <div className={`h-1.5 w-3/4 bg-[#17130d]/25 ${loading ? 'animate-pulse' : ''}`} />
+                <div
+                  className={`h-2 bg-[#17130d]/60 ${loading ? 'animate-pulse' : ''}`}
+                />
+                <div
+                  className={`h-1.5 bg-[#17130d]/25 ${loading ? 'animate-pulse' : ''}`}
+                />
+                <div
+                  className={`h-1.5 w-3/4 bg-[#17130d]/25 ${loading ? 'animate-pulse' : ''}`}
+                />
               </div>
             ))}
           </div>

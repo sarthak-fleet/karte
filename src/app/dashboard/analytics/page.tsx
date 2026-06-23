@@ -2,11 +2,17 @@ import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
 import { db, ensureProjectsTable } from '@/db';
-import { dailyResourceStats, dailyStats, dailyVisitorEvents, pageEvents } from '@/db/schema';
+import {
+  dailyResourceStats,
+  dailyStats,
+  dailyVisitorEvents,
+  pageEvents,
+} from '@/db/schema';
 import { getCurrentPage, getSession } from '@/lib/auth-server';
 
 function formatNumber(value: number | string | null) {
-  const num = typeof value === 'string' ? Number.parseInt(value, 10) : (value as number);
+  const num =
+    typeof value === 'string' ? Number.parseInt(value, 10) : (value as number);
   return new Intl.NumberFormat('en-US').format(num || 0);
 }
 
@@ -39,7 +45,11 @@ function MetricCard({
       <p className="mt-3 text-3xl font-semibold tracking-[-0.01em] tabular-nums text-karte-text">
         {value}
       </p>
-      {helper && <p className="mt-2 text-[13px] leading-[1.5] text-karte-text-3">{helper}</p>}
+      {helper && (
+        <p className="mt-2 text-[13px] leading-[1.5] text-karte-text-3">
+          {helper}
+        </p>
+      )}
     </div>
   );
 }
@@ -58,9 +68,13 @@ export default async function AnalyticsPage() {
   if (!page) {
     return (
       <div className="space-y-6 sm:space-y-8">
-        <h1 className="text-2xl font-bold tracking-[-0.015em] text-karte-text">Analytics</h1>
+        <h1 className="text-2xl font-bold tracking-[-0.015em] text-karte-text">
+          Analytics
+        </h1>
         <div className="rounded-2xl bg-white/[0.02] p-8 text-center">
-          <p className="text-karte-text-3">Create a page first to start collecting analytics.</p>
+          <p className="text-karte-text-3">
+            Create a page first to start collecting analytics.
+          </p>
         </div>
       </div>
     );
@@ -101,7 +115,9 @@ export default async function AnalyticsPage() {
       .groupBy(dailyResourceStats.eventType),
 
     db
-      .select({ count: sql<number>`COUNT(DISTINCT ${dailyVisitorEvents.visitorId})` })
+      .select({
+        count: sql<number>`COUNT(DISTINCT ${dailyVisitorEvents.visitorId})`,
+      })
       .from(dailyVisitorEvents)
       .where(eq(dailyVisitorEvents.pageId, page.id)),
 
@@ -112,7 +128,9 @@ export default async function AnalyticsPage() {
         count: dailyStats.count,
       })
       .from(dailyStats)
-      .where(and(eq(dailyStats.pageId, page.id), gte(dailyStats.date, dateLimit))),
+      .where(
+        and(eq(dailyStats.pageId, page.id), gte(dailyStats.date, dateLimit)),
+      ),
 
     db
       .select({
@@ -121,7 +139,12 @@ export default async function AnalyticsPage() {
         count: dailyResourceStats.count,
       })
       .from(dailyResourceStats)
-      .where(and(eq(dailyResourceStats.pageId, page.id), gte(dailyResourceStats.date, dateLimit))),
+      .where(
+        and(
+          eq(dailyResourceStats.pageId, page.id),
+          gte(dailyResourceStats.date, dateLimit),
+        ),
+      ),
 
     db
       .select({
@@ -130,7 +153,12 @@ export default async function AnalyticsPage() {
         clicks: sql<number>`SUM(${dailyResourceStats.count})`,
       })
       .from(dailyResourceStats)
-      .where(and(eq(dailyResourceStats.pageId, page.id), eq(dailyResourceStats.eventType, 'outbound_click')))
+      .where(
+        and(
+          eq(dailyResourceStats.pageId, page.id),
+          eq(dailyResourceStats.eventType, 'outbound_click'),
+        ),
+      )
       .groupBy(dailyResourceStats.resourceId)
       .orderBy(desc(sql`SUM(${dailyResourceStats.count})`))
       .limit(5),
@@ -142,7 +170,12 @@ export default async function AnalyticsPage() {
         views: sql<number>`SUM(${dailyResourceStats.count})`,
       })
       .from(dailyResourceStats)
-      .where(and(eq(dailyResourceStats.pageId, page.id), eq(dailyResourceStats.eventType, 'section_view')))
+      .where(
+        and(
+          eq(dailyResourceStats.pageId, page.id),
+          eq(dailyResourceStats.eventType, 'section_view'),
+        ),
+      )
       .groupBy(dailyResourceStats.resourceId)
       .orderBy(desc(sql`SUM(${dailyResourceStats.count})`))
       .limit(5),
@@ -155,8 +188,10 @@ export default async function AnalyticsPage() {
       .limit(8),
   ]);
 
-  const getCount = (type: string, source: { eventType: string; count: number }[]) =>
-    source.find((s) => s.eventType === type)?.count || 0;
+  const getCount = (
+    type: string,
+    source: { eventType: string; count: number }[],
+  ) => source.find((s) => s.eventType === type)?.count || 0;
 
   const pageViews = getCount('page_view', totals);
   const hookOpens = getCount('hook_open', totals);
@@ -165,25 +200,40 @@ export default async function AnalyticsPage() {
   const chatClicks = getCount('chat_cta_click', resourceTotals);
   const uniqueVisitors = visitorRows[0]?.count || 0;
 
-  const dailyMap = new Map<string, { views: number; sectionViews: number; clicks: number }>();
+  const dailyMap = new Map<
+    string,
+    { views: number; sectionViews: number; clicks: number }
+  >();
   for (const row of dailyAggs) {
-    const bucket = dailyMap.get(row.date) || { views: 0, sectionViews: 0, clicks: 0 };
+    const bucket = dailyMap.get(row.date) || {
+      views: 0,
+      sectionViews: 0,
+      clicks: 0,
+    };
     if (row.eventType === 'page_view') bucket.views += row.count;
     dailyMap.set(row.date, bucket);
   }
   for (const row of dailyResourceAggs) {
-    const bucket = dailyMap.get(row.date) || { views: 0, sectionViews: 0, clicks: 0 };
+    const bucket = dailyMap.get(row.date) || {
+      views: 0,
+      sectionViews: 0,
+      clicks: 0,
+    };
     if (row.eventType === 'section_view') bucket.sectionViews += row.count;
     if (row.eventType === 'outbound_click') bucket.clicks += row.count;
     dailyMap.set(row.date, bucket);
   }
 
-  const dailyRows = [...dailyMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  const dailyRows = [...dailyMap.entries()].sort((a, b) =>
+    a[0].localeCompare(b[0]),
+  );
 
   return (
     <div className="space-y-6 sm:space-y-8">
       <div className="mb-1 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold tracking-[-0.015em] text-karte-text">Analytics</h1>
+        <h1 className="text-2xl font-bold tracking-[-0.015em] text-karte-text">
+          Analytics
+        </h1>
         <span className="rounded-full border border-karte-accent/30 bg-karte-accent/[0.08] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.22em] text-karte-accent-soft">
           Beta
         </span>
@@ -193,11 +243,31 @@ export default async function AnalyticsPage() {
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <MetricCard label="Page views" value={formatNumber(pageViews)} helper="Total historical views" />
-        <MetricCard label="Unique visitors" value={formatNumber(uniqueVisitors)} helper="Across all time" />
-        <MetricCard label="Outbound clicks" value={formatNumber(outboundClicks)} helper="Link and project clicks" />
-        <MetricCard label="Chat / Hook" value={formatNumber(chatClicks + hookOpens)} helper="CTA clicks and widget opens" />
-        <MetricCard label="DM Leads" value={formatNumber(dmConversions)} helper="Messages via DM widget" />
+        <MetricCard
+          label="Page views"
+          value={formatNumber(pageViews)}
+          helper="Total historical views"
+        />
+        <MetricCard
+          label="Unique visitors"
+          value={formatNumber(uniqueVisitors)}
+          helper="Across all time"
+        />
+        <MetricCard
+          label="Outbound clicks"
+          value={formatNumber(outboundClicks)}
+          helper="Link and project clicks"
+        />
+        <MetricCard
+          label="Chat / Hook"
+          value={formatNumber(chatClicks + hookOpens)}
+          helper="CTA clicks and widget opens"
+        />
+        <MetricCard
+          label="DM Leads"
+          value={formatNumber(dmConversions)}
+          helper="Messages via DM widget"
+        />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
@@ -222,14 +292,16 @@ export default async function AnalyticsPage() {
                               ? 'Lead captured'
                               : event.eventType === 'dm_submit'
                                 ? 'Direct message sent'
-                              : event.eventType === 'hook_open'
-                                ? 'Chat widget opened'
-                                : event.eventType === 'chat_cta_click'
-                                  ? 'Chat CTA clicked'
-                                  : 'Outbound click'}
+                                : event.eventType === 'hook_open'
+                                  ? 'Chat widget opened'
+                                  : event.eventType === 'chat_cta_click'
+                                    ? 'Chat CTA clicked'
+                                    : 'Outbound click'}
                       </p>
                       <p className="mt-1 truncate text-[12px] text-karte-text-3">
-                        {event.resourceLabel || event.resourceId || 'Public page'}
+                        {event.resourceLabel ||
+                          event.resourceId ||
+                          'Public page'}
                       </p>
                     </div>
                     <span className="shrink-0 text-[11px] tabular-nums text-karte-text-4">
@@ -248,7 +320,9 @@ export default async function AnalyticsPage() {
           </h2>
           <div className="mt-4 space-y-2.5">
             {topDestinations.length === 0 ? (
-              <p className="text-[13px] text-karte-text-4">No outbound clicks yet.</p>
+              <p className="text-[13px] text-karte-text-4">
+                No outbound clicks yet.
+              </p>
             ) : (
               topDestinations.map((item, idx) => (
                 <div key={idx} className="rounded-xl bg-karte-bg/40 p-3.5">
@@ -277,7 +351,9 @@ export default async function AnalyticsPage() {
           </h2>
           <div className="mt-4 space-y-2.5">
             {topSections.length === 0 ? (
-              <p className="text-[13px] text-karte-text-4">No section views yet.</p>
+              <p className="text-[13px] text-karte-text-4">
+                No section views yet.
+              </p>
             ) : (
               topSections.map((item, idx) => (
                 <div key={idx} className="rounded-xl bg-karte-bg/40 p-3.5">
@@ -314,7 +390,9 @@ export default async function AnalyticsPage() {
                 key={day}
                 className="rounded-xl bg-karte-bg/40 p-3.5 sm:grid sm:grid-cols-[120px_1fr_90px_90px_80px] sm:items-center sm:gap-3 sm:bg-transparent sm:p-0"
               >
-                <p className="text-[13px] tabular-nums text-karte-text-3">{day}</p>
+                <p className="text-[13px] tabular-nums text-karte-text-3">
+                  {day}
+                </p>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.06] sm:mt-0">
                   <div
                     className="h-full rounded-full bg-karte-accent"
@@ -322,9 +400,15 @@ export default async function AnalyticsPage() {
                   />
                 </div>
                 <div className="mt-3 grid grid-cols-3 gap-3 text-[12px] tabular-nums text-karte-text-2 sm:contents sm:text-[13px]">
-                  <p className="text-left sm:text-right">{metrics.views} views</p>
-                  <p className="text-left sm:text-right">{metrics.sectionViews} section</p>
-                  <p className="text-left sm:text-right">{metrics.clicks} clicks</p>
+                  <p className="text-left sm:text-right">
+                    {metrics.views} views
+                  </p>
+                  <p className="text-left sm:text-right">
+                    {metrics.sectionViews} section
+                  </p>
+                  <p className="text-left sm:text-right">
+                    {metrics.clicks} clicks
+                  </p>
                 </div>
               </div>
             ))

@@ -23,7 +23,10 @@ import {
   TimelineSlice,
 } from '@/components/public/ai-components/registry';
 import { applyLayoutDirectives } from '@/lib/ai-components/layout';
-import type { LayoutDirectives, RenderableComponent } from '@/lib/ai-components/types';
+import type {
+  LayoutDirectives,
+  RenderableComponent,
+} from '@/lib/ai-components/types';
 
 const ACCENT_PRESETS: ReadonlyArray<{ label: string; value: string }> = [
   { label: 'Gold (default)', value: '#c4a46b' },
@@ -46,9 +49,7 @@ function Story({ name, notes, children }: StoryProps) {
         <h2 className="font-mono text-[12px] uppercase tracking-[0.18em] text-karte-text-2">
           {name}
         </h2>
-        {notes && (
-          <p className="text-[11.5px] text-karte-text-4">{notes}</p>
-        )}
+        {notes && <p className="text-[11.5px] text-karte-text-4">{notes}</p>}
       </header>
       <div className="rounded-xl bg-black/40 p-4">{children}</div>
     </section>
@@ -59,9 +60,7 @@ export function ComponentsStorybook() {
   const [accent, setAccent] = useState(ACCENT_PRESETS[0].value);
 
   return (
-    <div
-      style={{ ['--karte-accent' as never]: accent } as React.CSSProperties}
-    >
+    <div style={{ ['--karte-accent' as never]: accent } as React.CSSProperties}>
       {/* Accent picker */}
       <div className="mb-8 flex flex-wrap items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4">
         <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
@@ -100,13 +99,13 @@ export function ComponentsStorybook() {
           />
         </Story>
 
-        <Story name="AvailabilityChip" notes="Status pill — open / limited / closed">
+        <Story
+          name="AvailabilityChip"
+          notes="Status pill — open / limited / closed"
+        >
           <div className="flex flex-wrap gap-3">
             <AvailabilityChip status="open" />
-            <AvailabilityChip
-              status="limited"
-              label="One slot open in June"
-            />
+            <AvailabilityChip status="limited" label="One slot open in June" />
             <AvailabilityChip status="closed" label="Booked through Q3" />
           </div>
         </Story>
@@ -182,7 +181,16 @@ export function ComponentsStorybook() {
         <Story name="StackList" notes="Tech / tool tokens">
           <StackList
             label="Backend"
-            items={['Go', 'Node.js', 'Python', 'Kafka', 'Temporal', 'PostgreSQL', 'Redis', 'ClickHouse']}
+            items={[
+              'Go',
+              'Node.js',
+              'Python',
+              'Kafka',
+              'Temporal',
+              'PostgreSQL',
+              'Redis',
+              'ClickHouse',
+            ]}
           />
         </Story>
 
@@ -191,9 +199,17 @@ export function ComponentsStorybook() {
             heading="Recent ships"
             events={[
               { when: 'May 2026', title: 'Released TinyGPT', where: undefined },
-              { when: 'Feb 2026', title: 'Shipped free-ai', where: 'CF Workers' },
+              {
+                when: 'Feb 2026',
+                title: 'Shipped free-ai',
+                where: 'CF Workers',
+              },
               { when: 'Nov 2025', title: 'Built CodeVetter', where: undefined },
-              { when: 'Feb 2025', title: 'Joined VaultWealth', where: 'Peak XV' },
+              {
+                when: 'Feb 2025',
+                title: 'Joined VaultWealth',
+                where: 'Peak XV',
+              },
             ]}
           />
         </Story>
@@ -218,7 +234,9 @@ function SizeVariantStories() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {sizes.map((s) => (
             <div key={s}>
-              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">{s}</p>
+              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">
+                {s}
+              </p>
               <ProjectMini
                 title="TinyGPT"
                 description="0.8M-param transformer in the browser via PyTorch → WASM + WebGPU."
@@ -231,11 +249,16 @@ function SizeVariantStories() {
         </div>
       </Story>
 
-      <Story name="EssayLink · sizes" notes="sm hides the excerpt (list-row feel)">
+      <Story
+        name="EssayLink · sizes"
+        notes="sm hides the excerpt (list-row feel)"
+      >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {sizes.map((s) => (
             <div key={s}>
-              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">{s}</p>
+              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">
+                {s}
+              </p>
               <EssayLink
                 title="How to Do Great Work"
                 url="http://www.paulgraham.com/greatwork.html"
@@ -252,18 +275,30 @@ function SizeVariantStories() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {sizes.map((s) => (
             <div key={s}>
-              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">{s}</p>
-              <MetricCard value="200k DAU" label="Peak users" context="Front.Page, 2023" size={s} />
+              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">
+                {s}
+              </p>
+              <MetricCard
+                value="200k DAU"
+                label="Peak users"
+                context="Front.Page, 2023"
+                size={s}
+              />
             </div>
           ))}
         </div>
       </Story>
 
-      <Story name="TimelineSlice · sizes" notes="sm caps at 3 events; lg allows 6">
+      <Story
+        name="TimelineSlice · sizes"
+        notes="sm caps at 3 events; lg allows 6"
+      >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {sizes.map((s) => (
             <div key={s}>
-              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">{s}</p>
+              <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-karte-text-4">
+                {s}
+              </p>
               <TimelineSlice
                 heading="Recent"
                 events={[
@@ -354,16 +389,23 @@ function LayoutDirectiveSandbox() {
     applied.density === 'compact'
       ? 'mt-1.5 space-y-1.5'
       : applied.density === 'magazine'
-      ? 'mt-3 space-y-4'
-      : 'mt-2 space-y-2';
+        ? 'mt-3 space-y-4'
+        : 'mt-2 space-y-2';
 
   return (
-    <Story name="Layout directives sandbox" notes="Apply directives without an AI round trip">
+    <Story
+      name="Layout directives sandbox"
+      notes="Apply directives without an AI round trip"
+    >
       <div className="space-y-4">
-        <SandboxControls directives={directives} setDirectives={setDirectives} />
+        <SandboxControls
+          directives={directives}
+          setDirectives={setDirectives}
+        />
         <div className="rounded-xl border border-white/[0.08] bg-black/30 p-3">
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-karte-text-4">
-            Output · {applied.components.length} component{applied.components.length === 1 ? '' : 's'}
+            Output · {applied.components.length} component
+            {applied.components.length === 1 ? '' : 's'}
           </p>
           <div className={gapClass} style={applied.moodStyle}>
             {applied.components.map((c, i) => renderComponent(c, i, i))}
@@ -384,11 +426,18 @@ function SandboxControls({
   const densities = ['comfortable', 'compact', 'magazine'] as const;
   const orders = ['none', 'recency', 'impact', 'alphabetical'] as const;
   const moods = ['default', 'serious', 'playful', 'minimal', 'dark'] as const;
-  const hideOptions = ['ProjectMini', 'EssayLink', 'TimelineSlice', 'MetricCard'] as const;
+  const hideOptions = [
+    'ProjectMini',
+    'EssayLink',
+    'TimelineSlice',
+    'MetricCard',
+  ] as const;
 
   function toggleHide(type: string) {
     const cur = directives.hide ?? [];
-    const next = cur.includes(type) ? cur.filter((t) => t !== type) : [...cur, type];
+    const next = cur.includes(type)
+      ? cur.filter((t) => t !== type)
+      : [...cur, type];
     setDirectives({ ...directives, hide: next.length ? next : undefined });
   }
 
@@ -400,7 +449,10 @@ function SandboxControls({
             key={d}
             active={(directives.density ?? 'comfortable') === d}
             onClick={() =>
-              setDirectives({ ...directives, density: d === 'comfortable' ? undefined : d })
+              setDirectives({
+                ...directives,
+                density: d === 'comfortable' ? undefined : d,
+              })
             }
           >
             {d}
@@ -413,7 +465,10 @@ function SandboxControls({
             key={o}
             active={(directives.order ?? 'none') === o}
             onClick={() =>
-              setDirectives({ ...directives, order: o === 'none' ? undefined : o })
+              setDirectives({
+                ...directives,
+                order: o === 'none' ? undefined : o,
+              })
             }
           >
             {o}
@@ -426,7 +481,10 @@ function SandboxControls({
             key={m}
             active={(directives.mood ?? 'default') === m}
             onClick={() =>
-              setDirectives({ ...directives, mood: m === 'default' ? undefined : m })
+              setDirectives({
+                ...directives,
+                mood: m === 'default' ? undefined : m,
+              })
             }
           >
             {m}
@@ -450,7 +508,10 @@ function SandboxControls({
           placeholder="e.g. AI"
           value={directives.filter ?? ''}
           onChange={(e) =>
-            setDirectives({ ...directives, filter: e.target.value || undefined })
+            setDirectives({
+              ...directives,
+              filter: e.target.value || undefined,
+            })
           }
           className="rounded-md border border-white/[0.12] bg-black/40 px-2 py-1 text-[12px] text-karte-text outline-none focus:border-white/30"
         />
@@ -459,7 +520,13 @@ function SandboxControls({
   );
 }
 
-function ControlRow({ label, children }: { label: string; children: React.ReactNode }) {
+function ControlRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-karte-text-4">

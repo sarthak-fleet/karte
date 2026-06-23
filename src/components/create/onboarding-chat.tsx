@@ -51,11 +51,17 @@ function fieldSummary(state: OnboardingState): string[] {
   if (state.location) lines.push(`Location: ${state.location}`);
   if (state.slug) lines.push(`URL: karte.cc/${state.slug}`);
   if (state.calendarUrl)
-    lines.push(`Booking: ${hostnameFromUrl(state.calendarUrl, state.calendarUrl)}`);
+    lines.push(
+      `Booking: ${hostnameFromUrl(state.calendarUrl, state.calendarUrl)}`,
+    );
   if (state.newsletterUrl)
-    lines.push(`Newsletter: ${hostnameFromUrl(state.newsletterUrl, state.newsletterUrl)}`);
-  if (state.tipUrl) lines.push(`Tip jar: ${hostnameFromUrl(state.tipUrl, state.tipUrl)}`);
-  if (state.videoUrl) lines.push(`Video: ${hostnameFromUrl(state.videoUrl, state.videoUrl)}`);
+    lines.push(
+      `Newsletter: ${hostnameFromUrl(state.newsletterUrl, state.newsletterUrl)}`,
+    );
+  if (state.tipUrl)
+    lines.push(`Tip jar: ${hostnameFromUrl(state.tipUrl, state.tipUrl)}`);
+  if (state.videoUrl)
+    lines.push(`Video: ${hostnameFromUrl(state.videoUrl, state.videoUrl)}`);
   if (state.links?.length) lines.push(`Links: ${state.links.length}`);
   if (state.projects?.length) lines.push(`Projects: ${state.projects.length}`);
   return lines;
@@ -98,14 +104,19 @@ export function OnboardingChat() {
         if (res.status === 429) {
           setError('Too many messages — slow down a moment.');
         } else if (res.status === 503) {
-          setError('Onboarding bot is offline right now. Use the import or scratch flow below.');
+          setError(
+            'Onboarding bot is offline right now. Use the import or scratch flow below.',
+          );
         } else {
           setError(data.error || 'Something went wrong. Try again.');
         }
         return;
       }
       setState(data.state);
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: data.reply },
+      ]);
       if (data.done) {
         setDone(true);
         try {
@@ -231,7 +242,9 @@ export function OnboardingChat() {
           type="text"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder={done ? 'Onboarding done — claim your page →' : 'Say something…'}
+          placeholder={
+            done ? 'Onboarding done — claim your page →' : 'Say something…'
+          }
           disabled={loading || done}
           className="min-w-0 flex-1 rounded-xl bg-white/[0.045] px-4 py-3 text-[14px] text-karte-text placeholder:text-karte-text-4 outline-none ring-1 ring-inset ring-transparent transition-all duration-200 ease-[var(--karte-ease)] hover:bg-white/[0.06] focus:bg-white/[0.06] focus:ring-karte-accent/35 disabled:cursor-not-allowed disabled:opacity-50"
         />

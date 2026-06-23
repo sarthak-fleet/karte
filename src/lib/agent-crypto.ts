@@ -1,7 +1,11 @@
 const API_KEY_PREFIX = 'kk_';
 
 function pepper(): string {
-  return process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || 'karte-dev-pepper';
+  return (
+    process.env.BETTER_AUTH_SECRET ||
+    process.env.AUTH_SECRET ||
+    'karte-dev-pepper'
+  );
 }
 
 export async function hashSecret(value: string): Promise<string> {
@@ -28,7 +32,9 @@ export function apiKeyPrefix(rawKey: string): string {
 }
 
 export function isApiKeyFormat(value: string): boolean {
-  return value.startsWith(API_KEY_PREFIX) && value.length > API_KEY_PREFIX.length + 8;
+  return (
+    value.startsWith(API_KEY_PREFIX) && value.length > API_KEY_PREFIX.length + 8
+  );
 }
 
 export function generateAuthCode(): string {

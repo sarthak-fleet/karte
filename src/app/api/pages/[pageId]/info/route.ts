@@ -8,7 +8,14 @@ import { ingestDocument } from '@/lib/knowledgebase';
 import { ensureProfileMemoryIndex } from '@/lib/profile-memory-index';
 import { MAX_CONTENT_LENGTH } from '@/lib/validation';
 
-const ALLOWED_INFO_BLOCK_TYPES = new Set(['text', 'resume', 'faq', 'current', 'voice', 'boundaries']);
+const ALLOWED_INFO_BLOCK_TYPES = new Set([
+  'text',
+  'resume',
+  'faq',
+  'current',
+  'voice',
+  'boundaries',
+]);
 
 function isValidInfoBlockType(type: string): boolean {
   return ALLOWED_INFO_BLOCK_TYPES.has(type);
@@ -64,7 +71,10 @@ export async function POST(
 
   if (!isValidInfoBlockType(type)) {
     return NextResponse.json(
-      { error: 'Invalid block type. Must be one of: text, resume, faq, current, voice, boundaries' },
+      {
+        error:
+          'Invalid block type. Must be one of: text, resume, faq, current, voice, boundaries',
+      },
       { status: 400 },
     );
   }
@@ -107,7 +117,10 @@ export async function POST(
       title: title || undefined,
       blockId: block.id,
     });
-    await db.update(infoBlocks).set({ smDocumentId: doc.id }).where(eq(infoBlocks.id, block.id));
+    await db
+      .update(infoBlocks)
+      .set({ smDocumentId: doc.id })
+      .where(eq(infoBlocks.id, block.id));
   } catch {
     console.error('Failed to ingest info block into knowledgebase RAG');
   }

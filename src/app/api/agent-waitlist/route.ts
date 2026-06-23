@@ -11,7 +11,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL_LEN = 254; // RFC 5321
 
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const { ok } = rateLimit(`agent-waitlist:${ip}`, {
     maxRequests: 5,
     windowMs: 60_000,
@@ -27,9 +28,12 @@ export async function POST(req: Request) {
     email?: unknown;
     source?: unknown;
   };
-  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const email =
+    typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   const source =
-    typeof body.source === 'string' ? body.source.slice(0, 64) : 'landing-card-iv';
+    typeof body.source === 'string'
+      ? body.source.slice(0, 64)
+      : 'landing-card-iv';
 
   if (!email || email.length > MAX_EMAIL_LEN || !EMAIL_RE.test(email)) {
     return NextResponse.json(

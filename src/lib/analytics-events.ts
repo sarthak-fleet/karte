@@ -17,16 +17,16 @@
  * is browser-only and routes through `posthog-js` (initialized by the
  * AnalyticsProvider in `posthog-provider.tsx`).
  */
-import posthog from "posthog-js";
+import posthog from 'posthog-js';
 
-const PROJECT = "linkchat" as const;
+const PROJECT = 'linkchat' as const;
 
 /**
  * The product-specific action behind a `core_action` event.
  * linkchat's core verbs: publishing a profile, and generating one of the
  * shareable AI profile modes (encyclopedia / newspaper / roast).
  */
-export type CoreAction = "page_published" | "mode_generated";
+export type CoreAction = 'page_published' | 'mode_generated';
 
 interface AnalyticsEventMap {
   /** First session after an account is created. */
@@ -39,9 +39,12 @@ interface AnalyticsEventMap {
   returned: { project_id: typeof PROJECT };
 }
 
-export function trackEvent(event: string, properties: Record<string, unknown> = {}): void {
+export function trackEvent(
+  event: string,
+  properties: Record<string, unknown> = {},
+): void {
   try {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
     posthog.capture(event, { project_id: PROJECT, ...properties });
   } catch {
     // Analytics must never break a user flow. Swallow and move on.
@@ -50,27 +53,27 @@ export function trackEvent(event: string, properties: Record<string, unknown> = 
 
 function emit<K extends keyof AnalyticsEventMap>(
   event: K,
-  props: Omit<AnalyticsEventMap[K], "project_id">,
+  props: Omit<AnalyticsEventMap[K], 'project_id'>,
 ): void {
   trackEvent(event, props);
 }
 
 /** Fire once, on the first session after an account is created. */
 export function trackSignup(): void {
-  emit("signup", {});
+  emit('signup', {});
 }
 
 /** Fire once, when the user first reaches real value (first publish). */
 export function trackActivated(): void {
-  emit("activated", {});
+  emit('activated', {});
 }
 
 /** Fire on each completion of the core product action. */
 export function trackCoreAction(action: CoreAction): void {
-  emit("core_action", { action });
+  emit('core_action', { action });
 }
 
 /** Fire on session start for a user who has prior activity. */
 export function trackReturned(): void {
-  emit("returned", {});
+  emit('returned', {});
 }

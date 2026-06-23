@@ -75,11 +75,16 @@ export async function POST(
   const body = (await req.json().catch(() => ({}))) as { text?: unknown };
   const raw = typeof body.text === 'string' ? body.text.trim() : '';
   if (!raw) {
-    return NextResponse.json({ error: 'Paste some text first.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Paste some text first.' },
+      { status: 400 },
+    );
   }
   if (raw.length > MAX_INPUT_CHARS) {
     return NextResponse.json(
-      { error: `Too long — keep it under ${MAX_INPUT_CHARS.toLocaleString()} characters.` },
+      {
+        error: `Too long — keep it under ${MAX_INPUT_CHARS.toLocaleString()} characters.`,
+      },
       { status: 400 },
     );
   }
@@ -143,9 +148,12 @@ function extractAndSanitize(raw: string): ParsedEvent[] {
     const type = typeof r.type === 'string' ? r.type : '';
     if (!VALID_TYPES.has(type as TimelineEventType)) continue;
 
-    const title = typeof r.title === 'string' ? r.title.trim().slice(0, MAX_TITLE) : '';
+    const title =
+      typeof r.title === 'string' ? r.title.trim().slice(0, MAX_TITLE) : '';
     const whenLabel =
-      typeof r.whenLabel === 'string' ? r.whenLabel.trim().slice(0, MAX_FIELD) : '';
+      typeof r.whenLabel === 'string'
+        ? r.whenLabel.trim().slice(0, MAX_FIELD)
+        : '';
     if (!title || !whenLabel) continue;
 
     out.push({

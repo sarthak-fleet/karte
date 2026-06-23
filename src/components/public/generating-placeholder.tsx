@@ -21,7 +21,8 @@ const STYLES: Record<
 > = {
   roast: {
     main: 'grid min-h-screen place-items-center bg-karte-bg px-6 py-16 text-karte-text antialiased',
-    eyebrow: 'text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4',
+    eyebrow:
+      'text-[11px] font-medium uppercase tracking-[0.22em] text-karte-text-4',
     eyebrowContent: (
       <>
         <span className="text-karte-accent/80">·</span> Generating
@@ -35,7 +36,8 @@ const STYLES: Record<
   },
   encyclopedia: {
     main: 'grid min-h-screen place-items-center bg-[#f8f9fa] px-6 py-16 text-gray-800',
-    eyebrow: 'text-[11px] font-medium uppercase tracking-[0.22em] text-gray-500',
+    eyebrow:
+      'text-[11px] font-medium uppercase tracking-[0.22em] text-gray-500',
     eyebrowContent: 'Generating',
     heading: 'mt-4 font-serif text-3xl text-gray-900',
     headingText: 'The encyclopedia entry is being written.',

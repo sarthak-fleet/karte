@@ -37,7 +37,8 @@ function loomId(url: string): string | null {
     const u = new URL(url);
     if (!u.hostname.includes('loom.com')) return null;
     const parts = u.pathname.split('/').filter(Boolean);
-    if ((parts[0] === 'share' || parts[0] === 'embed') && parts[1]) return parts[1];
+    if ((parts[0] === 'share' || parts[0] === 'embed') && parts[1])
+      return parts[1];
     return null;
   } catch {
     return null;
@@ -71,7 +72,10 @@ export function VideoEmbed({
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 rounded-full border border-karte-border bg-white/[0.025] px-4 py-2 text-[13px] font-medium text-karte-text transition-colors duration-200 hover:bg-white/[0.05]"
       >
-        ▶ Watch video <span aria-hidden="true" className="text-karte-text-4">↗</span>
+        ▶ Watch video{' '}
+        <span aria-hidden="true" className="text-karte-text-4">
+          ↗
+        </span>
       </a>
     );
   }

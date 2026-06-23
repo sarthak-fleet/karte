@@ -15,8 +15,7 @@ export async function PUT(
   if ('error' in auth) return auth.error;
 
   const page = await loadOwnedPage(pageId, auth.userId);
-  if (!page)
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!page) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const [existing] = await db
     .select()
@@ -87,10 +86,11 @@ export async function DELETE(
   // Verify page ownership
   const page = await loadOwnedPage(pageId, auth.userId);
 
-  if (!page)
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!page) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  await db.delete(links).where(and(eq(links.id, linkId), eq(links.pageId, pageId)));
+  await db
+    .delete(links)
+    .where(and(eq(links.id, linkId), eq(links.pageId, pageId)));
 
   return NextResponse.json({ success: true });
 }

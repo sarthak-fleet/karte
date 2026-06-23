@@ -21,10 +21,10 @@ export function createAuth() {
   const authSchema = { user, session, account, verification };
   const authDb = drizzle(db, { schema: authSchema });
   const baseURL =
-    process.env.BETTER_AUTH_URL
-    || process.env.AUTH_URL
-    || process.env.NEXT_PUBLIC_APP_URL
-    || 'http://localhost:3000';
+    process.env.BETTER_AUTH_URL ||
+    process.env.AUTH_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    'http://localhost:3000';
 
   _auth = betterAuth({
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET,
@@ -36,7 +36,8 @@ export function createAuth() {
     socialProviders: {
       google: {
         clientId: (process.env.GOOGLE_CLIENT_ID || process.env.AUTH_GOOGLE_ID)!,
-        clientSecret: (process.env.GOOGLE_CLIENT_SECRET || process.env.AUTH_GOOGLE_SECRET)!,
+        clientSecret: (process.env.GOOGLE_CLIENT_SECRET ||
+          process.env.AUTH_GOOGLE_SECRET)!,
       },
     },
     trustedOrigins: [baseURL],
@@ -117,7 +118,10 @@ export async function ensureAuthTables() {
 /** Execute raw SQL on the auth D1 database */
 export async function authDbExecute(sql: string, args: unknown[] = []) {
   const db = getD1();
-  return db.prepare(sql).bind(...args).run();
+  return db
+    .prepare(sql)
+    .bind(...args)
+    .run();
 }
 
 // Keep backward compat — lazily resolve `auth`

@@ -112,7 +112,9 @@ function LinkCard({
               <span className="rounded-full border border-karte-border-strong bg-white/5 px-2 py-0.5 text-[11px] font-medium text-karte-text-2">
                 #{index + 1}
               </span>
-              <p className="truncate font-medium text-karte-text">{link.title}</p>
+              <p className="truncate font-medium text-karte-text">
+                {link.title}
+              </p>
             </div>
             <p className="truncate text-sm text-karte-text-3">{link.url}</p>
           </div>
@@ -252,9 +254,7 @@ export function LinkEditor({
   initialLinks: Link[];
 }) {
   const [links, setLinks] = useState<Link[]>(
-    [...initialLinks].sort(
-      (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
-    ),
+    [...initialLinks].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   );
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
@@ -264,7 +264,9 @@ export function LinkEditor({
   const [loading, setLoading] = useState(false);
   const [importUrl, setImportUrl] = useState('');
   const [importedLinks, setImportedLinks] = useState<ImportedLink[]>([]);
-  const [selectedImportUrls, setSelectedImportUrls] = useState<Set<string>>(new Set());
+  const [selectedImportUrls, setSelectedImportUrls] = useState<Set<string>>(
+    new Set(),
+  );
   const [importLoading, setImportLoading] = useState(false);
   const [importMessage, setImportMessage] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -279,16 +281,12 @@ export function LinkEditor({
   );
 
   const activeLink = activeId
-    ? links.find((l) => l.id === activeId) ?? null
+    ? (links.find((l) => l.id === activeId) ?? null)
     : null;
-  const activeIndex = activeId
-    ? links.findIndex((l) => l.id === activeId)
-    : -1;
+  const activeIndex = activeId ? links.findIndex((l) => l.id === activeId) : -1;
 
   function normalizeLinks(items: Link[]) {
-    return [...items].sort(
-      (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
-    );
+    return [...items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   }
 
   async function persistOrder(nextLinks: Link[]) {
@@ -423,7 +421,9 @@ export function LinkEditor({
         linkCount: Array.isArray(data.links) ? data.links.length : 0,
       });
 
-      const nextLinks = Array.isArray(data.links) ? data.links as ImportedLink[] : [];
+      const nextLinks = Array.isArray(data.links)
+        ? (data.links as ImportedLink[])
+        : [];
       setImportedLinks(nextLinks);
       setSelectedImportUrls(new Set(nextLinks.map((item) => item.url)));
       setImportMessage(
@@ -432,14 +432,18 @@ export function LinkEditor({
           : 'No importable links found on that page.',
       );
     } catch (error) {
-      setImportMessage(error instanceof Error ? error.message : 'Failed to preview import');
+      setImportMessage(
+        error instanceof Error ? error.message : 'Failed to preview import',
+      );
     } finally {
       setImportLoading(false);
     }
   }
 
   async function importSelectedLinks() {
-    const selected = importedLinks.filter((item) => selectedImportUrls.has(item.url));
+    const selected = importedLinks.filter((item) =>
+      selectedImportUrls.has(item.url),
+    );
     if (selected.length === 0) {
       setImportMessage('Select at least one link to import.');
       return;
@@ -464,13 +468,21 @@ export function LinkEditor({
         linkCount: Array.isArray(data.imported) ? data.imported.length : 0,
       });
 
-      const inserted = Array.isArray(data.imported) ? data.imported as Link[] : [];
+      const inserted = Array.isArray(data.imported)
+        ? (data.imported as Link[])
+        : [];
       setLinks((prev) => normalizeLinks([...prev, ...inserted]));
       setImportedLinks([]);
       setSelectedImportUrls(new Set());
-      setImportMessage(`Imported ${inserted.length} links${data.skipped ? `, skipped ${data.skipped} duplicates` : ''}.`);
+      setImportMessage(
+        `Imported ${inserted.length} links${data.skipped ? `, skipped ${data.skipped} duplicates` : ''}.`,
+      );
     } catch (error) {
-      setImportMessage(error instanceof Error ? error.message : 'Failed to import selected links');
+      setImportMessage(
+        error instanceof Error
+          ? error.message
+          : 'Failed to import selected links',
+      );
     } finally {
       setImportLoading(false);
     }
@@ -505,7 +517,10 @@ export function LinkEditor({
           </p>
         </div>
 
-        <form onSubmit={previewImport} className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <form
+          onSubmit={previewImport}
+          className="mt-5 flex flex-col gap-3 sm:flex-row"
+        >
           <input
             type="url"
             placeholder="https://linktr.ee/yourname"

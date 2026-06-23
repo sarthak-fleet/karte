@@ -22,10 +22,16 @@ export async function DELETE(
   }
 
   // Look up block for knowledgebase RAG cleanup.
-  const [block] = await db.select().from(infoBlocks).where(and(eq(infoBlocks.id, blockId), eq(infoBlocks.pageId, pageId)));
+  const [block] = await db
+    .select()
+    .from(infoBlocks)
+    .where(and(eq(infoBlocks.id, blockId), eq(infoBlocks.pageId, pageId)));
 
   if (block?.smDocumentId) {
-    const [user] = await db.select().from(users).where(eq(users.id, auth.userId));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, auth.userId));
     if (user?.smIndexId) {
       try {
         await deleteDocument(block.smDocumentId);

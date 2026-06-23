@@ -62,7 +62,9 @@ export function Sidebar({ slug }: { slug?: string }) {
 
   const activeItem = [...allNavItems]
     .sort((a, b) => b.href.length - a.href.length)
-    .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+    .find(
+      (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
+    );
   const pageTitle = activeItem?.label ?? 'Dashboard';
 
   function renderNav({
@@ -73,55 +75,52 @@ export function Sidebar({ slug }: { slug?: string }) {
     onNavigate?: () => void;
   }) {
     return (
-      <>
-        <nav className={`flex-1 space-y-5 ${mobile ? 'px-3 pb-4' : 'px-3'}`}>
-          {navGroups.map((group, gi) => (
-            <div key={group.label ?? `g-${gi}`} className="space-y-0.5">
-              {group.label && (
-                <p className="mb-1.5 px-3 text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
-                  {group.label}
-                </p>
-              )}
-              {group.items.map((item) => {
-                const isActive =
-                  pathname === item.href || pathname.startsWith(`${item.href}/`);
-                const baseClass =
-                  'flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors duration-200 ease-[var(--karte-ease)]';
-                const stateClass = item.featured
-                  ? isActive
-                    ? 'bg-karte-accent/[0.12] text-karte-text'
-                    : 'text-karte-text-2 hover:bg-karte-accent/[0.08] hover:text-karte-text'
-                  : isActive
-                    ? 'bg-white/[0.06] text-karte-text'
-                    : 'text-karte-text-3 hover:bg-white/[0.03] hover:text-karte-text';
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={onNavigate}
-                    // Default prefetch: Next.js warms dynamic routes on
-                    // hover/focus, not viewport. Hover-warming makes nav
-                    // feel instant while avoiding the eager DB hits we
-                    // were seeing with prefetch={true}.
-                    className={`${baseClass} ${stateClass}`}
-                  >
-                    <span>{item.label}</span>
-                    {item.featured && (
-                      <span
-                        aria-hidden="true"
-                        className="text-[10px] text-karte-accent/80"
-                      >
-                        ✨
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
-        </nav>
-
-      </>
+      <nav className={`flex-1 space-y-5 ${mobile ? 'px-3 pb-4' : 'px-3'}`}>
+        {navGroups.map((group, gi) => (
+          <div key={group.label ?? `g-${gi}`} className="space-y-0.5">
+            {group.label && (
+              <p className="mb-1.5 px-3 text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
+                {group.label}
+              </p>
+            )}
+            {group.items.map((item) => {
+              const isActive =
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const baseClass =
+                'flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors duration-200 ease-[var(--karte-ease)]';
+              const stateClass = item.featured
+                ? isActive
+                  ? 'bg-karte-accent/[0.12] text-karte-text'
+                  : 'text-karte-text-2 hover:bg-karte-accent/[0.08] hover:text-karte-text'
+                : isActive
+                  ? 'bg-white/[0.06] text-karte-text'
+                  : 'text-karte-text-3 hover:bg-white/[0.03] hover:text-karte-text';
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onNavigate}
+                  // Default prefetch: Next.js warms dynamic routes on
+                  // hover/focus, not viewport. Hover-warming makes nav
+                  // feel instant while avoiding the eager DB hits we
+                  // were seeing with prefetch={true}.
+                  className={`${baseClass} ${stateClass}`}
+                >
+                  <span>{item.label}</span>
+                  {item.featured && (
+                    <span
+                      aria-hidden="true"
+                      className="text-[10px] text-karte-accent/80"
+                    >
+                      ✨
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
     );
   }
 

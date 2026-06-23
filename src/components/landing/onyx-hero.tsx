@@ -32,14 +32,14 @@ export function OnyxHero() {
       </h1>
 
       <p className="onyx-hero-etymology">
-        <span className="gold">karte</span>{' '}
-        <span className="gold">·</span> <span className="gold">/ˈkartə/</span>{' '}
-        — German for card. <em>This one talks back.</em>
+        <span className="gold">karte</span> <span className="gold">·</span>{' '}
+        <span className="gold">/ˈkartə/</span> — German for card.{' '}
+        <em>This one talks back.</em>
       </p>
 
       <p className="onyx-hero-sub">
-        Same one link. But this one knows what you&rsquo;d say —
-        and handles it in your voice, before it hits your inbox.
+        Same one link. But this one knows what you&rsquo;d say — and handles it
+        in your voice, before it hits your inbox.
       </p>
 
       <div className="onyx-hero-actions">

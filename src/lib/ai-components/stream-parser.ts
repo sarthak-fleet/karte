@@ -219,7 +219,9 @@ function parseLayoutBuffer(raw: string): LayoutDirectives | null {
  * one so visitors always have a clear follow-up path. Cheap reliability
  * boost on the prompt's "usually include AskAgain" rule.
  */
-function augmentComponents(components: RenderableComponent[]): RenderableComponent[] {
+function augmentComponents(
+  components: RenderableComponent[],
+): RenderableComponent[] {
   if (components.length === 0) return components;
   const hasAskAgain = components.some((c) => c.type === 'AskAgain');
   if (hasAskAgain) return components;

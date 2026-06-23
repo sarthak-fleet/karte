@@ -33,7 +33,9 @@ export async function PUT(
   const [existing] = await db
     .select()
     .from(pageSections)
-    .where(and(eq(pageSections.id, sectionId), eq(pageSections.pageId, pageId)));
+    .where(
+      and(eq(pageSections.id, sectionId), eq(pageSections.pageId, pageId)),
+    );
 
   if (!existing) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -46,7 +48,7 @@ export async function PUT(
   const content =
     typeof body.content === 'string'
       ? body.content.trim()
-      : existing.content ?? '';
+      : (existing.content ?? '');
   const buttonLabel =
     body.buttonLabel === undefined
       ? existing.buttonLabel
@@ -63,7 +65,10 @@ export async function PUT(
     body.enabled !== undefined ? Boolean(body.enabled) : existing.enabled;
 
   if (!isPageSectionType(type)) {
-    return NextResponse.json({ error: 'Invalid section type' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid section type' },
+      { status: 400 },
+    );
   }
 
   if (!title) {
@@ -138,7 +143,9 @@ export async function DELETE(
 
   await db
     .delete(pageSections)
-    .where(and(eq(pageSections.id, sectionId), eq(pageSections.pageId, pageId)));
+    .where(
+      and(eq(pageSections.id, sectionId), eq(pageSections.pageId, pageId)),
+    );
 
   return NextResponse.json({ success: true });
 }

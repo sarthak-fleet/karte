@@ -18,8 +18,11 @@ export function AgentProfileBanner({
     <div className="mb-6 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] px-4 py-2.5 text-[12px] text-cyan-100/90">
         <span>
-          <span className="font-semibold text-cyan-100">AI agent trust card.</span>{' '}
-          You are viewing a machine-operated agent registry entry, not a human profile.
+          <span className="font-semibold text-cyan-100">
+            AI agent trust card.
+          </span>{' '}
+          You are viewing a machine-operated agent registry entry, not a human
+          profile.
         </span>
         <Link
           href={`/${slug}/agent.json`}

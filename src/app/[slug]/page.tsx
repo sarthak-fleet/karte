@@ -26,11 +26,15 @@ import { getFullPageData } from './_lib/get-page-data';
 
 // ChatWidget is a 700+ line client bundle — code-split it so initial JS
 // stays small. Still renders server-side initially as a fixed button.
-const ChatWidget = nextDynamic(
-  () => import('@/components/public/chat-widget').then((m) => m.ChatWidget),
+const ChatWidget = nextDynamic(() =>
+  import('@/components/public/chat-widget').then((m) => m.ChatWidget),
 );
 
-const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: 'italic' });
+const serif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: 'italic',
+});
 
 // Force into the static-renderable pipeline so the OpenNext incremental
 // cache + Next.js Cache-Control headers actually apply.
@@ -64,10 +68,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? newsHeadline.trim()
       : null;
   const ogHeadline =
-    liveHeadline
-    ?? (isAgent ? page.agentPurpose : null)
-    ?? page.bio
-    ?? `${page.displayName} on Karte`;
+    liveHeadline ??
+    (isAgent ? page.agentPurpose : null) ??
+    page.bio ??
+    `${page.displayName} on Karte`;
   const ogParams = new URLSearchParams({
     slug,
     name: page.displayName,
@@ -81,9 +85,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: page.displayName,
     description:
-      (isAgent ? page.agentPurpose : null)
-      ?? page.bio
-      ?? `${page.displayName} on Karte — links, chat, and more.`,
+      (isAgent ? page.agentPurpose : null) ??
+      page.bio ??
+      `${page.displayName} on Karte — links, chat, and more.`,
     openGraph: {
       title: page.displayName,
       description:
@@ -122,7 +126,8 @@ export default async function ProfilePage({ params }: Props) {
   const operatorLabel = agentOperatorLabel(page);
 
   const enabledPages = {
-    encyclopedia: (page.encyclopediaEnabled ?? false) && readyPages.has('encyclopedia'),
+    encyclopedia:
+      (page.encyclopediaEnabled ?? false) && readyPages.has('encyclopedia'),
     roast: (page.roastEnabled ?? false) && readyPages.has('roast'),
     newspaper: (page.newspaperEnabled ?? false) && readyPages.has('newspaper'),
   };
@@ -238,10 +243,12 @@ export default async function ProfilePage({ params }: Props) {
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-8 sm:px-8">
         {isAgent && <AgentProfileBanner page={page} slug={slug} />}
-            {isDemoProfile && !isAgent && (
+        {isDemoProfile && !isAgent && (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-400/25 bg-amber-400/[0.06] px-4 py-2.5 text-[12px] text-amber-200/90">
             <span>
-              <span className="font-semibold text-amber-200">Sample profile.</span>{' '}
+              <span className="font-semibold text-amber-200">
+                Sample profile.
+              </span>{' '}
               Built from public information about {page.displayName} to demo
               Karte. Not an official page.
             </span>
@@ -280,13 +287,19 @@ export default async function ProfilePage({ params }: Props) {
           <div className="space-y-10 lg:py-12">
             {isAgent && (
               <AnimatedReveal>
-                <AgentCapabilitiesSection page={page} accentColor={theme.accentColor} />
+                <AgentCapabilitiesSection
+                  page={page}
+                  accentColor={theme.accentColor}
+                />
               </AnimatedReveal>
             )}
 
             {page.videoUrl && (
               <AnimatedReveal>
-                <VideoEmbed url={page.videoUrl} accentColor={theme.accentColor} />
+                <VideoEmbed
+                  url={page.videoUrl}
+                  accentColor={theme.accentColor}
+                />
               </AnimatedReveal>
             )}
 
@@ -294,16 +307,17 @@ export default async function ProfilePage({ params }: Props) {
               <section>
                 <AnimatedReveal>
                   <div className="mb-5">
-                    <p
-                      className="text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-4"
-                    >
-                      <span style={{ color: theme.accentColor }}>·</span> Projects
+                    <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
+                      <span style={{ color: theme.accentColor }}>·</span>{' '}
+                      Projects
                     </p>
                     <h2 className="mt-2 text-2xl font-semibold tracking-[-0.015em] text-karte-text sm:text-[28px]">
                       Things {firstName} is building
                     </h2>
                     <p className="mt-1.5 text-[14px] leading-[1.55] text-karte-text-3">
-                      {projectData.length} {projectData.length === 1 ? 'project' : 'projects'} — each one is a separate landing page, links out below.
+                      {projectData.length}{' '}
+                      {projectData.length === 1 ? 'project' : 'projects'} — each
+                      one is a separate landing page, links out below.
                     </p>
                   </div>
                 </AnimatedReveal>
@@ -320,13 +334,15 @@ export default async function ProfilePage({ params }: Props) {
               <AnimatedReveal as="section">
                 <div className="mb-5">
                   <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-karte-text-4">
-                    <span style={{ color: theme.accentColor }}>·</span> AI surfaces
+                    <span style={{ color: theme.accentColor }}>·</span> AI
+                    surfaces
                   </p>
                   <h2 className="mt-2 text-2xl font-semibold tracking-[-0.015em] text-karte-text sm:text-[28px]">
                     Three takes, same source
                   </h2>
                   <p className="mt-1.5 text-[14px] leading-[1.55] text-karte-text-3">
-                    Each card is the actual opening of a full AI-written page about {firstName}. Click in.
+                    Each card is the actual opening of a full AI-written page
+                    about {firstName}. Click in.
                   </p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
@@ -366,7 +382,10 @@ export default async function ProfilePage({ params }: Props) {
                             )}
                             <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#6ea8fe] underline decoration-[#6ea8fe]/40 underline-offset-2 transition-colors duration-200 group-hover:decoration-[#6ea8fe]">
                               {card.cta}
-                              <span aria-hidden="true" className="no-underline transition-transform duration-200 group-hover:translate-x-0.5">
+                              <span
+                                aria-hidden="true"
+                                className="no-underline transition-transform duration-200 group-hover:translate-x-0.5"
+                              >
                                 →
                               </span>
                             </span>
@@ -390,7 +409,9 @@ export default async function ProfilePage({ params }: Props) {
                         >
                           <div className="flex items-center justify-between border-b-[3px] border-double border-[#17130d]/55 px-4 pt-2.5 pb-1.5 text-[8px] font-medium uppercase tracking-[0.22em] text-[#17130d]/70">
                             <span>VOL. I</span>
-                            <span>{paper?.dateline?.split(',')[0] || 'Latest'}</span>
+                            <span>
+                              {paper?.dateline?.split(',')[0] || 'Latest'}
+                            </span>
                           </div>
                           <div className="flex flex-1 flex-col px-4 py-3">
                             <h3
@@ -405,7 +426,10 @@ export default async function ProfilePage({ params }: Props) {
                             {card.preview && (
                               <p
                                 className="mt-2.5 line-clamp-2 text-[12px] font-bold uppercase leading-[1.25] tracking-[-0.005em]"
-                                style={{ fontFamily: serif.style.fontFamily, fontStyle: 'normal' }}
+                                style={{
+                                  fontFamily: serif.style.fontFamily,
+                                  fontStyle: 'normal',
+                                }}
                               >
                                 <TypedText
                                   text={paper?.headline || card.preview}
@@ -418,7 +442,10 @@ export default async function ProfilePage({ params }: Props) {
                             )}
                             <span className="mt-3 inline-flex items-center gap-1 self-start border-b border-[#17130d]/30 pb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#17130d] transition-colors duration-200 group-hover:border-[#17130d]">
                               {card.cta}
-                              <span aria-hidden="true" className="border-none transition-transform duration-200 group-hover:translate-x-0.5">
+                              <span
+                                aria-hidden="true"
+                                className="border-none transition-transform duration-200 group-hover:translate-x-0.5"
+                              >
                                 →
                               </span>
                             </span>
@@ -460,7 +487,10 @@ export default async function ProfilePage({ params }: Props) {
                           )}
                           <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff4d6d] transition-colors duration-200 group-hover:text-[#ff8aa3]">
                             {card.cta}
-                            <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">
+                            <span
+                              aria-hidden="true"
+                              className="transition-transform duration-200 group-hover:translate-x-0.5"
+                            >
                               →
                             </span>
                           </span>
@@ -475,7 +505,10 @@ export default async function ProfilePage({ params }: Props) {
             {publicSections.length > 0 && (
               <section className="space-y-4">
                 {publicSections.map((section, i) => (
-                  <AnimatedReveal key={section.id} delay={Math.min(i * 60, 240)}>
+                  <AnimatedReveal
+                    key={section.id}
+                    delay={Math.min(i * 60, 240)}
+                  >
                     <TrackableSection
                       slug={slug}
                       sectionId={section.id}
@@ -523,7 +556,10 @@ export default async function ProfilePage({ params }: Props) {
                 </span>
                 <span
                   className="text-karte-text-3 transition-colors duration-200 group-hover:text-karte-text"
-                  style={{ fontFamily: serif.style.fontFamily, fontStyle: 'italic' }}
+                  style={{
+                    fontFamily: serif.style.fontFamily,
+                    fontStyle: 'italic',
+                  }}
                 >
                   Karte
                 </span>
@@ -555,7 +591,9 @@ export default async function ProfilePage({ params }: Props) {
           because an external image failed. Click → opens chat. */}
       {(page.petEnabled ?? true) && (
         <RoamingCharacter
-          avatarUrl={isDemoProfile ? page.avatarUrl : page.petUrl || page.avatarUrl}
+          avatarUrl={
+            isDemoProfile ? page.avatarUrl : page.petUrl || page.avatarUrl
+          }
           displayName={page.displayName}
           accentColor={theme.accentColor}
           lines={greetingLines}

@@ -38,7 +38,7 @@ export function applyLayoutDirectives(
     out = out.filter((c) => !hideSet.has(c.type.toLowerCase()));
   }
 
-  if (directives?.filter && directives.filter.trim()) {
+  if (directives?.filter?.trim()) {
     const needle = directives.filter.toLowerCase();
     out = out.filter((c) => componentMatchesNeedle(c, needle));
   }
@@ -49,7 +49,9 @@ export function applyLayoutDirectives(
 
   const density = directives?.density ?? 'comfortable';
   const moodStyle: CSSProperties | undefined = directives?.mood
-    ? ({ ['--karte-accent' as string]: MOOD_ACCENT[directives.mood] } as CSSProperties)
+    ? ({
+        ['--karte-accent' as string]: MOOD_ACCENT[directives.mood],
+      } as CSSProperties)
     : undefined;
 
   return { components: out, density, moodStyle };
@@ -59,7 +61,10 @@ export function applyLayoutDirectives(
 // the topic in. Searched case-insensitively against the filter
 // needle. AskAgain is special-cased to always pass so the visitor
 // keeps a follow-up affordance even after filtering.
-function componentMatchesNeedle(c: RenderableComponent, needle: string): boolean {
+function componentMatchesNeedle(
+  c: RenderableComponent,
+  needle: string,
+): boolean {
   if (c.type === 'AskAgain') return true;
   const haystack = collectText(c).toLowerCase();
   return haystack.includes(needle);
@@ -74,23 +79,34 @@ function collectText(c: RenderableComponent): string {
     case 'BookCallSlot':
       return [c.props.label, c.props.duration].filter(Boolean).join(' ');
     case 'EssayLink':
-      return [c.props.title, c.props.excerpt, c.props.year].filter(Boolean).join(' ');
+      return [c.props.title, c.props.excerpt, c.props.year]
+        .filter(Boolean)
+        .join(' ');
     case 'HiringStatus':
       return c.props.label ?? c.props.status;
     case 'LocationCard':
-      return [c.props.city, c.props.timezone, c.props.travelStatus].filter(Boolean).join(' ');
+      return [c.props.city, c.props.timezone, c.props.travelStatus]
+        .filter(Boolean)
+        .join(' ');
     case 'MetricCard':
-      return [c.props.value, c.props.label, c.props.context].filter(Boolean).join(' ');
+      return [c.props.value, c.props.label, c.props.context]
+        .filter(Boolean)
+        .join(' ');
     case 'ProjectMini':
       return [c.props.title, c.props.description].filter(Boolean).join(' ');
     case 'QuoteBlock':
       return [c.props.quote, c.props.attribution].filter(Boolean).join(' ');
     case 'RateCard':
-      return [c.props.tier, c.props.price, c.props.slots, c.props.cta].filter(Boolean).join(' ');
+      return [c.props.tier, c.props.price, c.props.slots, c.props.cta]
+        .filter(Boolean)
+        .join(' ');
     case 'StackList':
       return [c.props.label, ...c.props.items].filter(Boolean).join(' ');
     case 'TimelineSlice':
-      return [c.props.heading, ...c.props.events.map((e) => `${e.when} ${e.title} ${e.where ?? ''}`)]
+      return [
+        c.props.heading,
+        ...c.props.events.map((e) => `${e.when} ${e.title} ${e.where ?? ''}`),
+      ]
         .filter(Boolean)
         .join(' ');
   }

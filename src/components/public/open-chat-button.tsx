@@ -38,16 +38,19 @@ export function OpenChatButton({
               eventType: 'chat_cta_click',
               visitorId: getOrCreateVisitorId(),
               resourceType: 'chat_cta',
-              resourceLabel: typeof children === 'string' ? children : prompt || mode,
+              resourceLabel:
+                typeof children === 'string' ? children : prompt || mode,
               metadata: { prompt, autoSend, mode },
             }),
             keepalive: true,
           });
         }
 
-        window.dispatchEvent(new CustomEvent('karte:open-widget', {
-          detail: { mode, prompt, autoSend },
-        }));
+        window.dispatchEvent(
+          new CustomEvent('karte:open-widget', {
+            detail: { mode, prompt, autoSend },
+          }),
+        );
       }}
     >
       {children}

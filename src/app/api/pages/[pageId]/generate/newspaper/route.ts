@@ -22,17 +22,19 @@ export async function POST(
         );
       }
       if (settings?.tone && settings.tone !== 'Prestigious') {
-        promptAdditions.push(`Write in a "${settings.tone}" newspaper tone. ${
-          settings.tone === 'Tabloid'
-            ? 'Use sensational headlines, exclamation marks, and dramatic language like a tabloid paper.'
-            : settings.tone === 'Local'
-              ? 'Write in a warm, community-focused local newspaper style. Make it feel homey and personal.'
-              : ''
-        }`);
+        promptAdditions.push(
+          `Write in a "${settings.tone}" newspaper tone. ${
+            settings.tone === 'Tabloid'
+              ? 'Use sensational headlines, exclamation marks, and dramatic language like a tabloid paper.'
+              : settings.tone === 'Local'
+                ? 'Write in a warm, community-focused local newspaper style. Make it feel homey and personal.'
+                : ''
+          }`,
+        );
       }
 
       if (promptAdditions.length > 0) {
-        systemPrompt += '\n\nIMPORTANT: ' + promptAdditions.join(' ');
+        systemPrompt += `\n\nIMPORTANT: ${promptAdditions.join(' ')}`;
       }
       return systemPrompt;
     },

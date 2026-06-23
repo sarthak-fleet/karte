@@ -63,7 +63,9 @@ export const account = sqliteTable('account', {
   refreshToken: text('refreshToken'),
   idToken: text('idToken'),
   accessTokenExpiresAt: integer('accessTokenExpiresAt', { mode: 'timestamp' }),
-  refreshTokenExpiresAt: integer('refreshTokenExpiresAt', { mode: 'timestamp' }),
+  refreshTokenExpiresAt: integer('refreshTokenExpiresAt', {
+    mode: 'timestamp',
+  }),
   scope: text('scope'),
   password: text('password'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
@@ -111,11 +113,17 @@ export const pages = sqliteTable('pages', {
   chatEnabled: integer('chatEnabled', { mode: 'boolean' }).default(false),
   chatSystemPrompt: text('chatSystemPrompt'),
   dmMode: text('dmMode').$type<DmMode>().notNull().default('off'),
-  encyclopediaEnabled: integer('encyclopediaEnabled', { mode: 'boolean' }).default(false),
+  encyclopediaEnabled: integer('encyclopediaEnabled', {
+    mode: 'boolean',
+  }).default(false),
   roastEnabled: integer('roastEnabled', { mode: 'boolean' }).default(false),
-  newspaperEnabled: integer('newspaperEnabled', { mode: 'boolean' }).default(false),
+  newspaperEnabled: integer('newspaperEnabled', { mode: 'boolean' }).default(
+    false,
+  ),
   pageSettings: text('pageSettings', { mode: 'json' }).$type<PageSettings>(),
-  scrapedContent: text('scrapedContent', { mode: 'json' }).$type<ScrapedCache>(),
+  scrapedContent: text('scrapedContent', {
+    mode: 'json',
+  }).$type<ScrapedCache>(),
   // Quick-action fields. All nullable; surfaced on the public profile only
   // when set. Pure URL/text — no integrations, just well-rendered links.
   location: text('location'),
@@ -131,16 +139,21 @@ export const pages = sqliteTable('pages', {
   pageType: text('pageType').$type<PageType>().notNull().default('person'),
   verifiedDomain: text('verifiedDomain'),
   verifiedAt: integer('verifiedAt', { mode: 'timestamp' }),
-  verificationMethod: text('verificationMethod').$type<AgentVerificationMethod>(),
+  verificationMethod:
+    text('verificationMethod').$type<AgentVerificationMethod>(),
   verificationToken: text('verificationToken'),
   agentPurpose: text('agentPurpose'),
   agentOperator: text('agentOperator'),
   agentOperatorUrl: text('agentOperatorUrl'),
-  agentCapabilities: text('agentCapabilities', { mode: 'json' }).$type<AgentCapability[]>(),
+  agentCapabilities: text('agentCapabilities', { mode: 'json' }).$type<
+    AgentCapability[]
+  >(),
   agentDisclosurePolicy: text('agentDisclosurePolicy'),
   brainEndpointUrl: text('brainEndpointUrl'),
   brainEndpointAuth: text('brainEndpointAuth'),
-  brainEndpointShape: text('brainEndpointShape').$type<BrainEndpointShape>().default('openai-chat'),
+  brainEndpointShape: text('brainEndpointShape')
+    .$type<BrainEndpointShape>()
+    .default('openai-chat'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),
@@ -151,13 +164,21 @@ export const pages = sqliteTable('pages', {
 
 // ── Generated Pages (cached AI content) ─────────────────────────────
 export const generatedPages = sqliteTable('generatedPages', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  pageId: text('pageId').notNull().references(() => pages.id, { onDelete: 'cascade' }),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
   type: text('type').notNull(), // 'encyclopedia' | 'roast' | 'newspaper'
   content: text('content', { mode: 'json' }).$type<Record<string, unknown>>(),
   status: text('status').notNull().default('pending'), // 'pending' | 'generating' | 'ready' | 'error'
-  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-  updatedAt: integer('updatedAt', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
+  updatedAt: integer('updatedAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
 });
 
 // ── Links (profile links) ────────────────────────────────────────────
@@ -239,8 +260,14 @@ export const contactSubmissions = sqliteTable('contactSubmissions', {
   visitorId: text('visitorId'),
   name: text('name').notNull(),
   email: text('email').notNull(),
-  senderType: text('senderType').$type<'anonymous' | 'email'>().notNull().default('email'),
-  status: text('status').$type<'unread' | 'replied' | 'archived'>().notNull().default('unread'),
+  senderType: text('senderType')
+    .$type<'anonymous' | 'email'>()
+    .notNull()
+    .default('email'),
+  status: text('status')
+    .$type<'unread' | 'replied' | 'archived'>()
+    .notNull()
+    .default('unread'),
   message: text('message').notNull(),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
@@ -268,8 +295,12 @@ export const pageEvents = sqliteTable('pageEvents', {
 
 // ── Daily Aggregates (durable analytics) ─────────────────────────────
 export const dailyStats = sqliteTable('dailyStats', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  pageId: text('pageId').notNull().references(() => pages.id, { onDelete: 'cascade' }),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
   date: text('date').notNull(), // YYYY-MM-DD
   eventType: text('eventType').notNull(),
   count: integer('count').notNull().default(0),
@@ -277,8 +308,12 @@ export const dailyStats = sqliteTable('dailyStats', {
 });
 
 export const dailyResourceStats = sqliteTable('dailyResourceStats', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  pageId: text('pageId').notNull().references(() => pages.id, { onDelete: 'cascade' }),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
   date: text('date').notNull(), // YYYY-MM-DD
   eventType: text('eventType').notNull(),
   resourceType: text('resourceType').notNull(),
@@ -290,8 +325,12 @@ export const dailyResourceStats = sqliteTable('dailyResourceStats', {
 
 // ── Duplicate-tolerant helper ────────────────────────────────────────
 export const dailyVisitorEvents = sqliteTable('dailyVisitorEvents', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  pageId: text('pageId').notNull().references(() => pages.id, { onDelete: 'cascade' }),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
   visitorId: text('visitorId').notNull(),
   date: text('date').notNull(), // YYYY-MM-DD
   eventType: text('eventType').notNull(),
@@ -317,7 +356,9 @@ export const pageDomains = sqliteTable('pageDomains', {
   hostname: text('hostname').notNull().unique(),
   status: text('status').$type<PageDomainStatus>().notNull().default('pending'),
   isPrimary: integer('isPrimary', { mode: 'boolean' }).notNull().default(false),
-  verification: text('verification', { mode: 'json' }).$type<PageDomainVerification[]>(),
+  verification: text('verification', { mode: 'json' }).$type<
+    PageDomainVerification[]
+  >(),
   errorMessage: text('errorMessage'),
   lastCheckedAt: integer('lastCheckedAt', { mode: 'timestamp' }),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
@@ -330,22 +371,34 @@ export const pageDomains = sqliteTable('pageDomains', {
 
 // ── Conversations (chat history) ──────────────────────────────────
 export const conversations = sqliteTable('conversations', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  pageId: text('pageId').notNull().references(() => pages.id, { onDelete: 'cascade' }),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
   visitorId: text('visitorId'), // anonymous session ID from client
   // Email captured from the visitor before they could send a chat message.
   // Nullable for backwards compat — pre-existing conversations have no email.
   visitorEmail: text('visitorEmail'),
-  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
 });
 
 // ── Messages (chat messages) ──────────────────────────────────────
 export const messages = sqliteTable('messages', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  conversationId: text('conversationId').notNull().references(() => conversations.id, { onDelete: 'cascade' }),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  conversationId: text('conversationId')
+    .notNull()
+    .references(() => conversations.id, { onDelete: 'cascade' }),
   role: text('role').notNull(), // 'user' | 'assistant'
   content: text('content').notNull(),
-  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
 });
 
 // ── Timeline Events ──────────────────────────────────────────────
@@ -365,7 +418,12 @@ export type TimelineEventType =
   | 'agent-ownership-changed'
   | 'custom';
 
-export type TimelineEventSource = 'manual' | 'github' | 'rss' | 'x' | 'substack';
+export type TimelineEventSource =
+  | 'manual'
+  | 'github'
+  | 'rss'
+  | 'x'
+  | 'substack';
 export type TimelineEventStatus = 'published' | 'pending-review' | 'hidden';
 
 export const timelineEvents = sqliteTable('timelineEvents', {
@@ -383,8 +441,14 @@ export const timelineEvents = sqliteTable('timelineEvents', {
   imageUrl: text('imageUrl'),
   whenLabel: text('whenLabel').notNull(),
   sortDate: integer('sortDate', { mode: 'timestamp' }).notNull(),
-  source: text('source').$type<TimelineEventSource>().notNull().default('manual'),
-  status: text('status').$type<TimelineEventStatus>().notNull().default('published'),
+  source: text('source')
+    .$type<TimelineEventSource>()
+    .notNull()
+    .default('manual'),
+  status: text('status')
+    .$type<TimelineEventStatus>()
+    .notNull()
+    .default('published'),
   externalId: text('externalId'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),

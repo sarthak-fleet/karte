@@ -2,10 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import type {
-  TimelineEventStatus,
-  TimelineEventType,
-} from '@/db/schema';
+import type { TimelineEventStatus, TimelineEventType } from '@/db/schema';
 import { pages, timelineEvents } from '@/db/schema';
 import { requireUser } from '@/lib/api-auth';
 import { parseWhenLabel } from '@/lib/timeline';
@@ -35,7 +32,11 @@ const MAX_TITLE = 200;
 const MAX_BODY = 1500;
 const MAX_FIELD = 200;
 
-async function verifyOwnership(pageId: string, eventId: string, userId: string) {
+async function verifyOwnership(
+  pageId: string,
+  eventId: string,
+  userId: string,
+) {
   const [row] = await db
     .select({
       eventId: timelineEvents.id,
@@ -83,13 +84,18 @@ export async function PATCH(
     patch.title = t;
   }
   if ('body' in body) patch.body = stringOrNull(body.body, MAX_BODY);
-  if ('whereLabel' in body) patch.whereLabel = stringOrNull(body.whereLabel, MAX_FIELD);
+  if ('whereLabel' in body)
+    patch.whereLabel = stringOrNull(body.whereLabel, MAX_FIELD);
   if ('link' in body) patch.link = stringOrNull(body.link, MAX_FIELD);
-  if ('imageUrl' in body) patch.imageUrl = stringOrNull(body.imageUrl, MAX_FIELD);
+  if ('imageUrl' in body)
+    patch.imageUrl = stringOrNull(body.imageUrl, MAX_FIELD);
   if (typeof body.whenLabel === 'string') {
     const w = body.whenLabel.trim();
     if (!w) {
-      return NextResponse.json({ error: 'whenLabel is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'whenLabel is required' },
+        { status: 400 },
+      );
     }
     patch.whenLabel = w;
     patch.sortDate = parseWhenLabel(w);

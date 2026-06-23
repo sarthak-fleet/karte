@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   // both Beasties (post-build inline-critical-css.mjs) and OpenNext need
   // to share. Without this, OpenNext's own build step regenerates the
   // standalone copy after Beasties runs, wiping the inlined CSS.
-  output: "standalone",
+  output: 'standalone',
   reactCompiler: true,
   // experimental.useLightningcss intentionally NOT enabled: Next.js 16 is
   // strict about this — the flag throws "lightningcss-loader does not work
@@ -75,7 +75,10 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
-      { protocol: 'https', hostname: 'pub-b339ffd5395643a28df3655ef3aa943d.r2.dev' },
+      {
+        protocol: 'https',
+        hostname: 'pub-b339ffd5395643a28df3655ef3aa943d.r2.dev',
+      },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       // Demo profile avatars + project logos.
       { protocol: 'https', hostname: 'api.dicebear.com' },

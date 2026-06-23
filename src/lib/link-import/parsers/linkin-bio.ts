@@ -1,7 +1,7 @@
 import { MAX_TITLE_LENGTH } from '@/lib/validation';
 
 import { fetchSource } from '../fetch';
-import { type ImportedLink, ImportError, type Parser } from '../types';
+import { ImportError, type ImportedLink, type Parser } from '../types';
 import {
   cleanTitle,
   dedupeLinks,
@@ -31,7 +31,12 @@ type LinkinbioBlockData = {
   title?: string;
   label?: string;
   enabled?: boolean;
-  buttons?: Array<{ url?: string; title?: string; label?: string; enabled?: boolean }>;
+  buttons?: Array<{
+    url?: string;
+    title?: string;
+    label?: string;
+    enabled?: boolean;
+  }>;
   social_links?: Array<{ url?: string; platform?: string; enabled?: boolean }>;
 };
 
@@ -71,7 +76,10 @@ function pushBlock(
   out.push(item);
 }
 
-function extractFromPage(page: LinkinbioPage, sourceUrl: string): ImportedLink[] {
+function extractFromPage(
+  page: LinkinbioPage,
+  sourceUrl: string,
+): ImportedLink[] {
   const sourceHost = getSourceHost(sourceUrl);
   const out: ImportedLink[] = [];
   const seen = new Set<string>();
@@ -85,7 +93,14 @@ function extractFromPage(page: LinkinbioPage, sourceUrl: string): ImportedLink[]
       case 'button_list': {
         for (const btn of data.buttons ?? []) {
           if (btn.enabled === false) continue;
-          pushBlock(out, seen, btn.url, btn.title ?? btn.label ?? '', sourceUrl, sourceHost);
+          pushBlock(
+            out,
+            seen,
+            btn.url,
+            btn.title ?? btn.label ?? '',
+            sourceUrl,
+            sourceHost,
+          );
           if (out.length >= MAX_IMPORT_LINKS) break;
         }
         break;
@@ -93,7 +108,14 @@ function extractFromPage(page: LinkinbioPage, sourceUrl: string): ImportedLink[]
       case 'social_link_list': {
         for (const social of data.social_links ?? []) {
           if (social.enabled === false) continue;
-          pushBlock(out, seen, social.url, platformTitle(social.platform), sourceUrl, sourceHost);
+          pushBlock(
+            out,
+            seen,
+            social.url,
+            platformTitle(social.platform),
+            sourceUrl,
+            sourceHost,
+          );
           if (out.length >= MAX_IMPORT_LINKS) break;
         }
         break;
@@ -101,7 +123,14 @@ function extractFromPage(page: LinkinbioPage, sourceUrl: string): ImportedLink[]
       default: {
         // Fallback for "link", "button", and any future singular blocks.
         if (typeof data.url === 'string') {
-          pushBlock(out, seen, data.url, data.title ?? data.label ?? '', sourceUrl, sourceHost);
+          pushBlock(
+            out,
+            seen,
+            data.url,
+            data.title ?? data.label ?? '',
+            sourceUrl,
+            sourceHost,
+          );
         }
       }
     }

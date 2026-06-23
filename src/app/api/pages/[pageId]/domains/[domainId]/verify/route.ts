@@ -23,14 +23,17 @@ export async function POST(
   const domain = await db.query.pageDomains.findFirst({
     where: and(eq(pageDomains.id, domainId), eq(pageDomains.pageId, pageId)),
   });
-  if (!domain) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!domain)
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const status = await getDomainStatus(domain.hostname).catch((err: unknown) => ({
-    status: 'error' as const,
-    verification: [],
-    configured: true,
-    errorMessage: err instanceof Error ? err.message : 'Verification failed',
-  }));
+  const status = await getDomainStatus(domain.hostname).catch(
+    (err: unknown) => ({
+      status: 'error' as const,
+      verification: [],
+      configured: true,
+      errorMessage: err instanceof Error ? err.message : 'Verification failed',
+    }),
+  );
 
   const now = new Date();
   const [updated] = await db

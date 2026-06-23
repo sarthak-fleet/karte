@@ -1,8 +1,8 @@
-import { and,eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 import { db, ensureProjectsTable } from '@/db';
-import { conversations,pages } from '@/db/schema';
+import { conversations, pages } from '@/db/schema';
 import { resolvePublicProfileSlug } from '@/lib/demo-profiles';
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;

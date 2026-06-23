@@ -24,7 +24,9 @@ export default function NewspaperLoading() {
 
       <div className="w-full max-w-3xl border border-[#1c1a14]/30 bg-[#f7f0df] p-5 text-[#17130d] shadow-[0_28px_90px_-55px_rgba(0,0,0,0.75)] sm:p-8">
         <div className="border-b-2 border-[#17130d] pb-4 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.28em]">Special Edition</p>
+          <p className="text-xs font-bold uppercase tracking-[0.28em]">
+            Special Edition
+          </p>
           <h1 className="mt-2 font-serif text-4xl font-black leading-none sm:text-5xl">
             The Profile Times
           </h1>

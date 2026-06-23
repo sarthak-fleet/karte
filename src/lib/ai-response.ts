@@ -7,7 +7,8 @@ export function parseAIResponse<T>(raw: string): T {
 
     const start = raw.indexOf('{');
     const end = raw.lastIndexOf('}');
-    if (start !== -1 && end > start) return JSON.parse(raw.slice(start, end + 1));
+    if (start !== -1 && end > start)
+      return JSON.parse(raw.slice(start, end + 1));
 
     throw new Error('Could not parse AI response as JSON');
   }

@@ -28,7 +28,8 @@ const PAGE_FEATURES = [
   {
     key: 'encyclopediaEnabled' as const,
     label: 'Encyclopedia',
-    description: 'A Wikipedia-style profile mode generated from your memory and page data',
+    description:
+      'A Wikipedia-style profile mode generated from your memory and page data',
     path: 'encyclopedia',
     settingsKey: 'encyclopedia' as const,
   },
@@ -42,7 +43,8 @@ const PAGE_FEATURES = [
   {
     key: 'newspaperEnabled' as const,
     label: 'Newspaper',
-    description: 'A front-page profile mode that turns your story into headlines',
+    description:
+      'A front-page profile mode that turns your story into headlines',
     path: 'newspaper',
     settingsKey: 'newspaper' as const,
   },
@@ -66,11 +68,14 @@ export function PageToggles({
     roastEnabled: initialRoast,
     newspaperEnabled: initialNewspaper,
   });
-  const [pageSettings, setPageSettings] = useState<PageSettings>(initialPageSettings);
+  const [pageSettings, setPageSettings] =
+    useState<PageSettings>(initialPageSettings);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [generating, setGenerating] = useState<string | null>(null);
-  const [expandedSettings, setExpandedSettings] = useState<Set<string>>(new Set());
+  const [expandedSettings, setExpandedSettings] = useState<Set<string>>(
+    new Set(),
+  );
 
   function toggleSettingsPanel(key: string) {
     setExpandedSettings((prev) => {
@@ -155,7 +160,9 @@ export function PageToggles({
           <FormField label="Tone">
             <Select
               value={settings.tone || 'Savage'}
-              onChange={(e) => updatePageSetting('roast', 'tone', e.target.value)}
+              onChange={(e) =>
+                updatePageSetting('roast', 'tone', e.target.value)
+              }
             >
               {ROAST_TONES.map((tone) => (
                 <option key={tone} value={tone} className="bg-karte-bg">
@@ -168,7 +175,9 @@ export function PageToggles({
             <Textarea
               rows={3}
               value={settings.context || ''}
-              onChange={(e) => updatePageSetting('roast', 'context', e.target.value)}
+              onChange={(e) =>
+                updatePageSetting('roast', 'context', e.target.value)
+              }
               placeholder="Add details the AI should know about you for a better roast"
             />
           </FormField>
@@ -184,14 +193,18 @@ export function PageToggles({
             <Input
               type="text"
               value={settings.name || ''}
-              onChange={(e) => updatePageSetting('newspaper', 'name', e.target.value)}
+              onChange={(e) =>
+                updatePageSetting('newspaper', 'name', e.target.value)
+              }
               placeholder="Leave empty for AI to generate one"
             />
           </FormField>
           <FormField label="Tone">
             <Select
               value={settings.tone || 'Prestigious'}
-              onChange={(e) => updatePageSetting('newspaper', 'tone', e.target.value)}
+              onChange={(e) =>
+                updatePageSetting('newspaper', 'tone', e.target.value)
+              }
             >
               {NEWSPAPER_TONES.map((tone) => (
                 <option key={tone} value={tone} className="bg-karte-bg">
@@ -204,7 +217,9 @@ export function PageToggles({
             <Textarea
               rows={3}
               value={settings.context || ''}
-              onChange={(e) => updatePageSetting('newspaper', 'context', e.target.value)}
+              onChange={(e) =>
+                updatePageSetting('newspaper', 'context', e.target.value)
+              }
               placeholder="Add details the AI should use when writing the newspaper"
             />
           </FormField>
@@ -219,7 +234,9 @@ export function PageToggles({
           <FormField label="Writing Style">
             <Select
               value={settings.style || 'Formal Wikipedia'}
-              onChange={(e) => updatePageSetting('encyclopedia', 'style', e.target.value)}
+              onChange={(e) =>
+                updatePageSetting('encyclopedia', 'style', e.target.value)
+              }
             >
               {ENCYCLOPEDIA_STYLES.map((style) => (
                 <option key={style} value={style} className="bg-karte-bg">
@@ -232,7 +249,9 @@ export function PageToggles({
             <Textarea
               rows={3}
               value={settings.context || ''}
-              onChange={(e) => updatePageSetting('encyclopedia', 'context', e.target.value)}
+              onChange={(e) =>
+                updatePageSetting('encyclopedia', 'context', e.target.value)
+              }
               placeholder="Add details the AI should include in the encyclopedia article"
             />
           </FormField>
@@ -265,8 +284,12 @@ export function PageToggles({
             <Card key={feature.key}>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <h3 className="text-sm font-medium text-karte-text">{feature.label}</h3>
-                  <p className="mt-1 text-xs text-karte-text-3">{feature.description}</p>
+                  <h3 className="text-sm font-medium text-karte-text">
+                    {feature.label}
+                  </h3>
+                  <p className="mt-1 text-xs text-karte-text-3">
+                    {feature.description}
+                  </p>
                 </div>
                 <Toggle
                   checked={enabled}

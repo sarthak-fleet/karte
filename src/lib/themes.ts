@@ -109,8 +109,9 @@ export function isThemePresetId(value: string): value is ThemePresetId {
 }
 
 export function resolveThemeConfig(config?: ThemeConfig | null) {
-  const preset = THEME_PRESETS.find((item) => item.id === config?.presetId)
-    ?? DEFAULT_THEME_PRESET;
+  const preset =
+    THEME_PRESETS.find((item) => item.id === config?.presetId) ??
+    DEFAULT_THEME_PRESET;
 
   return {
     presetId: preset.id,

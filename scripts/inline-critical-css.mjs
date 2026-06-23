@@ -1,5 +1,5 @@
-import { readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 import Beasties from 'beasties';
@@ -39,21 +39,21 @@ function deRenderBlockCss(html) {
 export async function runInlineCss(opts = {}) {
   const strict = opts.strict ?? false;
   const staticRoot = resolve('.next');
-  const prerenderedRoots = DEFAULT_PRERENDERED_ROOTS.map((p) => resolve(p)).filter((p) =>
-    existsSync(p),
-  );
+  const prerenderedRoots = DEFAULT_PRERENDERED_ROOTS.map((p) =>
+    resolve(p),
+  ).filter((p) => existsSync(p));
 
   const htmls = [];
   for (const root of prerenderedRoots) {
     htmls.push(...(await walkHtml(root)));
   }
   if (htmls.length === 0) {
-    const msg = '[inline-critical-css] no .html files under .next/server/app — skipping';
+    const msg =
+      '[inline-critical-css] no .html files under .next/server/app — skipping';
     if (strict) {
       console.error(msg);
       process.exit(1);
     }
-    console.log(msg);
     return;
   }
 
@@ -66,8 +66,8 @@ export async function runInlineCss(opts = {}) {
     logLevel: 'warn',
   });
 
-  let total = 0;
-  let saved = 0;
+  let _total = 0;
+  let _saved = 0;
   for (const file of htmls) {
     const before = await readFile(file, 'utf8');
     let after;
@@ -81,15 +81,8 @@ export async function runInlineCss(opts = {}) {
     if (after === before) continue;
     await writeFile(file, after);
     const delta = before.length - after.length;
-    total += 1;
-    saved += delta;
-    const rel = file.replace(`${process.cwd()}/`, '');
-    console.log(
-      `[inline-critical-css] ${rel}: ${(before.length / 1024).toFixed(1)}KB → ${(after.length / 1024).toFixed(1)}KB`,
-    );
+    _total += 1;
+    _saved += delta;
+    const _rel = file.replace(`${process.cwd()}/`, '');
   }
-
-  console.log(
-    `[inline-critical-css] done — processed ${total} file(s), net size change ${(saved / 1024).toFixed(1)}KB`,
-  );
 }

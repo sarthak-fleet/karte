@@ -21,7 +21,11 @@ import {
 // Kept inline since the route handler can't export non-handler symbols.
 interface RevampPlan {
   themePresetId: string;
-  customColors?: { gradientFrom: string; gradientTo: string; accentColor: string };
+  customColors?: {
+    gradientFrom: string;
+    gradientTo: string;
+    accentColor: string;
+  };
   headline: string;
   rationale: string;
   emphasis: string[];
@@ -99,12 +103,14 @@ function sanitizeSlug(value: string): string {
 }
 
 function getInitials(value: string) {
-  return value
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('') || 'K';
+  return (
+    value
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || 'K'
+  );
 }
 
 export function PageSettings({
@@ -132,8 +138,8 @@ export function PageSettings({
   const [bio, setBio] = useState(page?.bio ?? '');
   const [avatarUrl, setAvatarUrl] = useState(page?.avatarUrl ?? '');
   const [themePresetId, setThemePresetId] = useState<ThemePresetId>(
-    (page?.themeConfig?.presetId as ThemePresetId | undefined)
-      ?? DEFAULT_THEME_PRESET.id,
+    (page?.themeConfig?.presetId as ThemePresetId | undefined) ??
+      DEFAULT_THEME_PRESET.id,
   );
   const [published, setPublished] = useState(page?.published ?? false);
   const [dmMode, setDmMode] = useState<DmMode>(page?.dmMode ?? 'off');
@@ -151,7 +157,9 @@ export function PageSettings({
   // mutating; applyPendingPlan commits the previewed plan. Lets the
   // user inspect (and discard) before any DB write or theme swap.
   const [pendingPlan, setPendingPlan] = useState<RevampPlan | null>(null);
-  const [pendingRemovals, setPendingRemovals] = useState<RemovedSectionPreview[]>([]);
+  const [pendingRemovals, setPendingRemovals] = useState<
+    RemovedSectionPreview[]
+  >([]);
   // Bumped on every successful save to force the live-preview iframe to
   // reload with fresh content. Cheap way to keep the preview honest
   // without manually wiring a postMessage channel.
@@ -182,9 +190,13 @@ export function PageSettings({
       }
       setPendingPlan(data.plan);
       setPendingRemovals(data.removedSections ?? []);
-      setAiMessage('Preview ready — review below, then Apply when you are happy.');
+      setAiMessage(
+        'Preview ready — review below, then Apply when you are happy.',
+      );
     } catch (error) {
-      setAiMessage(error instanceof Error ? error.message : 'Failed to generate theme');
+      setAiMessage(
+        error instanceof Error ? error.message : 'Failed to generate theme',
+      );
     } finally {
       setAiRunning(false);
     }
@@ -207,7 +219,8 @@ export function PageSettings({
         plan?: RevampPlan;
       };
       if (!res.ok) throw new Error(data.error || 'Failed to apply theme');
-      const nextPresetId = data?.plan?.themePresetId ?? pendingPlan.themePresetId;
+      const nextPresetId =
+        data?.plan?.themePresetId ?? pendingPlan.themePresetId;
       if (typeof nextPresetId === 'string') {
         setThemePresetId(nextPresetId as ThemePresetId);
       }
@@ -218,7 +231,9 @@ export function PageSettings({
       setPreviewRefreshKey((n) => n + 1);
       router.refresh();
     } catch (error) {
-      setAiMessage(error instanceof Error ? error.message : 'Failed to apply theme');
+      setAiMessage(
+        error instanceof Error ? error.message : 'Failed to apply theme',
+      );
     } finally {
       setAiRunning(false);
     }
@@ -407,8 +422,8 @@ export function PageSettings({
           </h2>
           <p className="mt-1.5 text-[12px] leading-[1.55] text-karte-text-3">
             Picks a theme preset and tweaks colors to match. Variant / layout
-            generation (which widgets the AI picks for each link or project)
-            is on the roadmap.
+            generation (which widgets the AI picks for each link or project) is
+            on the roadmap.
           </p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <input
@@ -454,7 +469,9 @@ export function PageSettings({
         <div className="rounded-2xl bg-white/[0.02] p-6">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-karte-text">Live preview</p>
+              <p className="text-sm font-medium text-karte-text">
+                Live preview
+              </p>
               <p className="text-xs text-karte-text-4">
                 Sketch of how your page will look. The real page appears here
                 once you claim it.
@@ -520,7 +537,6 @@ export function PageSettings({
       )}
 
       <div className="space-y-6 rounded-2xl bg-white/[0.02] p-6">
-
         {/* Slug */}
         <div>
           <label
@@ -640,7 +656,6 @@ export function PageSettings({
               );
             })}
           </div>
-
         </div>
 
         {/* Publish Toggle (edit mode only) */}
@@ -649,9 +664,12 @@ export function PageSettings({
             <div>
               <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-karte-text">Personal DMs</h3>
+                  <h3 className="text-sm font-medium text-karte-text">
+                    Personal DMs
+                  </h3>
                   <p className="text-xs text-karte-text-3">
-                    Choose how visitors can message you from the floating DM button.
+                    Choose how visitors can message you from the floating DM
+                    button.
                   </p>
                 </div>
               </div>
@@ -755,8 +773,8 @@ export function PageSettings({
                   </h3>
                   <p className="text-xs text-karte-text-3">
                     A cartoon character that walks along the bottom of your
-                    public page and pops up with AI-generated lines from
-                    your wiki / newspaper / roast.
+                    public page and pops up with AI-generated lines from your
+                    wiki / newspaper / roast.
                   </p>
                 </div>
                 <Toggle checked={petEnabled} onChange={setPetEnabled} />
@@ -791,7 +809,9 @@ export function PageSettings({
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-medium text-karte-text">Published</h3>
+                <h3 className="text-sm font-medium text-karte-text">
+                  Published
+                </h3>
                 <p className="text-xs text-karte-text-3">
                   Make your page visible to visitors
                 </p>
@@ -811,12 +831,12 @@ export function PageSettings({
             {shouldClaimOnLogin
               ? 'Continue to Claim Username'
               : uploadingAvatar
-              ? 'Uploading image...'
-              : saving
-              ? 'Saving...'
-              : isEditing
-                ? 'Save'
-                : 'Create Page'}
+                ? 'Uploading image...'
+                : saving
+                  ? 'Saving...'
+                  : isEditing
+                    ? 'Save'
+                    : 'Create Page'}
           </button>
           {message && (
             <p
@@ -858,7 +878,8 @@ function RevampPreview({
   onDiscard: () => void;
 }) {
   const themeLabel =
-    THEME_PRESETS.find((t) => t.id === plan.themePresetId)?.id ?? plan.themePresetId;
+    THEME_PRESETS.find((t) => t.id === plan.themePresetId)?.id ??
+    plan.themePresetId;
   const swatch = plan.customColors?.accentColor;
   return (
     <div className="mt-5 rounded-xl border border-karte-accent/30 bg-black/30 p-4">
@@ -927,7 +948,8 @@ function RevampPreview({
       {plan.blocks.length > 0 && (
         <div className="mt-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-karte-text-4">
-            {plan.blocks.length} new {plan.blocks.length === 1 ? 'block' : 'blocks'}
+            {plan.blocks.length} new{' '}
+            {plan.blocks.length === 1 ? 'block' : 'blocks'}
           </p>
           <ul className="mt-2 space-y-2">
             {plan.blocks.map((block, i) => (

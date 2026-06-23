@@ -8,12 +8,25 @@ import posthog from 'posthog-js';
 // this card sits between FOR THE AGENTS and the final CTA, giving
 // visitors a "see it on a real profile before you commit" beat.
 
-const SAMPLES: ReadonlyArray<{ slug: string; label: string; flavor: string }> = [
-  { slug: 'naval', label: 'Naval', flavor: 'On wealth, leverage, long-term games.' },
-  { slug: 'levelsio', label: 'levelsio', flavor: 'Solo builder. Public MRR. Lisbon-based.' },
-  { slug: 'pg', label: 'Paul Graham', flavor: 'YC. Essays. Default-alive.' },
-  { slug: 'karpathy', label: 'Karpathy', flavor: 'Back at OpenAI. Eureka Labs.' },
-];
+const SAMPLES: ReadonlyArray<{ slug: string; label: string; flavor: string }> =
+  [
+    {
+      slug: 'naval',
+      label: 'Naval',
+      flavor: 'On wealth, leverage, long-term games.',
+    },
+    {
+      slug: 'levelsio',
+      label: 'levelsio',
+      flavor: 'Solo builder. Public MRR. Lisbon-based.',
+    },
+    { slug: 'pg', label: 'Paul Graham', flavor: 'YC. Essays. Default-alive.' },
+    {
+      slug: 'karpathy',
+      label: 'Karpathy',
+      flavor: 'Back at OpenAI. Eureka Labs.',
+    },
+  ];
 
 function captureSampleClick(slug: string) {
   try {
@@ -26,10 +39,9 @@ function captureSampleClick(slug: string) {
 export function OnyxSamples() {
   return (
     <div className="onyx-samples">
-      <div className="onyx-eyebrow center">·  THE MEMBERS  ·</div>
+      <div className="onyx-eyebrow center">· THE MEMBERS ·</div>
       <h2 className="onyx-h2 center">
-        See it on a{' '}
-        <em>real profile.</em>
+        See it on a <em>real profile.</em>
       </h2>
       <p className="onyx-samples-sub">
         Four sample cards built from public writing. Open one and talk to it —

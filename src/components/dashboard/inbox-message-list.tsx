@@ -33,14 +33,11 @@ export function InboxMessageList({
     setUpdatingId(messageId);
 
     try {
-      const res = await fetch(
-        `/api/pages/${pageId}/submissions/${messageId}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status }),
-        },
-      );
+      const res = await fetch(`/api/pages/${pageId}/submissions/${messageId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
 
       if (!res.ok) {
         return;
@@ -65,7 +62,8 @@ export function InboxMessageList({
     return (
       <div className="rounded-2xl bg-white/[0.02] p-8 text-center">
         <p className="text-karte-text-3">
-          No messages yet. Direct messages and contact submissions will show here.
+          No messages yet. Direct messages and contact submissions will show
+          here.
         </p>
       </div>
     );
@@ -75,7 +73,8 @@ export function InboxMessageList({
     <div className="space-y-3">
       {archivedCount > 0 && (
         <p className="text-xs text-karte-text-4">
-          {archivedCount} archived message{archivedCount === 1 ? '' : 's'} hidden.
+          {archivedCount} archived message{archivedCount === 1 ? '' : 's'}{' '}
+          hidden.
         </p>
       )}
 
@@ -114,7 +113,9 @@ export function InboxMessageList({
                   </span>
                 </div>
                 {isAnonymous ? (
-                  <p className="mt-1 text-sm text-karte-text-3">No email attached</p>
+                  <p className="mt-1 text-sm text-karte-text-3">
+                    No email attached
+                  </p>
                 ) : (
                   <a
                     href={`mailto:${message.email}`}

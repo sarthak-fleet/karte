@@ -34,7 +34,9 @@ function selectParser(sourceUrl: string): Parser {
  *  - HTTP-level errors (timeout / 403 / wrong content-type / cross-domain
  *    redirect) raise `ImportError` with a user-facing message.
  */
-export async function parseSource(sourceUrl: string): Promise<ParseSourceResult> {
+export async function parseSource(
+  sourceUrl: string,
+): Promise<ParseSourceResult> {
   const parser = selectParser(sourceUrl);
 
   if (parser.fetchesItsOwnData) {

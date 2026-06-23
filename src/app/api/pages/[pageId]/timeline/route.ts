@@ -22,7 +22,7 @@ const VALID_TYPES: ReadonlyArray<TimelineEventType> = [
   'custom',
 ];
 
-const VALID_STATUSES: ReadonlyArray<TimelineEventStatus> = [
+const _VALID_STATUSES: ReadonlyArray<TimelineEventStatus> = [
   'published',
   'pending-review',
   'hidden',
@@ -39,7 +39,7 @@ async function verifyOwnership(pageId: string, userId: string) {
 // GET — list events for a page. Owner-only; future: a "public" mode
 // for the visible timeline render (filters hidden + pending-review).
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ pageId: string }> },
 ) {
   const auth = await requireUser();
@@ -76,16 +76,23 @@ export async function POST(
 
   const type = typeof body.type === 'string' ? body.type : '';
   const title = typeof body.title === 'string' ? body.title.trim() : '';
-  const whenLabel = typeof body.whenLabel === 'string' ? body.whenLabel.trim() : '';
+  const whenLabel =
+    typeof body.whenLabel === 'string' ? body.whenLabel.trim() : '';
 
   if (!type || !VALID_TYPES.includes(type as TimelineEventType)) {
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   }
   if (!title || title.length > MAX_TITLE) {
-    return NextResponse.json({ error: 'Title is required (max 200 chars)' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Title is required (max 200 chars)' },
+      { status: 400 },
+    );
   }
   if (!whenLabel) {
-    return NextResponse.json({ error: 'whenLabel is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'whenLabel is required' },
+      { status: 400 },
+    );
   }
 
   const sortDate = parseWhenLabel(whenLabel);

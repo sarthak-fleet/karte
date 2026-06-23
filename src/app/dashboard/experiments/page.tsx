@@ -24,7 +24,9 @@ function VariantMetric({
 }) {
   return (
     <div className="rounded-xl bg-white/[0.025] p-4">
-      <p className="text-[11px] uppercase tracking-[0.24em] text-karte-text-4">{label}</p>
+      <p className="text-[11px] uppercase tracking-[0.24em] text-karte-text-4">
+        {label}
+      </p>
       <p className="mt-2 text-2xl font-semibold text-karte-text">{value}</p>
     </div>
   );
@@ -43,7 +45,9 @@ export default async function ExperimentsPage() {
       <div className="space-y-6 sm:space-y-8">
         <h1 className="text-2xl font-bold text-karte-text">Experiments</h1>
         <div className="rounded-2xl bg-white/[0.02] p-8 text-center">
-          <p className="text-karte-text-3">Create and publish a page before testing variants.</p>
+          <p className="text-karte-text-3">
+            Create and publish a page before testing variants.
+          </p>
         </div>
       </div>
     );
@@ -62,16 +66,21 @@ export default async function ExperimentsPage() {
   const analytics = summarizeVariantAnalytics(recentEvents);
   const analyticsById = new Map(analytics.map((row) => [row.id, row]));
   const totalViews = analytics.reduce((sum, row) => sum + row.views, 0);
-  const totalConversions = analytics.reduce((sum, row) => sum + row.conversions, 0);
+  const totalConversions = analytics.reduce(
+    (sum, row) => sum + row.conversions,
+    0,
+  );
   const bestVariant = analytics[0];
 
   return (
     <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-karte-text">Profile Experiments</h1>
+        <h1 className="text-2xl font-bold text-karte-text">
+          Profile Experiments
+        </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-karte-text-3">
-          Test profile framing with variant links and compare conversion events from the same
-          analytics stream.
+          Test profile framing with variant links and compare conversion events
+          from the same analytics stream.
         </p>
       </div>
 
@@ -95,17 +104,18 @@ export default async function ExperimentsPage() {
           const previewUrl = buildVariantPreviewUrl(page.slug, variant.id);
 
           return (
-            <div
-              key={variant.id}
-              className="rounded-2xl bg-white/[0.025] p-5"
-            >
+            <div key={variant.id} className="rounded-2xl bg-white/[0.025] p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-200">
                     {variant.audience}
                   </p>
-                  <h2 className="mt-3 text-xl font-semibold text-karte-text">{variant.label}</h2>
-                  <p className="mt-3 text-sm leading-6 text-karte-text-3">{variant.hypothesis}</p>
+                  <h2 className="mt-3 text-xl font-semibold text-karte-text">
+                    {variant.label}
+                  </h2>
+                  <p className="mt-3 text-sm leading-6 text-karte-text-3">
+                    {variant.hypothesis}
+                  </p>
                 </div>
                 <Link
                   href={previewUrl}
@@ -119,12 +129,19 @@ export default async function ExperimentsPage() {
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <VariantMetric label="Views" value={row.views} />
                 <VariantMetric label="Conversions" value={row.conversions} />
-                <VariantMetric label="Rate" value={formatPercent(row.conversionRate)} />
+                <VariantMetric
+                  label="Rate"
+                  value={formatPercent(row.conversionRate)}
+                />
               </div>
 
               <div className="mt-5 rounded-xl bg-black/25 p-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-karte-text-4">Share URL</p>
-                <p className="mt-2 break-all text-sm text-karte-text-2">{previewUrl}</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-karte-text-4">
+                  Share URL
+                </p>
+                <p className="mt-2 break-all text-sm text-karte-text-2">
+                  {previewUrl}
+                </p>
               </div>
             </div>
           );

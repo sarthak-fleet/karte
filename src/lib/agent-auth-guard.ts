@@ -57,8 +57,7 @@ export function checkAgentAuthRateLimits(ip: string, email: string) {
 }
 
 export async function assertAgentAuthDailyBudget(): Promise<
-  | { ok: true }
-  | { ok: false; status: 503; retryAfter: number; error: string }
+  { ok: true } | { ok: false; status: 503; retryAfter: number; error: string }
 > {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const [row] = await db
@@ -80,12 +79,19 @@ export async function assertAgentAuthDailyBudget(): Promise<
 
 export async function assertAgentAuthEmailCooldown(
   email: string,
-): Promise<{ ok: true } | { ok: false; status: 429; retryAfter: number; error: string }> {
+): Promise<
+  { ok: true } | { ok: false; status: 429; retryAfter: number; error: string }
+> {
   const since = new Date(Date.now() - AGENT_AUTH_LIMITS.emailCooldownMs);
   const [row] = await db
     .select({ total: count() })
     .from(agentAuthSendLog)
-    .where(and(eq(agentAuthSendLog.email, email), gt(agentAuthSendLog.createdAt, since)));
+    .where(
+      and(
+        eq(agentAuthSendLog.email, email),
+        gt(agentAuthSendLog.createdAt, since),
+      ),
+    );
 
   if ((row?.total ?? 0) > 0) {
     return {
@@ -110,9 +116,13 @@ export async function recordAgentAuthSend(email: string, ipHash: string) {
 
 export async function assertAgentAuthKeyBudget(
   email: string,
-): Promise<{ ok: true } | { ok: false; status: 429; retryAfter: number; error: string }> {
+): Promise<
+  { ok: true } | { ok: false; status: 429; retryAfter: number; error: string }
+> {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const operator = await db.query.user.findFirst({ where: eq(user.email, email) });
+  const operator = await db.query.user.findFirst({
+    where: eq(user.email, email),
+  });
   if (!operator) return { ok: true };
 
   const [row] = await db

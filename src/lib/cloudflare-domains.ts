@@ -66,7 +66,9 @@ type CloudflareCustomHostname = {
 type CloudflareListResult = CloudflareCustomHostname[];
 
 export function isCloudflareCustomHostnamesConfigured(): boolean {
-  return Boolean(process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ZONE_ID);
+  return Boolean(
+    process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ZONE_ID,
+  );
 }
 
 function cloudflareHeaders(): HeadersInit {
@@ -82,12 +84,23 @@ function customHostnamesUrl(path = '', query?: URLSearchParams): string {
   return `${CLOUDFLARE_API}/zones/${zoneId}/custom_hostnames${path}${suffix}`;
 }
 
-function cloudflareError(json: CloudflareEnvelope<unknown>, fallback: string): string {
-  return json.errors?.map((err) => err.message).filter(Boolean).join('; ') || fallback;
+function cloudflareError(
+  json: CloudflareEnvelope<unknown>,
+  fallback: string,
+): string {
+  return (
+    json.errors
+      ?.map((err) => err.message)
+      .filter(Boolean)
+      .join('; ') || fallback
+  );
 }
 
-function mapProviderStatus(hostname: CloudflareCustomHostname): PageDomainStatus {
-  if (hostname.status === 'active' && hostname.ssl?.status === 'active') return 'verified';
+function mapProviderStatus(
+  hostname: CloudflareCustomHostname,
+): PageDomainStatus {
+  if (hostname.status === 'active' && hostname.ssl?.status === 'active')
+    return 'verified';
   if (
     hostname.status === 'blocked' ||
     hostname.status === 'test_blocked' ||
@@ -101,7 +114,9 @@ function mapProviderStatus(hostname: CloudflareCustomHostname): PageDomainStatus
 // Verification records are tagged with a `reason` prefix so the UI can group
 // them and explain each option to the user. Any single one of these is enough
 // to validate the hostname — users don't need to add all of them.
-function mapVerification(hostname: CloudflareCustomHostname): PageDomainVerification[] {
+function mapVerification(
+  hostname: CloudflareCustomHostname,
+): PageDomainVerification[] {
   const records: PageDomainVerification[] = [];
 
   // Option: pre-validation TXT — derived from the hostname's CF resource UUID.
@@ -172,10 +187,15 @@ function mapVerification(hostname: CloudflareCustomHostname): PageDomainVerifica
   return records;
 }
 
-function mapCustomHostname(hostname: CloudflareCustomHostname): DomainProviderStatus {
+function mapCustomHostname(
+  hostname: CloudflareCustomHostname,
+): DomainProviderStatus {
   const errorMessage =
     hostname.verification_errors?.join('; ') ||
-    hostname.ssl?.validation_errors?.map((err) => err.message).filter(Boolean).join('; ') ||
+    hostname.ssl?.validation_errors
+      ?.map((err) => err.message)
+      .filter(Boolean)
+      .join('; ') ||
     undefined;
 
   return {
@@ -186,20 +206,26 @@ function mapCustomHostname(hostname: CloudflareCustomHostname): DomainProviderSt
   };
 }
 
-async function findCustomHostname(hostname: string): Promise<CloudflareCustomHostname | null> {
+async function findCustomHostname(
+  hostname: string,
+): Promise<CloudflareCustomHostname | null> {
   const query = new URLSearchParams({ hostname });
   const res = await fetch(customHostnamesUrl('', query), {
     method: 'GET',
     headers: cloudflareHeaders(),
   });
-  const json = (await res.json().catch(() => ({}))) as CloudflareEnvelope<CloudflareListResult>;
+  const json = (await res
+    .json()
+    .catch(() => ({}))) as CloudflareEnvelope<CloudflareListResult>;
   if (!res.ok) {
     throw new Error(cloudflareError(json, `Cloudflare returned ${res.status}`));
   }
   return json.result?.find((item) => item.hostname === hostname) ?? null;
 }
 
-export async function addDomain(hostname: string): Promise<DomainProviderStatus> {
+export async function addDomain(
+  hostname: string,
+): Promise<DomainProviderStatus> {
   if (!isCloudflareCustomHostnamesConfigured()) {
     return {
       status: 'pending',
@@ -216,7 +242,9 @@ export async function addDomain(hostname: string): Promise<DomainProviderStatus>
       ssl: { method: 'txt', type: 'dv' },
     }),
   });
-  const json = (await res.json().catch(() => ({}))) as CloudflareEnvelope<CloudflareCustomHostname>;
+  const json = (await res
+    .json()
+    .catch(() => ({}))) as CloudflareEnvelope<CloudflareCustomHostname>;
 
   if (!res.ok) {
     if (res.status === 409) {
@@ -236,7 +264,9 @@ export async function addDomain(hostname: string): Promise<DomainProviderStatus>
     : { status: 'verifying', verification: [], configured: true };
 }
 
-export async function getDomainStatus(hostname: string): Promise<DomainProviderStatus> {
+export async function getDomainStatus(
+  hostname: string,
+): Promise<DomainProviderStatus> {
   if (!isCloudflareCustomHostnamesConfigured()) {
     return { status: 'pending', verification: [], configured: false };
   }

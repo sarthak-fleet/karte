@@ -30,8 +30,12 @@ Rules:
 - If the question is hostile/spammy, deflect politely in one sentence.`;
 
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const { ok } = rateLimit(`demo-chat:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const { ok } = rateLimit(`demo-chat:${ip}`, {
+    maxRequests: 10,
+    windowMs: 60_000,
+  });
   if (!ok) {
     return NextResponse.json(
       { error: 'Slow down — try again in a minute.' },

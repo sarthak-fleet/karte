@@ -12,7 +12,17 @@ interface ShareCardProps {
 }
 
 export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
-  function ShareCard({ displayName, slug, vibeScore, personalityType, roastSummary, accentColor }, ref) {
+  function ShareCard(
+    {
+      displayName,
+      slug,
+      vibeScore,
+      personalityType,
+      roastSummary,
+      accentColor,
+    },
+    ref,
+  ) {
     const radius = 30;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (vibeScore / 100) * circumference;
@@ -118,14 +128,10 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 
         {/* Watermark */}
         <div className="relative z-10 flex items-center justify-between">
-          <span className="text-xs text-karte-text-4">
-            karte.cc/{slug}
-          </span>
-          <span className="text-xs text-karte-text-4">
-            Karte Roast
-          </span>
+          <span className="text-xs text-karte-text-4">karte.cc/{slug}</span>
+          <span className="text-xs text-karte-text-4">Karte Roast</span>
         </div>
       </div>
     );
-  }
+  },
 );

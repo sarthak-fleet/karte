@@ -11,7 +11,9 @@ interface LegacyEncyclopediaContent {
   categories: string[];
 }
 
-function isLegacyFormat(content: unknown): content is LegacyEncyclopediaContent {
+function isLegacyFormat(
+  content: unknown,
+): content is LegacyEncyclopediaContent {
   return (
     typeof content === 'object' &&
     content !== null &&
@@ -25,7 +27,9 @@ function isLegacyFormat(content: unknown): content is LegacyEncyclopediaContent 
  * Convert legacy encyclopedia content (leadParagraph + sections[])
  * to the new format (markdown as HTML string + infobox + categories).
  */
-function convertLegacyToNew(legacy: LegacyEncyclopediaContent): EncyclopediaContent {
+function convertLegacyToNew(
+  legacy: LegacyEncyclopediaContent,
+): EncyclopediaContent {
   const parts: string[] = [];
 
   // Lead paragraph
@@ -67,7 +71,9 @@ function escapeHtml(text: string): string {
  * Normalize any encyclopedia content to the current format.
  * If the content is in the legacy format, convert it automatically.
  */
-export function normalizeEncyclopediaContent(content: unknown): EncyclopediaContent | null {
+export function normalizeEncyclopediaContent(
+  content: unknown,
+): EncyclopediaContent | null {
   if (!content || typeof content !== 'object') return null;
 
   if (isLegacyFormat(content)) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode,useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 interface SafeImageProps {
   src: string | null | undefined;
