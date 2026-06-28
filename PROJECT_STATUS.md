@@ -1,6 +1,6 @@
 # linkchat — PROJECT STATUS
 
-Last updated: 2026-06-22
+Last updated: 2026-06-28
 
 ## Why/What
 
@@ -155,6 +155,3 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 - In-memory rate limiter resets on every deploy — not durable across Worker instances.
 - E2E tests assume local dev server — not run in CI by default without documented harness.
-- Production URL: `https://karte.cc/`; deploy via push to `main` or `pnpm deploy:cf`.
-- Documented env matrix in README; never commit secrets.
-- `AGENTS.md` holds extended architecture notes for agents.
