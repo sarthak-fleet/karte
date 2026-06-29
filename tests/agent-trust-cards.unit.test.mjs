@@ -61,21 +61,18 @@ test('buildKarteAgentSkillMarkdown includes version and auth endpoints', () => {
   assert.match(body, /agent\.json/);
 });
 
-test('buildKarteAgentSkillMarkdown documents autonomous AgentMail signup', () => {
+test('buildKarteAgentSkillMarkdown documents provider-agnostic autonomous signup', () => {
   const body = buildKarteAgentSkillMarkdown('https://karte.cc');
-  assert.match(body, /AgentMail/);
+  assert.match(body, /any agent with an email inbox/i);
   assert.match(body, /agent-card\.sh signup/);
-  assert.match(body, /api\.agentmail\.to\/v0\/inboxes/);
+  assert.match(body, /--poll-cmd/);
+  assert.match(body, /inbox provider is irrelevant/i);
 });
 
-test('buildKarteAgentDiscoveryCard advertises autonomous signup', () => {
+test('buildKarteAgentDiscoveryCard advertises provider-agnostic autonomous signup', () => {
   const card = buildKarteAgentDiscoveryCard('https://karte.cc');
-  assert.equal(
-    card.authentication.autonomous_signup.email_provider,
-    'https://agentmail.to',
-  );
-  assert.match(
-    card.authentication.autonomous_signup.command,
-    /agent-card\.sh signup/,
-  );
+  const signup = card.authentication.autonomous_signup;
+  assert.match(signup.description, /email inbox/i);
+  assert.match(signup.command, /agent-card\.sh signup/);
+  assert.match(signup.command, /--poll-cmd/);
 });
