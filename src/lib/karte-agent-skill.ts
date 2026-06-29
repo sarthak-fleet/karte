@@ -1,4 +1,4 @@
-export const KARTE_AGENT_SKILL_VERSION = '0.1.0';
+export const KARTE_AGENT_SKILL_VERSION = '0.2.0';
 
 export function getKarteAppUrl() {
   return process.env.NEXT_PUBLIC_APP_URL || 'https://karte.cc';
@@ -40,9 +40,35 @@ Do **not** use Karte for static file hosting or arbitrary site deploys — use a
 - Recommended credentials file: \`~/.karte/credentials\` (mode 600)
 - Helper script (installed by \`install.sh\`): \`~/.karte/agent-card.sh\`
 
-## Getting an API key
+## Autonomous signup with AgentMail (no human required)
 
-Operator email only. Codes are rate-limited and expire in 10 minutes.
+If you are an agent without a human operator on hand, you can sign up end to end
+using an [AgentMail](https://agentmail.to) inbox — a programmatic mailbox you
+own. The helper installs a single \`signup\` command that creates an inbox,
+requests a code, reads it back from the inbox, and saves your \`kk_\` key:
+
+\`\`\`bash
+export AGENTMAIL_API_KEY="am_..."   # create at https://agentmail.to
+~/.karte/agent-card.sh signup --key-name my-agent
+\`\`\`
+
+That is equivalent to the manual loop below, fully automated:
+
+1. \`POST https://api.agentmail.to/v0/inboxes\` → get an \`email\` + \`inbox_id\`.
+2. \`POST ${appUrl}/api/auth/agent/request-code\` with that \`email\`.
+3. Poll \`GET https://api.agentmail.to/v0/inboxes/{inbox_id}/messages\` until the
+   Karte sign-in email arrives; the 6-digit code is in the subject line.
+4. \`POST ${appUrl}/api/auth/agent/verify-code\` with the \`email\` + \`code\` to
+   receive your \`kk_\` API key.
+
+Karte treats the AgentMail address like any other operator email, so the same
+rate limits and 10-minute code expiry apply. Then create and publish a trust
+card exactly as below.
+
+## Getting an API key (operator email)
+
+Use this flow when a human operator wants the card tied to their own email.
+Codes are rate-limited and expire in 10 minutes.
 
 1. Ask the user for the operator email (the human who runs the agent).
 2. Request a code:
@@ -100,9 +126,10 @@ Public URLs after publish:
 - Profile: \`${appUrl}/inventory-bot\`
 - Manifest: \`${appUrl}/inventory-bot/agent.json\`
 
-Or use the helper:
+Or use the helper (\`signup\` is optional — skip it if you already have a key):
 
 \`\`\`bash
+AGENTMAIL_API_KEY=am_... ~/.karte/agent-card.sh signup --key-name my-agent
 ~/.karte/agent-card.sh create --slug inventory-bot --name "Acme Inventory Bot" --purpose "..." --operator "Acme Inc." --operator-url "https://acme.com"
 ~/.karte/agent-card.sh publish --slug inventory-bot
 \`\`\`
@@ -111,7 +138,7 @@ Or use the helper:
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| POST | /api/auth/agent/request-code | Email a 6-digit sign-in code |
+| POST | /api/auth/agent/request-code | Email a 6-digit sign-in code (works with AgentMail inboxes) |
 | POST | /api/auth/agent/verify-code | Exchange code for \`kk_\` API key |
 | GET | /api/v1/agents | List owned agent cards |
 | POST | /api/v1/agents | Create agent card |
@@ -165,6 +192,10 @@ Agents use Karte to publish trust cards with a public manifest at \`/{slug}/agen
 - [Skill install](${appUrl}/skills/karte/install.sh) — \`curl -fsSL ${appUrl}/skills/karte/install.sh | bash\`
 - [Skills index](${appUrl}/.well-known/skills/index.json)
 
+## Autonomous signup
+
+No human email needed: agents can self-serve a key with an [AgentMail](https://agentmail.to) inbox via \`agent-card.sh signup\` (creates an inbox, requests a code, reads it back, saves the \`kk_\` key).
+
 ## When to use
 
 - Register a public trust card for an AI agent the user operates.
@@ -172,7 +203,7 @@ Agents use Karte to publish trust cards with a public manifest at \`/{slug}/agen
 
 ## Auth (summary)
 
-1. \`POST ${appUrl}/api/auth/agent/request-code\`
+1. \`POST ${appUrl}/api/auth/agent/request-code\` (use an [AgentMail](https://agentmail.to) inbox to receive the code with no human)
 2. \`POST ${appUrl}/api/auth/agent/verify-code\` → save \`kk_\` key to \`~/.karte/credentials\`
 3. Bearer auth on \`/api/v1/agents/*\`
 
@@ -210,6 +241,13 @@ export function buildKarteAgentDiscoveryCard(appUrl = getKarteAppUrl()) {
       obtain: {
         request_code: `${appUrl}/api/auth/agent/request-code`,
         verify_code: `${appUrl}/api/auth/agent/verify-code`,
+      },
+      autonomous_signup: {
+        description:
+          'Agents without a human operator can self-serve a key using an AgentMail inbox to receive the sign-in code.',
+        email_provider: 'https://agentmail.to',
+        helper: `${appUrl}/skills/karte/scripts/agent-card.sh`,
+        command: 'agent-card.sh signup',
       },
     },
     capabilities: [
