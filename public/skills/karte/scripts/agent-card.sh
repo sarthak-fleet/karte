@@ -89,6 +89,19 @@ cmd_request_code() {
   request_json POST /api/auth/agent/request-code "{\"email\":\"${email}\"}" | jq .
 }
 
+# Print the first standalone 6-digit code found in the given text ($1),
+# optionally skipping a value ($2, e.g. a stale code). Requires non-digit
+# boundaries so a 6-digit run inside a longer number (a timestamp or reference
+# id) is not mistaken for the code.
+extract_code() {
+  local text="$1" exclude="${2:-}"
+  printf '%s' "${text}" \
+    | grep -oE '(^|[^0-9])[0-9]{6}([^0-9]|$)' \
+    | grep -oE '[0-9]{6}' \
+    | { if [[ -n "${exclude}" ]]; then grep -vxF "${exclude}"; else cat; fi } \
+    | head -n1 || true
+}
+
 # Fully autonomous signup for any agent that can read an email inbox. Requests a
 # Karte sign-in code, reads it back from the inbox via the caller-supplied
 # --poll-cmd, verifies it, and saves the resulting kk_ API key — no human needed.
@@ -109,24 +122,30 @@ cmd_signup() {
   [[ -n "${email}" ]] || die "signup requires --email <inbox address you can read>"
   [[ -n "${poll_cmd}" ]] || die "signup requires --poll-cmd '<command that prints the latest inbox message>'"
 
-  # 1. Ask Karte to email a sign-in code to the agent inbox.
+  # 1. Snapshot any code already in the inbox so we don't pick up a stale or
+  #    unrelated 6-digit number instead of the one Karte is about to send.
+  local baseline
+  baseline="$(extract_code "$(eval "${poll_cmd}" 2>/dev/null || true)")"
+
+  # 2. Ask Karte to email a sign-in code to the agent inbox.
   request_json POST /api/auth/agent/request-code "{\"email\":\"${email}\"}" >/dev/null \
     || die "karte: request-code failed for ${email}"
   echo "requested sign-in code; polling ${email} (timeout ${timeout}s)..." >&2
 
-  # 2. Poll the inbox until the 6-digit code arrives. --poll-cmd runs each
-  #    interval and should print the latest message; we extract the code.
+  # 3. Poll the inbox until a *new* 6-digit code arrives. --poll-cmd runs each
+  #    interval and should print the latest message; we extract the code and
+  #    ignore the baseline value captured above.
   local code="" raw deadline=$((SECONDS + timeout))
   while ((SECONDS < deadline)); do
     raw="$(eval "${poll_cmd}" 2>/dev/null || true)"
-    code="$(printf '%s' "${raw}" | grep -oE '[0-9]{6}' | head -n1 || true)"
+    code="$(extract_code "${raw}" "${baseline}")"
     [[ -n "${code}" ]] && break
     sleep "${interval}"
   done
   [[ -n "${code}" ]] || die "timed out waiting for a Karte sign-in code in ${email}"
   echo "received sign-in code" >&2
 
-  # 3. Exchange the code for a kk_ API key and persist it.
+  # 4. Exchange the code for a kk_ API key and persist it.
   local resp api_key_value dest
   resp="$(request_json POST /api/auth/agent/verify-code "{\"email\":\"${email}\",\"code\":\"${code}\",\"keyName\":\"${key_name}\"}")" \
     || die "karte: verify-code failed"
