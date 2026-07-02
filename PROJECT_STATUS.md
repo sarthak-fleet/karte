@@ -1,6 +1,6 @@
 # linkchat — PROJECT STATUS
 
-Last updated: 2026-06-28
+Last updated: 2026-07-02
 
 ## Why/What
 
@@ -76,6 +76,7 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 ## Timeline
 
+- **2026-07-02** — Added global try/catch error handler to OpenNext worker (`worker.mjs`).
 - **2026-05-25/26:** Active-AI UI tasks from loop marked done (homepage CTA, mobile first-message, guest preview, share-link loop).
 - **Production smoke:** karte.cc and workers.dev origin 200 (Workers version `b45ab8bf-4cce-4941-92b1-2e4b5ebf8769`).
 - **Security audit:** critical/high findings fixed; remaining items low-risk operational.
