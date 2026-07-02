@@ -8,6 +8,7 @@ import {
   isApiKeyFormat,
 } from '../src/lib/agent-crypto.ts';
 import {
+  buildKarteAgentDiscoveryCard,
   buildKarteAgentSkillMarkdown,
   KARTE_AGENT_SKILL_VERSION,
 } from '../src/lib/karte-agent-skill.ts';
@@ -58,4 +59,20 @@ test('buildKarteAgentSkillMarkdown includes version and auth endpoints', () => {
   assert.match(body, new RegExp(`Skill version: ${KARTE_AGENT_SKILL_VERSION}`));
   assert.match(body, /request-code/);
   assert.match(body, /agent\.json/);
+});
+
+test('buildKarteAgentSkillMarkdown documents provider-agnostic autonomous signup', () => {
+  const body = buildKarteAgentSkillMarkdown('https://karte.cc');
+  assert.match(body, /any agent with an email inbox/i);
+  assert.match(body, /agent-card\.sh signup/);
+  assert.match(body, /--poll-cmd/);
+  assert.match(body, /inbox provider is irrelevant/i);
+});
+
+test('buildKarteAgentDiscoveryCard advertises provider-agnostic autonomous signup', () => {
+  const card = buildKarteAgentDiscoveryCard('https://karte.cc');
+  const signup = card.authentication.autonomous_signup;
+  assert.match(signup.description, /email inbox/i);
+  assert.match(signup.command, /agent-card\.sh signup/);
+  assert.match(signup.command, /--poll-cmd/);
 });
