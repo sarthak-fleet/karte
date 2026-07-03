@@ -61,7 +61,7 @@ export async function POST(
 
   // Rate-limited per user since AI calls cost money + this is the only
   // place anyone can trigger an AI parse from the dashboard.
-  const { ok } = rateLimit(`timeline-import:${auth.userId}`, {
+  const { ok } = await rateLimit(`timeline-import:${auth.userId}`, {
     maxRequests: 10,
     windowMs: 60_000,
   });

@@ -48,7 +48,7 @@ src/
     themes.ts             # Theme presets
     scraper.ts            # URL scraping (Jina Reader)
     r2.ts                 # CF R2 client (avatar/image uploads via @aws-sdk/client-s3)
-    rate-limit.ts         # In-memory sliding window limiter (20 req/min/IP)
+    rate-limit.ts         # Durable sliding-window limiter (RateLimiterDO, 20 req/min/IP); fails open to in-memory
   middleware.ts           # Auth guards for /dashboard/*
 drizzle.config.ts         # Drizzle Kit config (Turso dialect)
 wrangler.jsonc            # Cloudflare Worker config (OpenNext output)
@@ -75,7 +75,7 @@ pnpm drizzle-kit studio     # Drizzle Studio UI
 - **React Compiler ON** — do NOT add manual `useMemo`/`useCallback`; compiler handles memoization.
 - **Dual deploy**: local dev uses standard Next.js with `file:local.db`. Production deploys to CF Workers via OpenNext.
 - **Generated content lifecycle**: `pending → generating → ready | error`. Cached in `generatedPages` table.
-- **Rate limiter is in-memory** — resets on deploy. Not distributed.
+- **Rate limiter is durable** — `RateLimiterDO` Durable Object backs `src/lib/rate-limit.ts`; counts survive deploys and are shared across isolates. Fails open to per-isolate in-memory fallback when the DO is missing (local dev) or errors/times out.
 - **No proper DB migrations**: some tables use runtime `CREATE TABLE IF NOT EXISTS`. Use `drizzle-kit push` for dev; verify migration strategy before prod schema changes.
 - **Knowledgebase RAG**: profile `infoBlocks` use the shared Cloudflare `knowledgebase` Worker through the `RAG_SERVICE` service binding and `RAG_SERVICE_KEY`; legacy SaasMaker RAG is no longer a fallback. Existing user fields `smProjectId`/`smApiKey`/`smIndexId` and `smDocumentId` remain as compatibility linkage columns.
 - **R2 storage**: avatar/project images in CF R2. Requires `CLOUDFLARE_ACCOUNT_ID`, `R2_BUCKET_NAME`, `R2_PUBLIC_BASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`.

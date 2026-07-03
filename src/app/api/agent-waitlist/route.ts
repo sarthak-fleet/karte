@@ -13,7 +13,7 @@ const MAX_EMAIL_LEN = 254; // RFC 5321
 export async function POST(req: Request) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const { ok } = rateLimit(`agent-waitlist:${ip}`, {
+  const { ok } = await rateLimit(`agent-waitlist:${ip}`, {
     maxRequests: 5,
     windowMs: 60_000,
   });

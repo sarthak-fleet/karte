@@ -29,16 +29,6 @@
   "placement": {
     "mode": "smart"
   },
-  "unsafe": {
-    "bindings": [
-      {
-        "name": "RATE_LIMITER",
-        "type": "ratelimit",
-        "namespace_id": "1001",
-        "simple": { "limit": 1000, "period": 60 }
-      }
-    ]
-  },
   "analytics_engine_datasets": [
     {
       "binding": "ANALYTICS"
@@ -78,11 +68,17 @@
   // Durable Object queue powering OpenNext's background revalidation of
   // ISR cache entries. The queue + the worker self-reference are required
   // for incrementalCache + queue overrides to function.
+  // RATE_LIMITER_DO backs src/lib/rate-limit.ts (rate-limiter-do.mjs) so
+  // sliding-window counts survive deploys; callers fail open if it errors.
   "durable_objects": {
     "bindings": [
       {
         "name": "NEXT_CACHE_DO_QUEUE",
         "class_name": "DOQueueHandler"
+      },
+      {
+        "name": "RATE_LIMITER_DO",
+        "class_name": "RateLimiterDO"
       }
     ]
   },
@@ -90,6 +86,10 @@
     {
       "tag": "v1",
       "new_sqlite_classes": ["DOQueueHandler"]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["RateLimiterDO"]
     }
   ],
   "services": [

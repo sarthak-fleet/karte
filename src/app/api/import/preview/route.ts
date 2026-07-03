@@ -12,7 +12,7 @@ import { isValidUrl } from '@/lib/validation';
 export async function POST(req: Request) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const { ok } = rateLimit(`import-preview:${ip}`, {
+  const { ok } = await rateLimit(`import-preview:${ip}`, {
     windowMs: 60_000,
     maxRequests: 5,
   });

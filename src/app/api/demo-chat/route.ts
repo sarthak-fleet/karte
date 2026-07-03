@@ -32,7 +32,7 @@ Rules:
 export async function POST(req: Request) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const { ok } = rateLimit(`demo-chat:${ip}`, {
+  const { ok } = await rateLimit(`demo-chat:${ip}`, {
     maxRequests: 10,
     windowMs: 60_000,
   });

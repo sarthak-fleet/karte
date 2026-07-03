@@ -135,7 +135,7 @@ export async function POST(req: Request) {
     req.headers.get('cf-connecting-ip') ||
     req.headers.get('x-forwarded-for') ||
     'anon';
-  const rate = rateLimit(`onboard-chat:${ip}`, {
+  const rate = await rateLimit(`onboard-chat:${ip}`, {
     maxRequests: 30,
     windowMs: 60_000,
   });

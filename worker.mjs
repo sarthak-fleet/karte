@@ -21,6 +21,8 @@ export {
   DOQueueHandler,
   DOShardedTagCache,
 } from './.open-next/worker.js';
+// Durable sliding-window rate limiter backing src/lib/rate-limit.ts.
+export { RateLimiterDO } from './rate-limiter-do.mjs';
 
 const CACHE_PATH = '/';
 const CACHE_CONTROL =

@@ -26,8 +26,8 @@ export async function hashClientIp(ip: string): Promise<string> {
   return hashSecret(`agent-auth-ip:${ip}`);
 }
 
-export function checkAgentAuthRateLimits(ip: string, email: string) {
-  const ipLimit = rateLimit(`agent-auth:ip:${ip}`, {
+export async function checkAgentAuthRateLimits(ip: string, email: string) {
+  const ipLimit = await rateLimit(`agent-auth:ip:${ip}`, {
     maxRequests: AGENT_AUTH_LIMITS.ipPerHour,
     windowMs: 60 * 60 * 1000,
   });
@@ -40,7 +40,7 @@ export function checkAgentAuthRateLimits(ip: string, email: string) {
     };
   }
 
-  const emailLimit = rateLimit(`agent-auth:email:${email}`, {
+  const emailLimit = await rateLimit(`agent-auth:email:${email}`, {
     maxRequests: AGENT_AUTH_LIMITS.emailPerHour,
     windowMs: 60 * 60 * 1000,
   });

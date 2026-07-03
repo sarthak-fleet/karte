@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const rateLimits = checkAgentAuthRateLimits(ip, email);
+  const rateLimits = await checkAgentAuthRateLimits(ip, email);
   if (!rateLimits.ok) {
     return NextResponse.json(
       { error: rateLimits.error, retry_after: rateLimits.retryAfter },

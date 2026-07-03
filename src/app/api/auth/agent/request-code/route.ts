@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const rateLimits = checkAgentAuthRateLimits(ip, email);
+  const rateLimits = await checkAgentAuthRateLimits(ip, email);
   if (!rateLimits.ok) {
     return limitResponse(
       rateLimits.error,

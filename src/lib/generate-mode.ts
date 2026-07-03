@@ -56,7 +56,7 @@ export async function generateProfileMode(
   if (!isBackgroundCall) {
     const ip =
       req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const { ok } = rateLimit(`${config.mode}:${ip}`, {
+    const { ok } = await rateLimit(`${config.mode}:${ip}`, {
       windowMs: 3_600_000,
       maxRequests: 3,
     });

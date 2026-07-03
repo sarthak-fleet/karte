@@ -71,11 +71,12 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 - **Dual deploy:** local `file:local.db`; production Turso + D1 on Workers.
 - **Generated content:** state machine `pending → generating → ready | error`.
-- **Rate limiter:** in-memory (`src/lib/rate-limit.ts`) — resets on deploy.
+- **Rate limiter:** durable sliding-window via `RateLimiterDO` Durable Object (`rate-limiter-do.mjs` + `src/lib/rate-limit.ts`); counts survive deploys and are shared across isolates. Fails open to per-isolate in-memory fallback when the DO is missing (local dev) or errors/times out. Same 20 req/min default semantics.
 - **SSRF-safe scraping:** `src/lib/scraper.ts` blocks loopback/RFC1918/link-local before fetch.
 
 ## Timeline
 
+- **2026-07-03** — Replaced in-memory rate limiter with durable `RateLimiterDO` Durable Object; counts now survive deploys. Removed stale `unsafe` native ratelimit binding. All `rateLimit` callers updated to `await` (now async).
 - **2026-07-02** — Added global try/catch error handler to OpenNext worker (`worker.mjs`).
 - **2026-05-25/26:** Active-AI UI tasks from loop marked done (homepage CTA, mobile first-message, guest preview, share-link loop).
 - **Production smoke:** karte.cc and workers.dev origin 200 (Workers version `b45ab8bf-4cce-4941-92b1-2e4b5ebf8769`).
@@ -141,7 +142,7 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 1. Make profile creation/editing resilient across guest, authenticated, and returning-user flows.
 2. Make memory/data connection zero-config: a creator should be able to say "I am sending data your way" through upload, paste, URL, email/webhook, or API, and Karte should infer structure, ingest through Knowledgebase, show status, and make chat use it automatically without exposing indexes, embeddings, or RAG mechanics.
 3. Creator-facing analytics for link clicks, chat interactions, and profile-mode usage (dashboard analytics exists — deepen product metrics).
-4. Harden rate limiting beyond in-memory when traffic or abuse evidence justifies it (fleet rule: explicit approval + endpoint evidence).
+4. Harden rate limiting beyond the durable sliding-window limiter when traffic or abuse evidence justifies stricter per-endpoint caps.
 5. Keep AI-generated content reviewable and traceable for profile owners.
 6. Wire richer PostHog funnels for mode usage (chat vs encyclopedia vs roast vs newspaper).
 
@@ -149,10 +150,9 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 - Broad social-network features — stay centered on public profile conversion.
 - Enterprise team management and CRM-style workflows.
-- Stricter production rate limits without endpoint-specific evidence.
+- Stricter production rate limits without endpoint-specific evidence (durable limiter is in place; tighter caps need approval + traffic data).
 - Paid tiers / billing — not active in current scope.
 
 ### Blocked
 
-- In-memory rate limiter resets on every deploy — not durable across Worker instances.
 - E2E tests assume local dev server — not run in CI by default without documented harness.
