@@ -84,6 +84,10 @@ export const metadata: Metadata = {
     'digital card',
     'Linktree alternative',
   ],
+  alternates: {
+    canonical: 'https://karte.cc',
+  },
+  authors: [{ name: 'Karte' }],
   openGraph: {
     type: 'website',
     url: SITE_URL,
@@ -105,6 +109,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'Karte',
+              url: 'https://karte.cc',
+              description:
+                'A single page for every link you carry. Karte is your digital calling card — and an AI that knows what you would say.',
+              inLanguage: 'en',
+              publisher: {
+                '@type': 'Organization',
+                name: 'Karte',
+                url: 'https://karte.cc',
+              },
+            }),
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${playfairDisplay.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
