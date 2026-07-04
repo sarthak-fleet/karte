@@ -43,14 +43,16 @@ function parseArgs() {
     if (arg === '--apply') parsed.apply = true;
     else if (arg === '--update-bio') parsed.updateBio = true;
     else if (arg === '--no-replace-existing') parsed.replaceExisting = false;
-    else if (arg === '--slug') parsed.slug = args[(index += 1)];
-    else if (arg === '--page-id') parsed.pageId = args[(index += 1)];
-    else if (arg === '--max-urls')
-      parsed.maxUrls = Math.min(
-        Number(args[(index += 1)]) || DEFAULT_MAX_URLS,
-        20,
-      );
-    else if (arg === '--help') parsed.help = true;
+    else if (arg === '--slug') {
+      index += 1;
+      parsed.slug = args[index];
+    } else if (arg === '--page-id') {
+      index += 1;
+      parsed.pageId = args[index];
+    } else if (arg === '--max-urls') {
+      index += 1;
+      parsed.maxUrls = Math.min(Number(args[index]) || DEFAULT_MAX_URLS, 20);
+    } else if (arg === '--help') parsed.help = true;
   }
 
   return parsed;
