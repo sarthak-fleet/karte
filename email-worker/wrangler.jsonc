@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "karte-email",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": ["nodejs_compat"],
+  // Email Routing: this Worker handles the *@karte.cc catch-all. Configure
+  // the catch-all rule in the Cloudflare dashboard (Email → Email Routing)
+  // to point at this Worker after `wrangler deploy`.
+  "email_routing": {
+    "enabled": true
+  },
+  // Service binding back to the main Next.js Worker so we can POST parsed
+  // mail to /api/email/inbound without needing our own D1/R2 bindings.
+  "services": [
+    {
+      "binding": "APP",
+      "service": "linkchat"
+    }
+  ],
+  "vars": {
+    "APP_PATH": "/api/email/inbound"
+    // EMAIL_INBOUND_SECRET — set with `wrangler secret put EMAIL_INBOUND_SECRET`
+    // (must match the main app's EMAIL_INBOUND_SECRET).
+    // FORWARD_FROM — optional override of the From header rewrite; defaults
+    // to preserving the original sender.
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0
+  }
+}

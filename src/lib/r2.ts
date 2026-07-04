@@ -112,3 +112,64 @@ export async function uploadImageToR2(args: {
     url: buildR2PublicUrl(args.objectKey),
   };
 }
+
+// ── Inbound email body storage (private, not exposed via public URL) ──
+// Email bodies are stored under pages/{pageId}/inbox/ and read back via
+// the R2 binding directly — never through R2_PUBLIC_BASE_URL, since these
+// are private user correspondence.
+
+type R2BucketFull = R2BucketLike & {
+  get(key: string): Promise<{
+    body: ReadableStream;
+    arrayBuffer(): Promise<ArrayBuffer>;
+  } | null>;
+  delete(key: string): Promise<void>;
+};
+
+function getR2BucketFull(): R2BucketFull | null {
+  try {
+    const { env } = getCloudflareContext();
+    return (
+      (env as unknown as { IMAGES_BUCKET?: R2BucketFull }).IMAGES_BUCKET ?? null
+    );
+  } catch {
+    return null;
+  }
+}
+
+export function createEmailBodyObjectKey(pageId: string): string {
+  return `pages/${pageId}/inbox/${Date.now()}-${crypto.randomUUID()}.eml`;
+}
+
+export async function uploadEmailBodyToR2(args: {
+  objectKey: string;
+  body: Uint8Array | ArrayBuffer | string;
+}): Promise<void> {
+  const bucket = getR2BucketFull();
+  if (!bucket) {
+    throw new Error('R2 binding IMAGES_BUCKET is not configured');
+  }
+  await bucket.put(args.objectKey, args.body as unknown as ArrayBuffer, {
+    httpMetadata: {
+      contentType: 'message/rfc822',
+      cacheControl: 'private, no-store',
+    },
+  });
+}
+
+export async function getEmailBodyFromR2(
+  objectKey: string,
+): Promise<Uint8Array | null> {
+  const bucket = getR2BucketFull();
+  if (!bucket) return null;
+  const obj = await bucket.get(objectKey);
+  if (!obj) return null;
+  const buf = await obj.arrayBuffer();
+  return new Uint8Array(buf);
+}
+
+export async function deleteEmailBodyFromR2(objectKey: string): Promise<void> {
+  const bucket = getR2BucketFull();
+  if (!bucket) return;
+  await bucket.delete(objectKey);
+}

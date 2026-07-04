@@ -43,6 +43,7 @@ export async function PUT(
     videoUrl,
     petUrl,
     petEnabled,
+    emailInboxEnabled,
   } = body;
 
   // Quick-action URL fields: accept undefined (unchanged), null/empty (clear),
@@ -153,6 +154,10 @@ export async function PUT(
       petUrl: upsertText(petUrl, page.petUrl),
       petEnabled:
         petEnabled === undefined ? page.petEnabled : Boolean(petEnabled),
+      emailInboxEnabled:
+        emailInboxEnabled === undefined
+          ? page.emailInboxEnabled
+          : Boolean(emailInboxEnabled),
       updatedAt: new Date(),
     })
     .where(eq(pages.id, pageId))

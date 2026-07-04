@@ -154,6 +154,12 @@ export const pages = sqliteTable('pages', {
   brainEndpointShape: text('brainEndpointShape')
     .$type<BrainEndpointShape>()
     .default('openai-chat'),
+  // Per-page opt-in for the slug@karte.cc inbound email inbox. Off by
+  // default so the catch-all Email Worker silently drops mail for pages
+  // that haven't enabled it — important for spam control.
+  emailInboxEnabled: integer('emailInboxEnabled', {
+    mode: 'boolean',
+  }).default(false),
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),
@@ -503,4 +509,43 @@ export const agentWaitlist = sqliteTable('agentWaitlist', {
   createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
     () => new Date(),
   ),
+});
+
+// ── Received Emails (inbound slug@karte.cc inbox) ───────────────────
+// Cloudflare Email Routing catch-all → standalone email-worker parses
+// MIME (postal-mime), forwards to the page owner's real inbox via
+// message.forward(), and POSTs metadata here. Raw body lives in R2
+// (IMAGES_BUCKET) under pages/{pageId}/inbox/{ts}-{uuid}.eml; this row
+// holds only the preview + R2 key so libSQL row-size limits stay safe.
+// See docs/email-inbox.md and migrations/d1/009_email_inbox.sql.
+export type ReceivedEmailStatus = 'unread' | 'read' | 'deleted';
+
+export const receivedEmails = sqliteTable('receivedEmails', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  pageId: text('pageId')
+    .notNull()
+    .references(() => pages.id, { onDelete: 'cascade' }),
+  // Sender envelope (parsed From header). fromName is the display name
+  // if present, otherwise null.
+  fromAddress: text('fromAddress').notNull(),
+  fromName: text('fromName'),
+  subject: text('subject'),
+  // First ~500 chars of the text body for list preview. Full body is
+  // fetched from R2 on demand via the r2Key.
+  textPreview: text('textPreview'),
+  // R2 object key for the raw .eml (or parsed text/html if we choose to
+  // store those instead). Nullable so a row can exist even if R2 write
+  // failed — preview still surfaces.
+  r2Key: text('r2Key'),
+  status: text('status')
+    .$type<ReceivedEmailStatus>()
+    .notNull()
+    .default('unread'),
+  receivedAt: integer('receivedAt', { mode: 'timestamp' }).$defaultFn(
+    () => new Date(),
+  ),
+  readAt: integer('readAt', { mode: 'timestamp' }),
+  deletedAt: integer('deletedAt', { mode: 'timestamp' }),
 });
