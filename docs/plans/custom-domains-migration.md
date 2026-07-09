@@ -29,7 +29,7 @@ Execute this plan when one of these fires:
 
 **Stays the same:**
 
-- All existing code in `src/middleware.ts`, `src/lib/page-domains.ts`,
+- All existing code in `worker-routing.mjs`, `src/lib/page-domains.ts`,
   `src/lib/cloudflare-domains.ts`, `src/app/api/pages/[pageId]/domains/*`,
   `src/components/dashboard/domain-editor.tsx`
 - `pageDomains` table + verification flow
@@ -171,7 +171,7 @@ These are leftovers from the failed CF-for-SaaS-on-Workers attempt:
 - [ ] Hit `https://karte.cc/sarthak` (or any slug) — should render profile
 - [ ] Add a fresh test hostname via the dashboard, complete validation
 - [ ] Hit the test hostname — should render the associated user's profile,
-      Host header preserved, middleware rewrites correctly
+      Host header preserved, Worker routing rewrites correctly
 - [ ] Check Cloudflare Workers analytics: dispatcher invocation count + user
       worker invocation count both incrementing
 

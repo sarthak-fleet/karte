@@ -18,6 +18,12 @@ import openNext, {
 } from './.open-next/worker.js';
 import { RateLimiterDO as RateLimiterDurableObject } from './rate-limiter-do.mjs';
 import { withTiming } from './timing.mjs';
+import {
+  addProfileCacheHeaders,
+  CACHE_CONTROL,
+  hasAuthCookie,
+  routeBeforeOpenNext,
+} from './worker-routing.mjs';
 
 // Durable Objects must be re-exported from the entry that wrangler.toml
 // points at, otherwise the bindings can't resolve them at deploy time.
@@ -29,32 +35,25 @@ export class DOShardedTagCache extends OpenNextDOShardedTagCache {}
 export class RateLimiterDO extends RateLimiterDurableObject {}
 
 const CACHE_PATH = '/';
-const CACHE_CONTROL =
-  'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
-
-// Skip cache when ANY of these cookies are present — covers the better-auth
-// session in both prod (__Secure-) and dev variants so signed-in users
-// always see live SSR (e.g. redirect to /library).
-const AUTH_COOKIE_FRAGMENTS = ['session_token', 'session-token'];
-
-function hasAuthCookie(request) {
-  const cookie = request.headers.get('cookie');
-  if (!cookie) return false;
-  return AUTH_COOKIE_FRAGMENTS.some((c) => cookie.includes(c));
-}
-
 export default {
   fetch: withTiming(async function fetch(request, env, ctx) {
     try {
+      const routed = await routeBeforeOpenNext(request, env);
+      if (routed.response) return routed.response;
+      request = routed.request ?? request;
+
       if (request.method !== 'GET') {
         return openNext.fetch(request, env, ctx);
       }
       const url = new URL(request.url);
       if (url.pathname !== CACHE_PATH) {
-        return openNext.fetch(request, env, ctx);
+        const response = await openNext.fetch(request, env, ctx);
+        return routed.cacheProfile
+          ? addProfileCacheHeaders(response)
+          : response;
       }
       // Auth-bearing requests pass straight through; the user is likely
-      // going to be redirected by middleware to /library or /dashboard.
+      // going to be redirected by Worker routing to /library or /dashboard.
       if (hasAuthCookie(request)) {
         return openNext.fetch(request, env, ctx);
       }
@@ -62,7 +61,7 @@ export default {
       // Short-circuit: the Astro landing is overlaid into
       // `.open-next/assets/index.html` by `scripts/overlay-astro-landing.mjs`.
       // For anon GET /, serve straight from the assets binding instead of
-      // booting the full OpenNext stack (next-server, middleware handler,
+      // booting the full OpenNext stack (next-server, route handler,
       // Beasties pipeline, etc.). Cuts TTFB from ~250ms to ~30ms.
       //
       // The Workers Static Assets binding does NOT auto-compress its

@@ -35,7 +35,7 @@ test('Unknown custom domain returns 404 plain text via Host header rewrite', asy
     headers: { host: 'no-such-domain.example' },
     maxRedirects: 0,
   });
-  // Either a 404 from the middleware fallback, or a redirect/normal response on
+  // Either a 404 from the Worker fallback, or a redirect/normal response on
   // app host. Accept any non-200 to keep this resilient across local setups.
   expect([200, 301, 302, 307, 308, 404]).toContain(res.status());
 });

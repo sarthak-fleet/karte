@@ -49,7 +49,7 @@ src/
     scraper.ts            # URL scraping (Jina Reader)
     r2.ts                 # CF R2 client (avatar/image uploads via @aws-sdk/client-s3)
     rate-limit.ts         # Durable sliding-window limiter (RateLimiterDO, 20 req/min/IP); fails open to in-memory
-  middleware.ts           # Auth guards for /dashboard/*
+  worker.mjs              # Edge routing/cache guard before OpenNext
 drizzle.config.ts         # Drizzle Kit config (Turso dialect)
 wrangler.jsonc            # Cloudflare Worker config (OpenNext output)
 open-next.config.ts       # OpenNext CF config
@@ -75,6 +75,7 @@ pnpm drizzle-kit studio     # Drizzle Studio UI
 - **React Compiler ON** — do NOT add manual `useMemo`/`useCallback`; compiler handles memoization.
 - **Dual deploy**: local dev uses standard Next.js with `file:local.db`. Production deploys to CF Workers via OpenNext.
 - **Generated content lifecycle**: `pending → generating → ready | error`. Cached in `generatedPages` table.
+- **Edge routing/cache guard** — `worker.mjs` and `worker-routing.mjs` handle dashboard redirects, custom-domain rewrites, landing fast path, and profile cache headers before requests enter OpenNext. Do not reintroduce Next `middleware.ts`/`proxy.ts` for these guards: Next `proxy.ts` runs on Node.js runtime in Next 16 and is not supported by the Cloudflare OpenNext adapter.
 - **Rate limiter is durable** — `RateLimiterDO` Durable Object backs `src/lib/rate-limit.ts`; counts survive deploys and are shared across isolates. Fails open to per-isolate in-memory fallback when the DO is missing (local dev) or errors/times out.
 - **No proper DB migrations**: some tables use runtime `CREATE TABLE IF NOT EXISTS`. Use `drizzle-kit push` for dev; verify migration strategy before prod schema changes.
 - **Knowledgebase RAG**: profile `infoBlocks` use the shared Cloudflare `knowledgebase` Worker through the `RAG_SERVICE` service binding and `RAG_SERVICE_KEY`; legacy SaasMaker RAG is no longer a fallback. Existing user fields `smProjectId`/`smApiKey`/`smIndexId` and `smDocumentId` remain as compatibility linkage columns.

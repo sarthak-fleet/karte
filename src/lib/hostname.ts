@@ -1,5 +1,5 @@
 /**
- * Pure hostname helpers shared between middleware, server libs, and tests.
+ * Pure hostname helpers shared between server libs and tests.
  * No `server-only` import — safe to use anywhere.
  */
 const HOSTNAME_RE =

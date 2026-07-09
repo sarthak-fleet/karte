@@ -11,7 +11,7 @@ infrastructure it relies on, and how to debug it.
 A user adds a hostname in the dashboard → Karte calls the Cloudflare for SaaS
 API to register it on the `karte.cc` zone → the user adds DNS records at their
 own DNS provider → Cloudflare validates ownership + issues an SSL cert →
-requests to the hostname hit our Worker, the middleware reads `Host`, looks up
+requests to the hostname hit our Worker, `worker-routing.mjs` reads `Host`, looks up
 `pageDomains`, and rewrites to the matching `/<slug>` route.
 
 ```
@@ -24,10 +24,10 @@ requests to the hostname hit our Worker, the middleware reads `Host`, looks up
     ↓
 [Cloudflare Worker receives request with Host: mike.com]
     ↓
-[middleware.ts: isAppHost(mike.com)? no → resolveSlugForHost(mike.com)]
+[worker-routing.mjs: isAppHost(mike.com)? no -> resolveSlugForHost(mike.com)]
 [pageDomains row: hostname='mike.com', status='verified' → slug='mike']
     ↓
-[NextResponse.rewrite("/mike") → renders Mike's profile]
+[Worker rewrites request URL to "/mike" -> renders Mike's profile]
 ```
 
 ---
@@ -38,7 +38,7 @@ requests to the hostname hit our Worker, the middleware reads `Host`, looks up
 
 | Layer | File | Role |
 |---|---|---|
-| Middleware | `src/middleware.ts` | Reads `Host` header on every request. If it's a known custom hostname, rewrites to `/<slug>`. |
+| Worker routing | `worker-routing.mjs` via `worker.mjs` | Reads `Host` header on every request. If it's a known custom hostname, rewrites to `/<slug>`. |
 | Hostname helpers | `src/lib/hostname.ts` | `isAppHost()` (allowlist of Karte's own domains), `normalizeHostname()`, DNS-instruction builder. |
 | Lookup | `src/lib/page-domains.ts` | `resolveSlugForHost()` queries the `pageDomains` table (60s in-memory cache). |
 | CF integration | `src/lib/cloudflare-domains.ts` | Wraps the Cloudflare Custom Hostnames API: add / list / verify / remove. |
@@ -98,8 +98,8 @@ Secrets (set via `pnpm exec wrangler secret put …`, not committed):
 4. **Cert issuance** — Once any one validation record is in DNS and CF can poll
    it, CF issues a Let's Encrypt cert (~30s). `status` flips to `verified`.
 
-5. **Serving** — Requests to `links.example.com` now hit the Worker. Middleware
-   resolves it to a slug and rewrites internally.
+5. **Serving** — Requests to `links.example.com` now hit the Worker. Worker
+   routing resolves it to a slug and rewrites internally.
 
 ---
 
