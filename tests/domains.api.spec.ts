@@ -1,7 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
-
 /**
  * These specs hit the running dev server and exercise the request-level
  * contracts of the custom-domain feature without authenticating. They are
@@ -13,7 +11,7 @@ test('GET /api/pages/:id/domains rejects unauthenticated requests', async ({
   request,
 }) => {
   const res = await request.get(
-    `${BASE}/api/pages/00000000-0000-0000-0000-000000000000/domains`,
+    '/api/pages/00000000-0000-0000-0000-000000000000/domains',
   );
   expect(res.status()).toBe(401);
 });
@@ -22,7 +20,7 @@ test('POST /api/pages/:id/domains rejects unauthenticated requests', async ({
   request,
 }) => {
   const res = await request.post(
-    `${BASE}/api/pages/00000000-0000-0000-0000-000000000000/domains`,
+    '/api/pages/00000000-0000-0000-0000-000000000000/domains',
     {
       data: { hostname: 'example.com' },
     },
@@ -33,7 +31,7 @@ test('POST /api/pages/:id/domains rejects unauthenticated requests', async ({
 test('Unknown custom domain returns 404 plain text via Host header rewrite', async ({
   request,
 }) => {
-  const res = await request.get(`${BASE}/`, {
+  const res = await request.get('/', {
     headers: { host: 'no-such-domain.example' },
     maxRedirects: 0,
   });
@@ -43,6 +41,6 @@ test('Unknown custom domain returns 404 plain text via Host header rewrite', asy
 });
 
 test('App host root still serves the landing page', async ({ request }) => {
-  const res = await request.get(`${BASE}/`);
+  const res = await request.get('/');
   expect(res.ok()).toBeTruthy();
 });

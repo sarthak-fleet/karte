@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -6,10 +6,12 @@ import { IntentOnboarding } from '@/components/dashboard/intent-onboarding';
 import { db, ensureProjectsTable } from '@/db';
 import {
   contactSubmissions,
+  conversations,
   generatedPages,
   infoBlocks,
   links,
   projects,
+  receivedEmails,
 } from '@/db/schema';
 import { getCurrentPage, getSession } from '@/lib/auth-server';
 
@@ -48,6 +50,8 @@ export default async function DashboardPage() {
     memoryBlocks,
     readyGeneratedPages,
     inboxMessages,
+    emailMessages,
+    chatThreads,
   ] = await Promise.all([
     db.select({ id: links.id }).from(links).where(eq(links.pageId, page.id)),
     db
@@ -71,11 +75,26 @@ export default async function DashboardPage() {
       .select({ id: contactSubmissions.id })
       .from(contactSubmissions)
       .where(eq(contactSubmissions.pageId, page.id)),
+    db
+      .select({ id: receivedEmails.id })
+      .from(receivedEmails)
+      .where(
+        and(
+          eq(receivedEmails.pageId, page.id),
+          ne(receivedEmails.status, 'deleted'),
+        ),
+      ),
+    db
+      .select({ id: conversations.id })
+      .from(conversations)
+      .where(eq(conversations.pageId, page.id)),
   ]);
 
   const readyModeCount = new Set(
     readyGeneratedPages.filter((item) => item.type).map((item) => item.type),
   ).size;
+  const inboundCount =
+    inboxMessages.length + emailMessages.length + chatThreads.length;
 
   const setupItems = [
     {
@@ -104,9 +123,19 @@ export default async function DashboardPage() {
       href: '/dashboard/appearance',
     },
     {
-      label: 'Enable DMs',
+      label: 'Enable chat assistant',
+      done: Boolean(page.chatEnabled),
+      href: '/dashboard/chats',
+    },
+    {
+      label: 'Enable direct messages',
       done: page.dmMode !== 'off',
       href: '/dashboard/appearance',
+    },
+    {
+      label: 'Enable inbound email',
+      done: Boolean(page.emailInboxEnabled),
+      href: '/dashboard/email',
     },
     {
       label: 'Generate profile modes',
@@ -139,8 +168,8 @@ export default async function DashboardPage() {
         {[
           { label: 'Links', value: pageLinks.length },
           { label: 'Projects', value: pageProjects.length },
-          { label: 'Profile Modes', value: readyModeCount },
-          { label: 'Inbox', value: inboxMessages.length },
+          { label: 'Agent surfaces', value: readyModeCount },
+          { label: 'Inbounds', value: inboundCount },
         ].map((metric) => (
           <div key={metric.label} className="rounded-2xl bg-white/[0.025] p-5">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-karte-text-4">
@@ -165,7 +194,8 @@ export default async function DashboardPage() {
               Launch Checklist
             </h2>
             <p className="mt-1 text-sm text-karte-text-3">
-              {completedCount} of {setupItems.length} core setup steps complete.
+              {completedCount} of {setupItems.length} setup steps complete for a
+              public inbound agent.
             </p>
           </div>
           <div className="h-2 rounded-full bg-white/10 sm:w-48">

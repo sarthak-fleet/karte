@@ -59,8 +59,8 @@ export default async function EmailPage() {
       <div>
         <h1 className="mb-1 text-2xl font-bold text-karte-text">Email inbox</h1>
         <p className="text-sm text-karte-text-3">
-          Mail sent to your slug@karte.cc address appears here and is forwarded
-          to your real inbox.
+          Mail sent to your slug@karte.cc address appears here. You also get a
+          short notification in your real inbox.
         </p>
       </div>
 

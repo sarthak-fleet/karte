@@ -1,12 +1,12 @@
 # linkchat — PROJECT STATUS
 
-Last updated: 2026-07-02
+Last updated: 2026-07-09
 
 ## Why/What
 
-**Thesis:** Link-in-bio platform with AI-enhanced public profile modes — creators publish a shareable page at **karte.cc**; visitors browse links or interact through chat, encyclopedia, roast, and newspaper modes.
+**Thesis:** Personal page with a public inbound assistant — creators publish a shareable page at **karte.cc**; visitors browse links, ask questions, send contact/email inbounds, and arrive with enough context for a cleaner handoff.
 
-**In scope:** Profile builder, public SSR profiles, streaming chat, generated content lifecycle, dashboard CRUD, RAG-backed memory, analytics hooks, Astro landing overlay, agent API v1.
+**In scope:** Profile builder, public SSR profiles, streaming chat, contact/email inbox, lead capture, generated content lifecycle, dashboard CRUD, RAG-backed memory, analytics hooks, Astro landing overlay, agent API v1.
 
 **Out / parked:** Social network features, enterprise CRM/team management, stricter production rate limits without endpoint-specific evidence, broad monetization beyond creator conversion.
 
@@ -76,6 +76,8 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 ## Timeline
 
+- **2026-07-09** — Repositioned the landing and product thesis around Karte as a public inbound assistant, contrasting against static page builders with chat, email, leads, and cleaner handoffs.
+- **2026-07-09** — Built out the inbound-agent product loop beyond landing copy: inbound email now feeds Lead Radar, dashboard setup includes chat/DM/email activation, and email inbox copy matches the notify-not-forward architecture.
 - **2026-07-03** — Replaced in-memory rate limiter with durable `RateLimiterDO` Durable Object; counts now survive deploys. Removed stale `unsafe` native ratelimit binding. All `rateLimit` callers updated to `await` (now async).
 - **2026-07-02** — Added global try/catch error handler to OpenNext worker (`worker.mjs`).
 - **2026-05-25/26:** Active-AI UI tasks from loop marked done (homepage CTA, mobile first-message, guest preview, share-link loop).
@@ -116,6 +118,7 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 - `/dashboard/links`, `/sections`, `/appearance`, `/widgets`, `/components`.
 - `/dashboard/projects`, `/encyclopedia`, `/memory`, `/chats`, `/inbox`, `/leads`.
 - `/dashboard/analytics`, `/timeline`, `/experiments`, `/domains`.
+- `/dashboard/leads` — lead radar across direct messages, inbound email, chat transcripts, and tracked profile activity.
 
 ### API routes (representative)
 

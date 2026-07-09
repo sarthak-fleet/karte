@@ -2,27 +2,27 @@ const FAQ_ENTRIES: { question: string; answer: string }[] = [
   {
     question: 'What is Karte?',
     answer:
-      'Karte is a link-in-bio platform with AI-enhanced profile modes. It offers chat, encyclopedia, roast, and newspaper modes that transform how visitors interact with your profile. Built on Next.js 16 and deployed on Cloudflare Workers, Karte turns a single page into a conversational digital calling card.',
+      'Karte is a personal page with a public inbound assistant. Visitors can browse your links and projects, ask questions in chat, send contact messages, or use your dedicated page inbox. The goal is simple: fewer low-context DMs and better handoffs when someone actually needs you.',
   },
   {
     question: 'Is Karte free?',
     answer:
-      'Karte offers a free tier with core link-in-bio features including links, projects, and bio sections. AI-enhanced modes — chat, encyclopedia, roast, and newspaper — become available once you configure an AI provider key in the dashboard. Custom domains and analytics are included at no cost.',
+      'Karte offers a free tier with core profile, link, project, contact, chat, custom domain, and analytics features. AI-enhanced modes become available when you configure an AI provider key in the dashboard, so creators can start with a public page and add an assistant when ready.',
   },
   {
-    question: 'What AI modes does Karte offer?',
+    question: 'How does the inbound assistant work?',
     answer:
-      'Karte offers four AI-enhanced modes: chat lets visitors converse with your profile, encyclopedia generates a knowledge entry about you, roast delivers a humorous AI critique, and newspaper reformats your profile as a news article. Each mode is generated from your profile infoBlocks and cached for fast reuse.',
+      'You add links, projects, bio sections, FAQs, and boundaries. Karte uses that profile memory to answer visitor questions before they reach your inbox. When someone wants to collaborate, hire, invite, or ask more, the dashboard keeps the thread and context together.',
   },
   {
-    question: 'How is Karte different from Linktree?',
+    question: 'How is Karte different from Carrd, Own.page, or Linktree?',
     answer:
-      'Karte adds AI-enhanced interactive modes on top of standard link-in-bio features. Beyond listing links, visitors can chat with profiles, read AI-generated encyclopedic entries, or see profiles reformatted as newspaper articles. Karte also includes first-party analytics and custom domains, deployed on Cloudflare Workers.',
+      'Carrd, Own.page, and Linktree help you publish a page quickly. Karte is built around what happens after people arrive: chat, contact, inbound email, leads, analytics, and AI profile modes. It is less a static brochure and more a first-pass agent for public attention.',
   },
   {
-    question: 'Does Karte support analytics?',
+    question: 'Does Karte handle email and leads?',
     answer:
-      'Yes. Karte includes visitor analytics with anonymous tracking via a first-party cookie and localStorage. Page views and events are recorded through the dashboard, letting you see traffic without third-party scripts. Visitor identity stays stable across sessions using a two-year cookie and a localStorage fallback.',
+      'Yes. Public contact messages, chat conversations, leads, and optional per-page inbound email are dashboard surfaces in Karte. A creator can opt into a handle-based inbox, receive messages tied to the page, and keep visitor context next to the public profile that created it.',
   },
   {
     question: 'Can I use Karte with my own domain?',

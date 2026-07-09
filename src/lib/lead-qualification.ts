@@ -32,6 +32,16 @@ export type EventLeadSignal = {
   createdAt: DateLike;
 };
 
+export type EmailLeadSignal = {
+  id: string;
+  fromAddress: string;
+  fromName: string | null;
+  subject: string | null;
+  textPreview: string | null;
+  status: 'unread' | 'read' | 'deleted';
+  receivedAt: DateLike;
+};
+
 export type QualifiedLead = {
   id: string;
   visitorId: string | null;
@@ -43,6 +53,7 @@ export type QualifiedLead = {
   reasons: string[];
   lastSeenAt: Date | null;
   contactCount: number;
+  emailCount: number;
   conversationCount: number;
   userMessageCount: number;
   eventCount: number;
@@ -55,6 +66,7 @@ type LeadBucket = {
   visitorId: string | null;
   conversationEmail: string | null;
   contacts: ContactLeadSignal[];
+  emails: EmailLeadSignal[];
   conversations: ConversationLeadSignal[];
   messages: MessageLeadSignal[];
   events: EventLeadSignal[];
@@ -103,6 +115,24 @@ function getBucketId(
   return visitorId ? `visitor:${visitorId}` : `${prefix}:${fallback}`;
 }
 
+function emailBucketId(email: string | null | undefined) {
+  const normalized = email?.trim().toLowerCase();
+  return normalized ? `email:${normalized}` : null;
+}
+
+function contactBucketId(contact: ContactLeadSignal) {
+  return contact.visitorId
+    ? getBucketId('contact', contact.visitorId, contact.id)
+    : (emailBucketId(contact.email) ?? `contact:${contact.id}`);
+}
+
+function conversationBucketId(conversation: ConversationLeadSignal) {
+  return conversation.visitorId
+    ? getBucketId('conversation', conversation.visitorId, conversation.id)
+    : (emailBucketId(conversation.visitorEmail) ??
+        `conversation:${conversation.id}`);
+}
+
 function getTier(score: number): QualifiedLead['tier'] {
   if (score >= 70) {
     return 'hot';
@@ -128,6 +158,10 @@ function getNextAction(lead: QualifiedLead) {
     return 'Reply to the verified message';
   }
 
+  if (lead.emailCount > 0) {
+    return 'Reply from the email inbox';
+  }
+
   if (lead.contactCount > 0) {
     return 'Review the anonymous DM';
   }
@@ -149,11 +183,13 @@ function getNextAction(lead: QualifiedLead) {
 
 export function qualifyVisitorLeads({
   contacts,
+  emails = [],
   conversations,
   messages,
   events,
 }: {
   contacts: ContactLeadSignal[];
+  emails?: EmailLeadSignal[];
   conversations: ConversationLeadSignal[];
   messages: MessageLeadSignal[];
   events: EventLeadSignal[];
@@ -172,6 +208,7 @@ export function qualifyVisitorLeads({
       visitorId,
       conversationEmail: null,
       contacts: [],
+      emails: [],
       conversations: [],
       messages: [],
       events: [],
@@ -181,19 +218,24 @@ export function qualifyVisitorLeads({
   }
 
   for (const contact of contacts) {
-    const bucket = ensureBucket(
-      getBucketId('contact', contact.visitorId, contact.id),
-      contact.visitorId,
-    );
+    const bucket = ensureBucket(contactBucketId(contact), contact.visitorId);
     bucket.contacts.push(contact);
   }
 
-  for (const conversation of conversations) {
-    const bucketId = getBucketId(
-      'conversation',
-      conversation.visitorId,
-      conversation.id,
+  for (const email of emails) {
+    if (email.status === 'deleted') {
+      continue;
+    }
+
+    const bucket = ensureBucket(
+      emailBucketId(email.fromAddress) ?? `email:${email.id}`,
+      null,
     );
+    bucket.emails.push(email);
+  }
+
+  for (const conversation of conversations) {
+    const bucketId = conversationBucketId(conversation);
     const bucket = ensureBucket(bucketId, conversation.visitorId);
     bucket.conversations.push(conversation);
     if (conversation.visitorEmail && !bucket.conversationEmail) {
@@ -228,8 +270,14 @@ export function qualifyVisitorLeads({
       const contact = [...bucket.contacts].sort(
         (a, b) => dateTime(b.createdAt) - dateTime(a.createdAt),
       )[0];
+      const latestEmail = [...bucket.emails].sort(
+        (a, b) => dateTime(b.receivedAt) - dateTime(a.receivedAt),
+      )[0];
       const allText = [
         ...bucket.contacts.map((item) => item.message),
+        ...bucket.emails.map((item) =>
+          [item.subject, item.textPreview].filter(Boolean).join('\n'),
+        ),
         ...userMessages.map((item) => item.content),
       ].join('\n');
 
@@ -241,6 +289,11 @@ export function qualifyVisitorLeads({
         reasons.push(
           contact?.senderType === 'email' ? 'verified contact' : 'anonymous DM',
         );
+      } else if (bucket.emails.length > 0) {
+        score += bucket.emails.some((item) => item.status === 'unread')
+          ? 34
+          : 26;
+        reasons.push('inbound email');
       } else if (bucket.conversationEmail) {
         // Chat-derived email: lead capture via the chat gate.
         score += 28;
@@ -250,6 +303,11 @@ export function qualifyVisitorLeads({
       if (bucket.contacts.some((item) => item.status === 'unread')) {
         score += 8;
         reasons.push('unread inbound');
+      }
+
+      if (bucket.emails.some((item) => item.status === 'unread')) {
+        score += 8;
+        reasons.push('unread email');
       }
 
       if (userMessages.length > 0) {
@@ -306,6 +364,7 @@ export function qualifyVisitorLeads({
 
       const lastSeenAt = latestDate([
         ...bucket.contacts.map((item) => item.createdAt),
+        ...bucket.emails.map((item) => item.receivedAt),
         ...bucket.conversations.map((item) => item.createdAt),
         ...bucket.messages.map((item) => item.createdAt),
         ...bucket.events.map((item) => item.createdAt),
@@ -327,10 +386,12 @@ export function qualifyVisitorLeads({
       );
       const resolvedEmail =
         (contact?.senderType === 'email' ? contact.email : null) ??
+        latestEmail?.fromAddress ??
         bucket.conversationEmail ??
         null;
       const resolvedName =
         contact?.name ||
+        latestEmail?.fromName ||
         (resolvedEmail ? resolvedEmail.split('@')[0] : null) ||
         (bucket.visitorId
           ? `Visitor ${bucket.visitorId.slice(0, 8)}`
@@ -347,11 +408,15 @@ export function qualifyVisitorLeads({
         reasons: uniqueStrings(reasons),
         lastSeenAt,
         contactCount: bucket.contacts.length,
+        emailCount: bucket.emails.length,
         conversationCount: bucket.conversations.length,
         userMessageCount: userMessages.length,
         eventCount: bucket.events.length,
         preview:
           contact?.message ||
+          [latestEmail?.subject, latestEmail?.textPreview]
+            .filter(Boolean)
+            .join(' — ') ||
           userMessages.sort(
             (a, b) => dateTime(b.createdAt) - dateTime(a.createdAt),
           )[0]?.content ||

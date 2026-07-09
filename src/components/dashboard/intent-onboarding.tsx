@@ -31,7 +31,7 @@ const INTENT_OPTIONS: IntentOption[] = [
     value: 'reach',
     label: 'Reach out',
     description: 'Optimize for high-quality inbound messages.',
-    checklist: ['Enable DMs', 'Review Inbox', 'Publish profile'],
+    checklist: ['Enable chat', 'Enable inbox/email', 'Review leads'],
   },
   {
     value: 'vibe',

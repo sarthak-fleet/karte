@@ -1,4 +1,4 @@
-import { asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, ne } from 'drizzle-orm';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -8,6 +8,7 @@ import {
   conversations,
   messages,
   pageEvents,
+  receivedEmails,
 } from '@/db/schema';
 import { getCurrentPage, getSession } from '@/lib/auth-server';
 import {
@@ -45,6 +46,18 @@ function tierClasses(tier: QualifiedLead['tier']) {
 }
 
 function sourceBadge(lead: QualifiedLead) {
+  if (lead.emailCount > 0 && lead.contactCount > 0) {
+    return {
+      label: 'Email + contact',
+      tone: 'border-violet-300/30 bg-violet-300/10 text-violet-100',
+    };
+  }
+  if (lead.emailCount > 0 && lead.conversationCount > 0) {
+    return {
+      label: 'Email + chat',
+      tone: 'border-violet-300/30 bg-violet-300/10 text-violet-100',
+    };
+  }
   if (lead.contactCount > 0 && lead.conversationCount > 0) {
     return {
       label: 'Chat + contact',
@@ -55,6 +68,12 @@ function sourceBadge(lead: QualifiedLead) {
     return {
       label: 'From contact form',
       tone: 'border-emerald-300/30 bg-emerald-300/10 text-emerald-100',
+    };
+  }
+  if (lead.emailCount > 0) {
+    return {
+      label: 'From email',
+      tone: 'border-indigo-300/30 bg-indigo-300/10 text-indigo-100',
     };
   }
   if (lead.conversationCount > 0) {
@@ -70,6 +89,9 @@ function metricLabel(lead: QualifiedLead) {
   const parts = [
     lead.contactCount > 0
       ? `${lead.contactCount} DM${lead.contactCount === 1 ? '' : 's'}`
+      : '',
+    lead.emailCount > 0
+      ? `${lead.emailCount} email${lead.emailCount === 1 ? '' : 's'}`
       : '',
     lead.conversationCount > 0
       ? `${lead.conversationCount} chat${lead.conversationCount === 1 ? '' : 's'}`
@@ -101,48 +123,68 @@ export default async function LeadsPage() {
     );
   }
 
-  const [contacts, chatThreads, chatMessages, events] = await Promise.all([
-    db
-      .select()
-      .from(contactSubmissions)
-      .where(eq(contactSubmissions.pageId, page.id))
-      .orderBy(desc(contactSubmissions.createdAt)),
-    db
-      .select({
-        id: conversations.id,
-        visitorId: conversations.visitorId,
-        visitorEmail: conversations.visitorEmail,
-        createdAt: conversations.createdAt,
-      })
-      .from(conversations)
-      .where(eq(conversations.pageId, page.id))
-      .orderBy(desc(conversations.createdAt)),
-    db
-      .select({
-        conversationId: messages.conversationId,
-        role: messages.role,
-        content: messages.content,
-        createdAt: messages.createdAt,
-      })
-      .from(messages)
-      .innerJoin(conversations, eq(messages.conversationId, conversations.id))
-      .where(eq(conversations.pageId, page.id))
-      .orderBy(asc(messages.createdAt)),
-    db
-      .select({
-        visitorId: pageEvents.visitorId,
-        eventType: pageEvents.eventType,
-        resourceLabel: pageEvents.resourceLabel,
-        createdAt: pageEvents.createdAt,
-      })
-      .from(pageEvents)
-      .where(eq(pageEvents.pageId, page.id))
-      .orderBy(desc(pageEvents.createdAt))
-      .limit(500),
-  ]);
+  const [contacts, inboundEmails, chatThreads, chatMessages, events] =
+    await Promise.all([
+      db
+        .select()
+        .from(contactSubmissions)
+        .where(eq(contactSubmissions.pageId, page.id))
+        .orderBy(desc(contactSubmissions.createdAt)),
+      db
+        .select({
+          id: receivedEmails.id,
+          fromAddress: receivedEmails.fromAddress,
+          fromName: receivedEmails.fromName,
+          subject: receivedEmails.subject,
+          textPreview: receivedEmails.textPreview,
+          status: receivedEmails.status,
+          receivedAt: receivedEmails.receivedAt,
+        })
+        .from(receivedEmails)
+        .where(
+          and(
+            eq(receivedEmails.pageId, page.id),
+            ne(receivedEmails.status, 'deleted'),
+          ),
+        )
+        .orderBy(desc(receivedEmails.receivedAt)),
+      db
+        .select({
+          id: conversations.id,
+          visitorId: conversations.visitorId,
+          visitorEmail: conversations.visitorEmail,
+          createdAt: conversations.createdAt,
+        })
+        .from(conversations)
+        .where(eq(conversations.pageId, page.id))
+        .orderBy(desc(conversations.createdAt)),
+      db
+        .select({
+          conversationId: messages.conversationId,
+          role: messages.role,
+          content: messages.content,
+          createdAt: messages.createdAt,
+        })
+        .from(messages)
+        .innerJoin(conversations, eq(messages.conversationId, conversations.id))
+        .where(eq(conversations.pageId, page.id))
+        .orderBy(asc(messages.createdAt)),
+      db
+        .select({
+          visitorId: pageEvents.visitorId,
+          eventType: pageEvents.eventType,
+          resourceLabel: pageEvents.resourceLabel,
+          createdAt: pageEvents.createdAt,
+        })
+        .from(pageEvents)
+        .where(eq(pageEvents.pageId, page.id))
+        .orderBy(desc(pageEvents.createdAt))
+        .limit(500),
+    ]);
 
   const leads = qualifyVisitorLeads({
     contacts,
+    emails: inboundEmails,
     conversations: chatThreads,
     messages: chatMessages,
     events,
@@ -162,8 +204,8 @@ export default async function LeadsPage() {
         <div>
           <h1 className="text-2xl font-bold text-karte-text">Lead Radar</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-karte-text-3">
-            Qualified visitors from direct messages, chat transcripts, and
-            tracked profile activity.
+            Qualified visitors from direct messages, inbound email, chat
+            transcripts, and tracked profile activity.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

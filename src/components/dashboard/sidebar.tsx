@@ -37,12 +37,18 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: 'Settings & analytics',
+    label: 'Inbound',
     items: [
-      { label: 'Analytics', href: '/dashboard/analytics' },
+      { label: 'Chats', href: '/dashboard/chats' },
       { label: 'Inbox', href: '/dashboard/inbox' },
       { label: 'Email', href: '/dashboard/email' },
       { label: 'Leads', href: '/dashboard/leads' },
+    ],
+  },
+  {
+    label: 'Settings & analytics',
+    items: [
+      { label: 'Analytics', href: '/dashboard/analytics' },
       { label: 'Domains', href: '/dashboard/domains' },
     ],
   },

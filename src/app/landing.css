@@ -960,7 +960,24 @@ html:has(.onyx-deck) body::-webkit-scrollbar { display: none; }
   .onyx-agents-p { text-align: center; }
   .onyx-agents-actions { justify-content: center; width: 100%; }
   .onyx-agents-waitlist { max-width: none; }
+  .onyx-agents-right { display: none; }
   .onyx-agent-mini { width: 100%; max-width: 360px; }
+
+  .onyx-samples-sub {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .onyx-samples-list { margin-top: 16px; }
+  .onyx-samples-link {
+    gap: 4px;
+    padding: 12px 0;
+  }
+  .onyx-samples-name { font-size: 21px; }
+  .onyx-samples-flavor { font-size: 12px; }
+  .onyx-samples-arrow {
+    margin-top: 2px;
+    font-size: 9px;
+  }
 
   .onyx-cta-h { font-size: 52px; }
   .onyx-cta-sub { font-size: 14px; }

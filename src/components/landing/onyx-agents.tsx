@@ -32,7 +32,7 @@ type AgentAuthState =
   | { step: 'done'; email: string; apiKey: string; docsUrl: string };
 
 /**
- * Card IV — For the agents, too.
+ * Card IV — The assistant.
  *
  * Operator email sign-in → API key → agent API docs.
  */
@@ -142,15 +142,16 @@ export function OnyxAgents() {
   return (
     <div className="onyx-agents">
       <div className="onyx-agents-left">
-        <div className="onyx-eyebrow">· ISSUED → ANY AGENT ·</div>
+        <div className="onyx-eyebrow">· ISSUED → YOUR INBOUND ·</div>
         <h2 className="onyx-h2">
-          For the agents,
+          Your assistant
           <br />
-          <em>too.</em>
+          <em>takes the first pass.</em>
         </h2>
         <p className="onyx-agents-p">
-          Your agent has a rate, a stack, and boundaries. It should have a card
-          too. Karte gives one to any agent you put on the open web.
+          It answers the obvious questions, asks for the missing context, and
+          keeps the awkward cold outreach out of your real inbox until there is
+          something worth reading.
         </p>
 
         {state.step === 'idle' ? (
@@ -169,7 +170,7 @@ export function OnyxAgents() {
                 });
               }}
             >
-              Get agent API key <span aria-hidden="true">→</span>
+              Open agent access <span aria-hidden="true">→</span>
             </button>
             <a className="onyx-agents-docs-link" href="/skill.md">
               Read agent skill
@@ -286,38 +287,38 @@ function AtlasMiniCard() {
     <div className="onyx-agent-mini">
       <div className="onyx-agent-mini-foil" aria-hidden="true" />
       <div className="onyx-agent-mini-top">
-        <span>AGENT EDITION</span>
+        <span>INBOUND DESK</span>
         <span>№ a-0042</span>
       </div>
       <div className="onyx-agent-mini-mid">
         <div className="onyx-agent-mini-avatar" aria-hidden="true">
           ○
         </div>
-        <div className="onyx-agent-mini-name">Atlas·4</div>
+        <div className="onyx-agent-mini-name">Karte Agent</div>
         <div className="onyx-agent-mini-rule" aria-hidden="true" />
         <div className="onyx-agent-mini-role">
-          <em>Coding agent · on call</em>
+          <em>Inbound assistant · first pass</em>
         </div>
       </div>
       <div className="onyx-agent-spec">
         <div>
-          <b>rate</b>
-          <span>on request</span>
+          <b>reply</b>
+          <span>availability · rates · links · FAQs</span>
         </div>
         <div>
-          <b>stack</b>
-          <span>TS · Rust · Postgres</span>
+          <b>intent</b>
+          <span>intent · email · project context</span>
         </div>
         <div>
-          <b>scopes</b>
-          <span>read · propose · ship (with review)</span>
+          <b>route</b>
+          <span>only the messages worth your time</span>
         </div>
       </div>
       <div className="onyx-agent-mini-bot">
-        <Link href="/atlas-demo" className="onyx-agent-mini-link">
-          karte.cc / atlas-demo
+        <Link href="/create" className="onyx-agent-mini-link">
+          karte.cc / yourname
         </Link>
-        <span>ISSUED → AGENT</span>
+        <span>ISSUED → INBOUND</span>
       </div>
     </div>
   );

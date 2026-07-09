@@ -1,5 +1,5 @@
 /**
- * Card III — The Flip: four living surfaces.
+ * Card III — The inbound desk.
  *
  * Editorial typographic list with leader-dot rules between title and
  * description, like an old-school table of contents. "Newspaper —
@@ -8,20 +8,20 @@
  * would be a feature claim we can't back.
  */
 const SURFACES: ReadonlyArray<{ i: string; t: string; b: string }> = [
-  { i: 'i.', t: 'Chat', b: 'Your AI version, on call.' },
-  { i: 'ii.', t: 'Encyclopedia', b: 'The official record.' },
-  { i: 'iii.', t: 'Newspaper', b: 'Above the fold.' },
-  { i: 'iv.', t: 'Roast', b: 'Built for screenshots.' },
+  { i: 'i.', t: 'Chat', b: 'Answers the repeat questions first.' },
+  { i: 'ii.', t: 'Email', b: 'Give inbound a dedicated front door.' },
+  { i: 'iii.', t: 'Leads', b: 'Capture who asked and why.' },
+  { i: 'iv.', t: 'Proof', b: 'Projects, links, and modes that back you up.' },
 ];
 
 export function OnyxSurfaces() {
   return (
     <div className="onyx-surfaces">
-      <div className="onyx-eyebrow center">· THE FLIP ·</div>
+      <div className="onyx-eyebrow center">· THE INBOUND DESK ·</div>
       <h2 className="onyx-h2 center">
         One memory.
         <br />
-        <em>Four living surfaces.</em>
+        <em>Four ways to handle inbound.</em>
       </h2>
       <ol className="onyx-surfaces-list">
         {SURFACES.map((s) => (

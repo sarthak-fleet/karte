@@ -9,18 +9,18 @@
 const STEPS: ReadonlyArray<{ i: string; t: string; b: string }> = [
   {
     i: 'I',
-    t: 'Feed it your memory',
-    b: 'Links, projects, FAQs, boundaries.',
+    t: 'Teach it your public life',
+    b: 'Links, projects, FAQs, rates, boundaries.',
   },
   {
     i: 'II',
-    t: 'Pick your modes',
-    b: 'Chat, Encyclopedia, Newspaper, Roast.',
+    t: 'Set the inbound brief',
+    b: 'What to answer, what to collect, what to route.',
   },
   {
     i: 'III',
-    t: 'Share one link',
-    b: 'Same link, every visitor. The page does the talking.',
+    t: 'Share one public agent',
+    b: 'Visitors ask first. Your inbox gets the cleaner version.',
   },
 ];
 
@@ -29,7 +29,7 @@ export function OnyxHow() {
     <div className="onyx-how">
       <div className="onyx-eyebrow center">· HOW IT WORKS ·</div>
       <h2 className="onyx-h2 center">
-        Three steps. <em>One afternoon.</em>
+        Your agent is live <em>before lunch.</em>
       </h2>
       <div className="onyx-how-grid">
         {STEPS.map((s) => (

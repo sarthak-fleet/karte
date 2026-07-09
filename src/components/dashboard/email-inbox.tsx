@@ -34,7 +34,6 @@ export function EmailInbox({
   pageId,
   slug,
   emailInboxEnabled,
-  unreadCount,
   initialMessages,
 }: EmailInboxProps) {
   const [enabled, setEnabled] = useState(emailInboxEnabled);
@@ -115,6 +114,7 @@ export function EmailInbox({
   }
 
   const emailAddress = `${slug}@karte.cc`;
+  const unreadCount = messages.filter((m) => m.status === 'unread').length;
 
   return (
     <div className="space-y-6">
@@ -140,8 +140,8 @@ export function EmailInbox({
               </div>
             ) : (
               <p className="mt-1 text-xs leading-5 text-karte-text-3">
-                Enable to activate {emailAddress}. Mail is forwarded to your
-                real inbox and stored here.
+                Enable to activate {emailAddress}. Mail is stored here and a
+                short notification is sent to your real inbox.
               </p>
             )}
           </div>
@@ -160,9 +160,9 @@ export function EmailInbox({
         </div>
         {enabled && (
           <p className="mt-3 text-xs leading-5 text-karte-text-4">
-            Messages are forwarded to your account email and capped at 50 stored
-            per page. Spam filtering is handled by Cloudflare Email Routing
-            (SPF/DMARC).
+            Messages are capped at 50 stored per page. Your account email gets a
+            short notification, not the full original message. Spam filtering is
+            handled by Cloudflare Email Routing (SPF/DMARC).
           </p>
         )}
       </div>

@@ -11,7 +11,7 @@ import { ImageResponse } from 'next/og';
  * carry the brand feel. The deck's full Playfair Display rendering
  * shows up the moment a visitor clicks through.
  */
-export const alt = 'Karte — Your link-in-bio, that answers back';
+export const alt = 'Karte — Everyone gets an inbound agent';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 export const revalidate = 3600; // cache OG image for 1 hour
@@ -89,7 +89,7 @@ export default function OpengraphImage() {
             display: 'flex',
           }}
         >
-          Digital Card · Card V2026
+          Inbound Agent · Card V2026
         </div>
         <div
           style={{
@@ -125,7 +125,7 @@ export default function OpengraphImage() {
             display: 'flex',
           }}
         >
-          ◆ The link-in-bio, upgraded
+          ◆ The public agent for your inbound
         </div>
         <div
           style={{
@@ -139,7 +139,7 @@ export default function OpengraphImage() {
             letterSpacing: '-0.025em',
           }}
         >
-          <div style={{ display: 'flex' }}>Your link-in-bio,</div>
+          <div style={{ display: 'flex' }}>Everyone gets</div>
           <div
             style={{
               display: 'flex',
@@ -148,7 +148,7 @@ export default function OpengraphImage() {
               marginTop: '4px',
             }}
           >
-            that answers back.
+            an agent.
           </div>
         </div>
         <div
@@ -161,7 +161,7 @@ export default function OpengraphImage() {
             lineHeight: 1.4,
           }}
         >
-          karte · /ˈkartə/ — German for card. This one talks back.
+          karte · /ˈkartə/ — German for card. This one handles inbound.
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: 'flex' }}>karte.cc/yourhandle</div>
-        <div style={{ display: 'flex' }}>Free · 60-second import</div>
+        <div style={{ display: 'flex' }}>Free · first-pass assistant</div>
       </div>
     </div>,
     { ...size },

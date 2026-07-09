@@ -11,26 +11,20 @@ import { expect, test } from '@playwright/test';
  * flow is verified manually against the mobile conventions doc.
  */
 test.describe('landing page', () => {
-  test('renders the interactive demo and key sections with no horizontal scroll', async ({
+  test('renders the inbound-agent deck with no horizontal scroll', async ({
     page,
   }) => {
     await page.goto('/');
 
-    // Hero manifesto headline (revamped landing)
     await expect(
-      page.getByRole('heading', { name: /Your link-in-bio is a/i, level: 1 }),
+      page.getByRole('heading', { name: /Everyone gets an agent/i, level: 1 }),
     ).toBeVisible();
 
-    await expect(page.getByTestId('landing-demo')).toBeVisible();
-
-    // A prompt button from the new demo
     await expect(
-      page.getByRole('button', { name: 'What is Sarthak building?' }),
+      page.getByText(/The public agent for your inbound/i),
     ).toBeVisible();
-
-    // Primary CTAs exist and are large
     await expect(
-      page.getByRole('link', { name: /See it live/i }).first(),
+      page.getByRole('link', { name: /Claim your name/i }).first(),
     ).toBeVisible();
 
     const overflow = await page.evaluate(
@@ -41,27 +35,34 @@ test.describe('landing page', () => {
     expect(overflow).toBe(false);
   });
 
-  test('demo mode tabs and prompts are interactive', async ({ page }) => {
+  test('assistant and inbound desk cards are present', async ({ page }) => {
     await page.goto('/');
 
-    const demo = page.getByTestId('landing-demo');
-    await expect(demo).toBeVisible();
+    await page
+      .getByText(/The inbound desk/i)
+      .first()
+      .scrollIntoViewIfNeeded();
+    await expect(
+      page.getByRole('heading', { name: /Four ways to handle inbound/i }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.onyx-surfaces-list').getByText('Email', { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.onyx-surfaces-list').getByText('Leads', { exact: true }),
+    ).toBeVisible();
 
-    // Switch to Encyclopedia mode
-    await demo.getByRole('button', { name: 'Encyclopedia' }).click();
-    await expect(demo.getByText(/citation-grade/i)).toBeVisible();
-
-    // Back to chat + click a prompt
-    await demo.getByRole('button', { name: 'Chat' }).click();
-    await demo.getByRole('button', { name: 'Should I reach out?' }).click();
-
-    // The assistant answer area updates (contains grounded text)
-    await expect(demo.getByText(/Boundaries/i)).toBeVisible();
+    await page.locator('.onyx-agents').scrollIntoViewIfNeeded();
+    await expect(
+      page.getByRole('heading', {
+        name: /Your assistant takes the first pass/i,
+      }),
+    ).toBeVisible();
   });
 
   test('the primary CTA is a large enough touch target', async ({ page }) => {
     await page.goto('/');
-    const cta = page.getByRole('link', { name: /See it live/i }).first();
+    const cta = page.getByRole('link', { name: /Claim your name/i }).first();
     const box = await cta.boundingBox();
     expect(box).not.toBeNull();
     expect(box?.height).toBeGreaterThanOrEqual(44);

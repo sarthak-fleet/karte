@@ -6,8 +6,8 @@ import posthog from 'posthog-js';
 /**
  * Card I — Hero.
  *
- * Carries the brand wordplay: a small italic line under the H1 picks
- * up the etymology + pun ("German for card. This one talks back.").
+ * Carries the brand wordplay while positioning Karte as an inbound
+ * assistant, not another generic page builder.
  */
 export function OnyxHero() {
   function captureClick(event: string) {
@@ -22,24 +22,25 @@ export function OnyxHero() {
     <div className="onyx-hero">
       <div className="onyx-eyebrow">
         <span className="onyx-eyebrow-dot" aria-hidden="true" />
-        The link-in-bio, upgraded
+        The public agent for your inbound
       </div>
 
       <h1 className="onyx-hero-h1">
-        Your link-in-bio,
+        Everyone gets
         <br />
-        <em>that answers back.</em>
+        <em>an agent.</em>
       </h1>
 
       <p className="onyx-hero-etymology">
         <span className="gold">karte</span> <span className="gold">·</span>{' '}
         <span className="gold">/ˈkartə/</span> — German for card.{' '}
-        <em>This one talks back.</em>
+        <em>This one handles inbound.</em>
       </p>
 
       <p className="onyx-hero-sub">
-        Same one link. But this one knows what you&rsquo;d say, and answers in
-        your voice before the question hits your inbox.
+        Movie stars have agents to filter calls, questions, and opportunities.
+        Karte gives that first-pass assistant to every public page: answers,
+        context, and cleaner handoffs before anything hits your inbox.
       </p>
 
       <div className="onyx-hero-actions">
@@ -60,7 +61,8 @@ export function OnyxHero() {
       </div>
 
       <div className="onyx-hero-fine">
-        Free · no card · 60-second import from Linktree, Beacons, or Bento.
+        Free · no card · 60-second import from Linktree, Carrd, Beacons, or
+        Bento.
       </div>
     </div>
   );

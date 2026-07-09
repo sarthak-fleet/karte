@@ -44,8 +44,8 @@ export function OnyxSamples() {
         See it on a <em>real profile.</em>
       </h2>
       <p className="onyx-samples-sub">
-        Four sample cards built from public writing. Open one and talk to it.
-        Ask what they charge, or what stack they use.
+        Four sample cards built from public writing. Open one and ask the kind
+        of question you would normally DM: fit, work, context, or next step.
       </p>
 
       <ul className="onyx-samples-list">

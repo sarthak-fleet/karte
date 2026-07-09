@@ -35,11 +35,14 @@ export function OnyxCta() {
     <div className="onyx-cta">
       <div className="onyx-eyebrow center">· CLAIM YOUR NAME ·</div>
       <h2 className="onyx-cta-h">
-        Build the profile
+        Claim the agent
         <br />
-        <em>they talk to.</em>
+        <em>people talk to.</em>
       </h2>
-      <p className="onyx-cta-sub">One link. Four surfaces. Free forever.</p>
+      <p className="onyx-cta-sub">
+        One link. One public assistant. Fewer cold messages, better handoffs.
+        Free forever.
+      </p>
       <form className="onyx-cta-form" onSubmit={handleSubmit}>
         <span className="onyx-cta-prefix">karte.cc /</span>
         <input
