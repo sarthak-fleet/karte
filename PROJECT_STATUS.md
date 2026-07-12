@@ -1,6 +1,6 @@
 # linkchat — PROJECT STATUS
 
-Last updated: 2026-07-09
+Last updated: 2026-07-13
 
 ## Why/What
 
@@ -76,6 +76,7 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 ## Timeline
 
+- **2026-07-13** — Added the approval-first Creator Opportunity Desk: owners can turn manual, timeline, contact, email, or chat signals into bounded AI-assisted partnership briefs, edit and approve drafts, then copy or open verified recipients in their own mail client. Karte does not send messages.
 - **2026-07-09** — Repositioned the landing and product thesis around Karte as a public inbound assistant, contrasting against static page builders with chat, email, leads, and cleaner handoffs.
 - **2026-07-09** — Built out the inbound-agent product loop beyond landing copy: inbound email now feeds Lead Radar, dashboard setup includes chat/DM/email activation, and email inbox copy matches the notify-not-forward architecture.
 - **2026-07-03** — Replaced in-memory rate limiter with durable `RateLimiterDO` Durable Object; counts now survive deploys. Removed stale `unsafe` native ratelimit binding. All `rateLimit` callers updated to `await` (now async).
@@ -92,6 +93,7 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 | AI profile modes | `/[slug]/encyclopedia`, `/roast`, `/newspaper` | Generated content modes |
 | Streaming chat | `/api/chat/[slug]` | Public SSE chat |
 | Creator dashboard | `/dashboard/*` | Links, appearance, memory, analytics, domains |
+| Opportunity Desk | `/dashboard/opportunities` | Owner-reviewed creator partnership signals and drafts |
 | Agent API v1 | `/api/v1/agents/[slug]` | Read/publish for external agents |
 | Landing | `/` | Astro overlay on production build |
 | Onboarding | `/create`, `/welcome`, `/login` | Page creation and auth entry |
@@ -119,12 +121,14 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 - `/dashboard/projects`, `/encyclopedia`, `/memory`, `/chats`, `/inbox`, `/leads`.
 - `/dashboard/analytics`, `/timeline`, `/experiments`, `/domains`.
 - `/dashboard/leads` — lead radar across direct messages, inbound email, chat transcripts, and tracked profile activity.
+- `/dashboard/opportunities` — page-owned creator opportunity signals, explicit AI brief generation, review, approval, copy, and user-controlled mail handoff.
 
 ### API routes (representative)
 
 - `/api/auth/*` — better-auth handler.
 - `/api/pages/*` — CRUD pages, links, sections, projects, domains, chat-config, conversations, timeline, enrich, revamp, generated-status.
 - `/api/pages/[pageId]/generate/{encyclopedia,roast,newspaper}` — AI generation.
+- `/api/pages/[pageId]/opportunities/*` — owner-only opportunity lifecycle and explicit, rate-limited brief generation.
 - `/api/chat/[slug]/messages`, `/conversations` — chat persistence.
 - `/api/uploads/images` — R2 avatar/project uploads.
 - `/api/settings/ai-key` — per-page AI key override.

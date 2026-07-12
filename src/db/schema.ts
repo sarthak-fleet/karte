@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import type { ScrapedCache } from '@/lib/scraper';
 import type { ThemeConfig } from '@/lib/themes';
@@ -460,6 +460,93 @@ export const timelineEvents = sqliteTable('timelineEvents', {
     () => new Date(),
   ),
 });
+
+// ── Creator Opportunity Desk ──────────────────────────────────────
+export type CreatorOpportunityStatus =
+  | 'signal'
+  | 'drafted'
+  | 'approved'
+  | 'dismissed';
+export type CreatorOpportunitySourceType =
+  | 'manual'
+  | 'timeline'
+  | 'lead'
+  | 'contact'
+  | 'conversation'
+  | 'email';
+
+export type CreatorOpportunitySourceSnapshot = {
+  label: string;
+  summary: string;
+  recipient?: string;
+  occurredAt?: string;
+};
+
+export type CreatorOpportunityAnalysis = {
+  schemaVersion: 1;
+  title: string;
+  leadTime: string;
+  fitRationale: string;
+  riskNotes: string[];
+  partnershipAngles: string[];
+  brandCategories: string[];
+  namedBrandHypotheses: string[];
+};
+
+export const creatorOpportunities = sqliteTable(
+  'creatorOpportunities',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    pageId: text('pageId')
+      .notNull()
+      .references(() => pages.id, { onDelete: 'cascade' }),
+    sourceType: text('sourceType')
+      .$type<CreatorOpportunitySourceType>()
+      .notNull()
+      .default('manual'),
+    sourceId: text('sourceId'),
+    sourceSnapshot: text('sourceSnapshot', { mode: 'json' })
+      .$type<CreatorOpportunitySourceSnapshot>()
+      .notNull(),
+    moment: text('moment').notNull(),
+    target: text('target'),
+    creatorNotes: text('creatorNotes'),
+    status: text('status')
+      .$type<CreatorOpportunityStatus>()
+      .notNull()
+      .default('signal'),
+    analysis: text('analysis', {
+      mode: 'json',
+    }).$type<CreatorOpportunityAnalysis>(),
+    recipient: text('recipient'),
+    recipientVerified: integer('recipientVerified', { mode: 'boolean' })
+      .notNull()
+      .default(false),
+    draftSubject: text('draftSubject'),
+    draftBody: text('draftBody'),
+    approvedAt: integer('approvedAt', { mode: 'timestamp' }),
+    createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
+      () => new Date(),
+    ),
+    updatedAt: integer('updatedAt', { mode: 'timestamp' }).$defaultFn(
+      () => new Date(),
+    ),
+  },
+  (table) => [
+    index('idx_creatorOpportunities_page_status_updated').on(
+      table.pageId,
+      table.status,
+      table.updatedAt,
+    ),
+    index('idx_creatorOpportunities_page_source').on(
+      table.pageId,
+      table.sourceType,
+      table.sourceId,
+    ),
+  ],
+);
 
 // ── Agent Waitlist ────────────────────────────────────────────────
 // Captured from card IV of the landing page until the agent subtype

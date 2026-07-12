@@ -43,6 +43,11 @@ const navGroups: NavGroup[] = [
       { label: 'Inbox', href: '/dashboard/inbox' },
       { label: 'Email', href: '/dashboard/email' },
       { label: 'Leads', href: '/dashboard/leads' },
+      {
+        label: 'Opportunities',
+        href: '/dashboard/opportunities',
+        featured: true,
+      },
     ],
   },
   {

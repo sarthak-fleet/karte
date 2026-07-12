@@ -210,6 +210,12 @@ export default async function LeadsPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
+            href="/dashboard/opportunities"
+            className="rounded-lg border border-karte-accent/35 px-4 py-2 text-sm font-medium text-karte-accent transition hover:bg-karte-accent/10"
+          >
+            Opportunity Desk
+          </Link>
+          <Link
             href="/dashboard/inbox"
             className="rounded-lg border border-karte-border-emphasis bg-white/5 px-4 py-2 text-sm font-medium text-karte-text transition hover:bg-white/10"
           >

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { TimelineEditor } from '@/components/dashboard/timeline-editor';
@@ -40,6 +41,12 @@ export default async function TimelinePage() {
           the AI surfaces (chat, encyclopedia, newspaper, roast) with dated
           context they would otherwise have to guess.
         </p>
+        <Link
+          href="/dashboard/opportunities"
+          className="mt-4 inline-flex rounded-lg border border-karte-accent/35 px-3 py-2 text-sm text-karte-accent"
+        >
+          Turn a timeline moment into an opportunity
+        </Link>
       </header>
 
       <TimelineEditor pageId={page.id} />
