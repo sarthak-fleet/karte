@@ -321,6 +321,42 @@ html:has(.onyx-deck) body::-webkit-scrollbar { display: none; }
   color: rgba(232, 223, 202, 0.78);
   margin: 0;
 }
+.onyx-proof {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+.onyx-proof-bubble {
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  max-width: 92%;
+}
+.onyx-proof-bubble.user {
+  align-self: flex-end;
+  background: rgba(196, 164, 107, 0.12);
+  border: 1px solid rgba(196, 164, 107, 0.22);
+  color: rgba(244, 235, 212, 0.95);
+}
+.onyx-proof-bubble.ai {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(196, 164, 107, 0.18);
+  color: rgba(232, 223, 202, 0.86);
+}
+.onyx-proof-fine {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: rgba(232, 223, 202, 0.48);
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 4px;
+}
 .onyx-hero-actions {
   display: flex;
   gap: 14px;
@@ -331,6 +367,15 @@ html:has(.onyx-deck) body::-webkit-scrollbar { display: none; }
   letter-spacing: 0.16em;
   color: rgba(232, 223, 202, 0.5);
   text-transform: uppercase;
+}
+.onyx-hero-fine-link {
+  color: #c4a46b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.onyx-hero-fine-link:hover {
+  color: #f6e5b8;
 }
 
 /* ── CARD II — HOW ────────────────────────────────────────────────── */
@@ -908,6 +953,9 @@ html:has(.onyx-deck) body::-webkit-scrollbar { display: none; }
   .onyx-hero-h1 { font-size: 46px; line-height: 0.98; }
   .onyx-hero-etymology { font-size: 12.5px; }
   .onyx-hero-sub { font-size: 15px; }
+  .onyx-proof { gap: 8px; }
+  .onyx-proof-bubble { font-size: 13px; padding: 10px 12px; max-width: 100%; }
+  .onyx-proof-fine { font-size: 9px; }
   .onyx-hero-actions { flex-direction: column; gap: 8px; width: 100%; }
   .onyx-hero-actions .onyx-btn-primary,
   .onyx-hero-actions .onyx-btn-ghost { width: 100%; justify-content: center; }

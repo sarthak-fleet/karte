@@ -61,7 +61,9 @@ export function OnyxCta() {
           Claim <span aria-hidden="true">→</span>
         </button>
       </form>
-      <div className="onyx-cta-fine">Free · no card · 60-second import.</div>
+      <div className="onyx-cta-fine">
+        Free · no credit card · 60-second import.
+      </div>
     </div>
   );
 }

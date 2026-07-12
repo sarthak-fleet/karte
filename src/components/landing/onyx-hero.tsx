@@ -43,6 +43,23 @@ export function OnyxHero() {
         context, and cleaner handoffs before anything hits your inbox.
       </p>
 
+      <div
+        className="onyx-proof"
+        aria-label="Example question and answer on Karte"
+      >
+        <div className="onyx-proof-bubble user">
+          “Can we sponsor your newsletter?”
+        </div>
+        <div className="onyx-proof-bubble ai">
+          “Yep — details are on my page. If it fits the guidelines, send a
+          message and I’ll reply.”
+        </div>
+        <div className="onyx-proof-fine">
+          Answers are grounded in your public links, FAQs, and boundaries — not
+          your inbox.
+        </div>
+      </div>
+
       <div className="onyx-hero-actions">
         <Link
           href="/create"
@@ -61,8 +78,17 @@ export function OnyxHero() {
       </div>
 
       <div className="onyx-hero-fine">
-        Free · no card · 60-second import from Linktree, Carrd, Beacons, or
-        Bento.
+        Free · no credit card · 60-second import from Linktree, Carrd, Beacons,
+        or Bento.
+        <br />
+        Already have a card?{' '}
+        <Link
+          href="/login"
+          className="onyx-hero-fine-link"
+          onClick={() => captureClick('landing_hero_login_clicked')}
+        >
+          Log in <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </div>
   );
