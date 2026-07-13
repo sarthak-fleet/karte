@@ -40,7 +40,7 @@
     "EMAIL_FROM_ADDRESS": "noreply@karte.cc",
     "EMAIL_FROM_NAME": "Karte",
     "AGENT_AUTH_DAILY_EMAIL_CAP": "80",
-    "LINKCHAT_DEFAULT_AI_ENDPOINT_URL": "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",
+    "LINKCHAT_DEFAULT_AI_ENDPOINT_URL": "https://ai-gateway.sassmaker.com/v1",
     "LINKCHAT_DEFAULT_AI_MODEL": "groq/llama-3.3-70b-versatile"
   },
   "send_email": [

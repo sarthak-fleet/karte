@@ -7,8 +7,7 @@ export type AiConfig = {
   model: string;
 };
 
-const DEFAULT_AI_ENDPOINT_URL =
-  'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1';
+const DEFAULT_AI_ENDPOINT_URL = 'https://ai-gateway.sassmaker.com/v1';
 const DEFAULT_AI_MODEL = 'workers-ai-llama-3.3-70b';
 const DEFAULT_FAST_AI_MODEL = 'workers-ai-llama-3b';
 const FREE_AI_PROJECT_ID = 'linkchat';
@@ -52,8 +51,9 @@ function reasoningEffortFor(
 }
 
 function isFreeAiGateway(config: AiConfig): boolean {
-  return config.endpointUrl.includes(
-    'free-ai-gateway.sarthakagrawal927.workers.dev',
+  return (
+    config.endpointUrl.includes('ai-gateway.sassmaker.com') ||
+    config.endpointUrl.includes('free-ai-gateway.sarthakagrawal927.workers.dev')
   );
 }
 
