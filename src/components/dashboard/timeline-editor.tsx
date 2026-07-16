@@ -508,7 +508,7 @@ Scaled real-time pipeline from 15k to 200k DAU. Built RAG support agents.`}
           <input
             value={form.link}
             onChange={(e) => setForm((s) => ({ ...s, link: e.target.value }))}
-            placeholder="https://github.com/sarthak-fleet/tinygpt"
+            placeholder="https://github.com/PostTrainLLM/tinygpt"
             className="rounded-xl border border-white/[0.10] bg-black/30 px-3 py-2 text-[14px] text-karte-text outline-none focus:border-karte-accent/40"
           />
         </label>

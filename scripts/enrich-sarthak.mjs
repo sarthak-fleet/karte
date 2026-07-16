@@ -43,14 +43,14 @@ const existingProjectTitles = new Set([
 const newProjects = [
   {
     title: 'TinyGPT',
-    url: 'https://github.com/sarthak-fleet/tinygpt',
+    url: 'https://github.com/PostTrainLLM/tinygpt',
     imageUrl: logo('github.com'),
     description:
       'A 0.8M-parameter transformer that trains and runs in the browser via PyTorch → WebAssembly / WebGPU. The smallest possible thing that is still a working GPT.',
   },
   {
     title: 'free-ai',
-    url: 'https://github.com/sarthak-fleet/free-ai',
+    url: 'https://github.com/sass-maker/free-ai',
     imageUrl: logo('github.com'),
     description:
       "OpenAI-compatible LLM gateway running on Cloudflare Workers. Routes to Cloudflare Workers AI, OpenRouter, or any chat-completions endpoint. Powers Karte's free tier.",
@@ -100,7 +100,7 @@ const newInfoBlocks = [
     type: 'faq',
     title: 'What is TinyGPT?',
     content:
-      'A 0.8M-param transformer I built that trains and runs entirely in the browser via PyTorch compiled to WebAssembly + WebGPU. The point: prove that the GPT architecture is small enough to fit in a webpage, and use it as a teaching artifact. Repo: github.com/sarthak-fleet/tinygpt.',
+      'A 0.8M-param transformer I built that trains and runs entirely in the browser via PyTorch compiled to WebAssembly + WebGPU. The point: prove that the GPT architecture is small enough to fit in a webpage, and use it as a teaching artifact. Repo: github.com/PostTrainLLM/tinygpt.',
   },
   {
     type: 'faq',
