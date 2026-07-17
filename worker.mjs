@@ -19,6 +19,8 @@ import openNext, {
 import { RateLimiterDO as RateLimiterDurableObject } from './rate-limiter-do.mjs';
 import { withTiming } from './timing.mjs';
 import {
+import { handleAgentEdge } from './agent-edge.mjs';
+
   addProfileCacheHeaders,
   CACHE_CONTROL,
   hasAuthCookie,
@@ -37,6 +39,12 @@ export class RateLimiterDO extends RateLimiterDurableObject {}
 const CACHE_PATH = '/';
 export default {
   fetch: withTiming(async function fetch(request, env, ctx) {
+
+    // Agent / LLM indexing surfaces (fleet GEO standard)
+    {
+      const agent = handleAgentEdge(request);
+      if (agent) return agent;
+    }
     try {
       const routed = await routeBeforeOpenNext(request, env);
       if (routed.response) return routed.response;

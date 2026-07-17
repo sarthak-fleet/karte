@@ -1,0 +1,39 @@
+{
+  "name": "Karte",
+  "version": "1",
+  "url": "https://karte.cc",
+  "llms": "https://karte.cc/llms.txt",
+  "llmsFull": null,
+  "sitemap": "https://karte.cc/sitemap.xml",
+  "markdown": {
+    "suffix": ".md",
+    "negotiation": true
+  },
+  "surfaces": [
+    {
+      "id": "home",
+      "url": "https://karte.cc/",
+      "md": "https://karte.cc/index.md",
+      "kind": "static",
+      "description": "Product home"
+    },
+    {
+      "id": "skill",
+      "url": "https://karte.cc/skill.md",
+      "md": null,
+      "kind": "static",
+      "description": "Full agent workflow"
+    },
+    {
+      "id": "llm-index",
+      "url": "https://karte.cc/llms.txt",
+      "md": null,
+      "kind": "static",
+      "description": "Agent index"
+    }
+  ],
+  "auth": {
+    "public": true,
+    "notes": "Auth-walled app routes are not agent-indexed unless listed here."
+  }
+}
