@@ -18,9 +18,8 @@ import openNext, {
 } from './.open-next/worker.js';
 import { RateLimiterDO as RateLimiterDurableObject } from './rate-limiter-do.mjs';
 import { withTiming } from './timing.mjs';
-import {
 import { handleAgentEdge } from './agent-edge.mjs';
-
+import {
   addProfileCacheHeaders,
   CACHE_CONTROL,
   hasAuthCookie,
