@@ -1,5 +1,5 @@
-import type { MetadataRoute } from 'next';
 import { eq } from 'drizzle-orm';
+import type { MetadataRoute } from 'next';
 
 import { db } from '@/db';
 import { pages } from '@/db/schema';
@@ -13,14 +13,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${siteUrl}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${siteUrl}/login`, lastModified: now, changeFrequency: 'monthly', priority: 0.3 },
-    { url: `${siteUrl}/create`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${siteUrl}/skill.md`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${siteUrl}/llms.txt`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
-    { url: `${siteUrl}/index.md`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
-    { url: `${siteUrl}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${siteUrl}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    {
+      url: `${siteUrl}/about`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/login`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${siteUrl}/create`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${siteUrl}/skill.md`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/llms.txt`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/index.md`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/privacy`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${siteUrl}/terms`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
   ];
 
   let profileRoutes: MetadataRoute.Sitemap = [];
@@ -39,7 +79,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     profileRoutes = published.flatMap((p) => {
       const lastModified =
-        p.updatedAt instanceof Date ? p.updatedAt : p.updatedAt ? new Date(p.updatedAt) : now;
+        p.updatedAt instanceof Date
+          ? p.updatedAt
+          : p.updatedAt
+            ? new Date(p.updatedAt)
+            : now;
       const base = `${siteUrl}/${p.slug}`;
       const entries: MetadataRoute.Sitemap = [
         {

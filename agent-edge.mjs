@@ -84,11 +84,16 @@ export function handleAgentEdge(request) {
       llms: `${url.origin}/llms.txt`,
       llmsFull: `${url.origin}/llms-full.txt`,
       sitemap: AGENT_SURFACE.catalog.sitemap
-        ? String(AGENT_SURFACE.catalog.sitemap).replace(AGENT_SURFACE.url, url.origin)
+        ? String(AGENT_SURFACE.catalog.sitemap).replace(
+            AGENT_SURFACE.url,
+            url.origin,
+          )
         : `${url.origin}/sitemap.xml`,
       surfaces: (AGENT_SURFACE.catalog.surfaces || []).map((s) => ({
         ...s,
-        url: s.url ? String(s.url).replace(AGENT_SURFACE.url, url.origin) : s.url,
+        url: s.url
+          ? String(s.url).replace(AGENT_SURFACE.url, url.origin)
+          : s.url,
         md: s.md ? String(s.md).replace(AGENT_SURFACE.url, url.origin) : s.md,
       })),
     };

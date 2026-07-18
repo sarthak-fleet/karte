@@ -16,9 +16,9 @@ import openNext, {
   DOQueueHandler as OpenNextDOQueueHandler,
   DOShardedTagCache as OpenNextDOShardedTagCache,
 } from './.open-next/worker.js';
+import { handleAgentEdge } from './agent-edge.mjs';
 import { RateLimiterDO as RateLimiterDurableObject } from './rate-limiter-do.mjs';
 import { withTiming } from './timing.mjs';
-import { handleAgentEdge } from './agent-edge.mjs';
 import {
   addProfileCacheHeaders,
   CACHE_CONTROL,
@@ -50,7 +50,6 @@ function isCacheableDocumentPath(pathname) {
 }
 export default {
   fetch: withTiming(async function fetch(request, env, ctx) {
-
     // Agent / LLM indexing surfaces (fleet GEO standard)
     {
       const agent = handleAgentEdge(request);
