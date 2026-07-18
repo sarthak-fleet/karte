@@ -64,3 +64,40 @@ The `linkchat_visitor_id` key in `localStorage` serves as a fallback and mirror 
 - LinkChat does not use browser fingerprinting techniques.
 - Visitor IDs are not linked to user accounts unless a visitor explicitly logs in or provides contact information.
 - Incognito browsing, manual data clearing, multiple devices, and some privacy settings can still create new visitor IDs.
+
+## Durable daily aggregates
+
+Raw events are kept for debugging but dashboard totals read from daily
+aggregate tables so historical numbers stay stable without keeping infinite
+raw rows.
+
+| Table | Holds |
+| --- | --- |
+| `dailyStats` | Daily counts for `page_view`, `hook_open`, `dm_conversion` |
+| `dailyResourceStats` | Daily counts for resource-specific events (`outbound_click`, `section_view`, `chat_cta_click`) |
+| `dailyVisitorEvents` | Per-visitor-per-day dedupe helper so aggregate increments are duplicate-tolerant |
+
+- `/api/track` and `/api/contact` call `recordAggregate` after persisting the
+  raw event, using an `ON CONFLICT DO UPDATE` upsert.
+- Unique visitor counts increment only if the `visitorId` hasn't already been
+  seen for that `(pageId, date, eventType, resourceId)` tuple.
+- Aggregates update asynchronously (non-blocking) in the tracking path; expect
+  sub-second lag before they show in the dashboard.
+- Visitor counts are unique per day; a returning visitor on a new day counts as
+  new for that day. Clearing storage / a different browser yields a new ID.
+
+### Backfill
+
+```bash
+pnpm backfill:aggregates   # repopulate aggregates from historical pageEvents
+```
+
+### Turso vs D1
+
+Aggregates currently live in **Turso** alongside the primary app data. The
+schema in `src/db/schema.ts` is plain SQLite and is D1-compatible if we later
+move aggregates to D1 (swap `src/db/index.ts` to the D1 driver in the
+Cloudflare runtime). Raw events could then offload to D1 or a time-series
+store while aggregates stay in the app DB for fast dashboard reads.
+
+> Historical migration plan retained at `docs/archive/analytics-migration.md`.

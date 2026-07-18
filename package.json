@@ -23,7 +23,8 @@
     "upload:cf": "pnpm cf:build && opennextjs-cloudflare upload",
     "format": "biome format --write .",
     "format:check": "biome format .",
-    "check": "biome check ."
+    "check": "biome check .",
+    "docs:check": "node scripts/docs-check.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.41",

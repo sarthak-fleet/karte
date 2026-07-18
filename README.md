@@ -26,7 +26,8 @@ Link-in-bio platform with AI-enhanced profile modes — chat, encyclopedia, roas
 - **Storage**: Cloudflare R2 for avatars / project images
 - **Deploy**: Cloudflare Workers via `@opennextjs/cloudflare`
 
-See `AGENTS.md` for full architecture notes.
+See `AGENTS.md` for the agent bootloader, `STATUS.md` for current status, and
+`docs/index.md` for the full documentation hub.
 
 ## Getting started
 
@@ -64,7 +65,7 @@ pnpm dev                              # http://localhost:3000
 ```bash
 pnpm dev                  # next dev
 pnpm build                # next build
-pnpm lint                 # eslint
+pnpm lint                 # biome check .
 pnpm test                 # Vitest unit tests (hostname, scraper, ...)
 pnpm test:e2e             # playwright (assumes pnpm dev on :3000)
 pnpm preview              # opennextjs-cloudflare build + local preview
@@ -95,9 +96,12 @@ pnpm drizzle-kit studio     # Drizzle Studio UI
 - **React Compiler ON** — don't hand-write `useMemo`/`useCallback`.
 - **Dual deploy** — local uses `file:local.db`; production uses Turso + D1 on CF Workers.
 - **Generated content** lifecycle: `pending → generating → ready | error`.
-- **Rate limiter is in-memory** (`src/lib/rate-limit.ts`) — resets on deploy.
+- **Rate limiter is durable** — `RateLimiterDO` Durable Object backs `src/lib/rate-limit.ts`; counts survive deploys and are shared across isolates. Fails open to in-memory when the DO is missing (local dev) or errors.
+- **Edge worker** — `worker.mjs` + `worker-routing.mjs` + `agent-edge.mjs` handle routing, cache headers, and agent indexing before OpenNext (no `middleware.ts`/`proxy.ts`).
 - **Knowledgebase RAG** — `infoBlocks` sync only to the shared Cloudflare `knowledgebase` Worker through `RAG_SERVICE` + `RAG_SERVICE_KEY`; legacy SaasMaker RAG is no longer a fallback.
 - **SSRF-safe scraping** — `src/lib/scraper.ts` blocks loopback / RFC 1918 / link-local addresses before fetching.
+
+Full architecture docs: `docs/architecture/`.
 
 ## Deploy
 

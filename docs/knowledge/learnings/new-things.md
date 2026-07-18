@@ -27,11 +27,12 @@ yourself after learning; never invent rationale.
 - Gotcha (from code): `src/lib/scraper.ts:104-112` — falls back to `https://r.jina.ai/http://` endpoint for cleaner text extraction when direct fetch produces poor results
 - Source: https://jina.ai/reader
 
-## In-memory rate limiting (sliding window)
-- What: Sliding window rate limiter using a Map with periodic cleanup — resets on deploy
+## Durable rate limiting (sliding window via Durable Object)
+- What: Sliding window rate limiter backed by a `RateLimiterDO` Durable Object so counts survive deploys and are shared across isolates; fails open to in-memory when the DO is missing/errors
 - Why here: TBD
-- Gotcha (from code): `src/lib/rate-limit.ts:1-39` — explicitly "resets on deploy. Not distributed" — fine for single-worker but won't work across multiple isolates
-- Source: https://developers.cloudflare.com/workers/reference/how-workers-work/
+- Gotcha (from code): `rate-limiter-do.mjs` + `src/lib/rate-limit.ts` — callers must `await rateLimit(...)` (async). Local dev falls back to per-isolate in-memory because the DO binding isn't wired
+- Source: https://developers.cloudflare.com/durable-objects/
+- See: `docs/architecture/rate-limiter.md`, ADR `docs/architecture/decisions/0002-durable-rate-limiter.md`
 
 ## React Compiler with no manual memoization
 - What: Using React Compiler instead of manual `useMemo`/`useCallback` — the compiler handles memoization automatically

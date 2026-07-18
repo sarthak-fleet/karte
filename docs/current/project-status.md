@@ -1,6 +1,11 @@
-# linkchat — PROJECT STATUS
+# linkchat — project status record
 
-Last updated: 2026-07-13
+Last updated: 2026-07-13.
+
+> **Living status** (objective, active work, blockers, unresolved questions,
+> next steps) lives in [`../../STATUS.md`](../../STATUS.md). This file is the
+> **durable record**: thesis, dependencies, timeline, product/feature
+> inventory.
 
 ## Why/What
 
@@ -144,7 +149,10 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 
 ## Todo / Planned / Deferred / Blocked
 
-### Planned
+> Moved to [`../../STATUS.md`](../../STATUS.md) (living status). The items
+> below are retained only as a historical snapshot of the 2026-07-13 state.
+
+### Planned (snapshot 2026-07-13)
 
 1. ~~Make profile creation/editing resilient across guest, authenticated, and returning-user flows.~~ **Paused** at current validated flow.
 2. ~~Make memory/data connection zero-config.~~ **Paused** at current Knowledgebase-backed ingest.
@@ -153,14 +161,14 @@ Browser → Cloudflare Worker (OpenNext) → Turso (pages, links, chat, projects
 5. Keep AI-generated content reviewable and traceable for profile owners.
 6. Wire richer PostHog funnels for mode usage (chat vs encyclopedia vs roast vs newspaper).
 
-### Deferred
+### Deferred (snapshot 2026-07-13)
 
 - Broad social-network features — stay centered on public profile conversion.
 - Enterprise team management and CRM-style workflows.
 - Stricter production rate limits without endpoint-specific evidence (durable limiter is in place; tighter caps need approval + traffic data).
 - Paid tiers / billing — not active in current scope.
 
-### Blocked
+### Blocked (snapshot 2026-07-13)
 
 - E2E tests assume local dev server — not run in CI by default without documented harness.
 

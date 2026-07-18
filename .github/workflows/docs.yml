@@ -1,0 +1,50 @@
+name: Docs
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "docs/**"
+      - "AGENTS.md"
+      - "STATUS.md"
+      - "README.md"
+      - "scripts/docs-check.mjs"
+      - "blume.config.ts"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "docs/**"
+      - "AGENTS.md"
+      - "STATUS.md"
+      - "README.md"
+      - "scripts/docs-check.mjs"
+      - "blume.config.ts"
+      - ".github/workflows/docs.yml"
+
+jobs:
+  validate:
+    name: Validate docs (links + structure)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Run docs validator
+        run: node scripts/docs-check.mjs
+
+  blume-build:
+    name: Blume build (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Build docs site with Blume
+        # Blume is invoked via npx; not a package dependency. Pinned to a
+        # published release. Allowed to fail so docs CI isn't blocked by an
+        # external docs-tool release.
+        run: npx --yes blume@1.0.3 build
