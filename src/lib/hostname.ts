@@ -119,7 +119,7 @@ export type DnsInstruction = {
   note?: string;
 };
 
-export function getCustomDomainCnameTarget(): string {
+function getCustomDomainCnameTarget(): string {
   const explicit =
     process.env.NEXT_PUBLIC_CUSTOM_DOMAIN_CNAME_TARGET ??
     process.env.CLOUDFLARE_CUSTOM_HOSTNAME_CNAME_TARGET;

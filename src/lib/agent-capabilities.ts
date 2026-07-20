@@ -4,7 +4,7 @@ export type AgentCapability = {
   description: string;
 };
 
-export const MAX_AGENT_CAPABILITIES = 20;
+const MAX_AGENT_CAPABILITIES = 20;
 
 export function normalizeAgentCapabilities(
   value: unknown,

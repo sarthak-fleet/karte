@@ -4,7 +4,6 @@ import { cache } from 'react';
 import { db, ensureProjectsTable } from '@/db';
 import {
   generatedPages,
-  infoBlocks,
   links,
   pageSections,
   pages,
@@ -197,7 +196,7 @@ async function loadFullPageData(slug: string) {
   };
 }
 
-export interface ModeContent {
+interface ModeContent {
   encyclopedia?: {
     body: string;
     topics: string[];
@@ -326,11 +325,6 @@ export const getPageBySlug = cache(async (slug: string) => {
   return result[0] ?? null;
 });
 
-export const getPageUser = cache(async (userId: string) => {
-  const result = await db.select().from(users).where(eq(users.id, userId));
-  return result[0] ?? null;
-});
-
 export const getPageLinks = cache(async (pageId: string) => {
   return db
     .select()
@@ -347,22 +341,6 @@ export const getPageProjects = cache(async (pageId: string) => {
     .orderBy(asc(projects.sortOrder));
 });
 
-export const getPageSections = cache(async (pageId: string) => {
-  return db
-    .select()
-    .from(pageSections)
-    .where(and(eq(pageSections.pageId, pageId), eq(pageSections.enabled, true)))
-    .orderBy(asc(pageSections.sortOrder));
-});
-
-export const getPageInfoBlocks = cache(async (pageId: string) => {
-  return db
-    .select()
-    .from(infoBlocks)
-    .where(eq(infoBlocks.pageId, pageId))
-    .orderBy(asc(infoBlocks.sortOrder));
-});
-
 export const getGeneratedPage = cache(async (pageId: string, type: string) => {
   const result = await db
     .select()
@@ -372,17 +350,4 @@ export const getGeneratedPage = cache(async (pageId: string, type: string) => {
     )
     .limit(1);
   return result[0] ?? null;
-});
-
-export const getReadyPages = cache(async (pageId: string) => {
-  const results = await db
-    .select({ type: generatedPages.type })
-    .from(generatedPages)
-    .where(
-      and(
-        eq(generatedPages.pageId, pageId),
-        eq(generatedPages.status, 'ready'),
-      ),
-    );
-  return new Set(results.map((r) => r.type));
 });

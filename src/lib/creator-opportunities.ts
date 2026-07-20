@@ -9,7 +9,7 @@ const shortText = (max: number) => z.string().trim().min(1).max(max);
 const optionalText = (max: number) =>
   z.string().trim().max(max).optional().nullable();
 
-export const opportunitySourceTypeSchema = z.enum([
+const opportunitySourceTypeSchema = z.enum([
   'manual',
   'timeline',
   'lead',
@@ -39,7 +39,7 @@ export const updateOpportunitySchema = z
   })
   .refine((value) => Object.keys(value).length > 0, 'No fields to update');
 
-export const generatedOpportunityBriefSchema = z.object({
+const generatedOpportunityBriefSchema = z.object({
   schemaVersion: z.literal(1),
   title: shortText(200),
   leadTime: shortText(240),
@@ -120,9 +120,7 @@ export function applyOpportunityLifecyclePatch(
   };
 }
 
-export function isValidEmail(
-  value: string | null | undefined,
-): value is string {
+function isValidEmail(value: string | null | undefined): value is string {
   return Boolean(value && z.string().email().safeParse(value.trim()).success);
 }
 

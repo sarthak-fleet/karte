@@ -122,19 +122,3 @@ export async function ensureAuthTables() {
 
   await authTablesReady;
 }
-
-/** Execute raw SQL on the auth D1 database */
-export async function authDbExecute(sql: string, args: unknown[] = []) {
-  const db = getD1();
-  return db
-    .prepare(sql)
-    .bind(...args)
-    .run();
-}
-
-// Keep backward compat — lazily resolve `auth`
-export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
-  get(_target, prop) {
-    return (createAuth() as Record<string | symbol, unknown>)[prop];
-  },
-});

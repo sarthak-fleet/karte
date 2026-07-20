@@ -1,6 +1,6 @@
 import type { AgentCapability, pages } from '@/db/schema';
 
-export const DEMO_AGENT_SLUG = 'atlas-demo';
+const DEMO_AGENT_SLUG = 'atlas-demo';
 
 export type AgentPageFields = Pick<
   typeof pages.$inferSelect,
@@ -19,10 +19,6 @@ export function isAgentPage(
   page: Pick<typeof pages.$inferSelect, 'pageType'>,
 ): boolean {
   return page.pageType === 'agent';
-}
-
-export function isDemoAgentSlug(slug: string | null | undefined): boolean {
-  return slug === DEMO_AGENT_SLUG;
 }
 
 export function isAgentVerified(page: AgentPageFields): boolean {

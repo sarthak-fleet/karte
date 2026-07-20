@@ -49,6 +49,6 @@ export async function parseSource(
   return { parser: parser.name, links };
 }
 
-export type { ImportedLink, Parser } from './types';
+export type { ImportedLink } from './types';
 export { ImportError } from './types';
 export { isBlockedUrl, MAX_IMPORT_LINKS } from './utils';

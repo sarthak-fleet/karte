@@ -5,7 +5,7 @@ import type { ImportedLink } from './types';
 export const MAX_IMPORT_LINKS = 30;
 export const FETCH_TIMEOUT_MS = 8000;
 
-export const BLOCKED_LABELS = new Set([
+const BLOCKED_LABELS = new Set([
   'cookie',
   'cookies',
   'privacy',
@@ -86,7 +86,7 @@ export function isBlockedUrl(urlStr: string): boolean {
   }
 }
 
-export function isAssetUrl(urlStr: string): boolean {
+function isAssetUrl(urlStr: string): boolean {
   try {
     const url = new URL(urlStr);
     const host = url.hostname.toLowerCase();
@@ -107,7 +107,7 @@ export function isAssetUrl(urlStr: string): boolean {
   }
 }
 
-export function decodeEntities(text: string) {
+function decodeEntities(text: string) {
   return text
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
@@ -120,7 +120,7 @@ export function decodeEntities(text: string) {
     .replace(/&nbsp;/g, ' ');
 }
 
-export function stripTags(value: string) {
+function stripTags(value: string) {
   return decodeEntities(
     value
       .replace(/<[^>]+>/g, ' ')
@@ -149,7 +149,7 @@ export function titleFromUrl(url: string) {
  * commonly produce `"Twitter Twitter"` because the aria-label and visible text
  * carry the same word — strip the duplicate so we get a clean title.
  */
-export function dedupeAdjacentWords(value: string): string {
+function dedupeAdjacentWords(value: string): string {
   const tokens = value.split(/\s+/).filter(Boolean);
   const out: string[] = [];
   for (const token of tokens) {

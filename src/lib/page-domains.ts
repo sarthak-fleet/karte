@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 
 import { db, ensureProjectsTable } from '@/db';
-import { pageDomains, pages } from '@/db/schema';
+import { pageDomains } from '@/db/schema';
 
 import { getAppHost, isAppHost, normalizeHostname } from './hostname';
 
@@ -11,37 +11,6 @@ const HOST_CACHE_TTL_MS = 60_000;
 
 type CachedHost = { slug: string | null; expiresAt: number };
 const hostCache = new Map<string, CachedHost>();
-
-/**
- * Resolve a verified custom-domain host to a published page slug.
- * Returns null when host is unknown or not verified. Cached in-memory.
- */
-export async function resolveSlugForHost(host: string): Promise<string | null> {
-  const normalized = normalizeHostname(host);
-  if (!normalized) return null;
-
-  const cached = hostCache.get(normalized);
-  const now = Date.now();
-  if (cached && cached.expiresAt > now) return cached.slug;
-
-  await ensureProjectsTable();
-  const rows = await db
-    .select({
-      slug: pages.slug,
-      published: pages.published,
-      status: pageDomains.status,
-    })
-    .from(pageDomains)
-    .innerJoin(pages, eq(pages.id, pageDomains.pageId))
-    .where(eq(pageDomains.hostname, normalized))
-    .limit(1);
-
-  const row = rows[0];
-  const slug =
-    row && row.status === 'verified' && row.published ? row.slug : null;
-  hostCache.set(normalized, { slug, expiresAt: now + HOST_CACHE_TTL_MS });
-  return slug;
-}
 
 export function invalidateHostCache(host?: string) {
   if (!host) {
@@ -69,14 +38,6 @@ export async function findConflictingDomain(hostname: string): Promise<{
     .where(eq(pageDomains.hostname, normalized))
     .limit(1);
   return rows[0] ?? null;
-}
-
-/**
- * List all domains attached to a page, with primary domain first.
- */
-export async function listPageDomains(pageId: string) {
-  await ensureProjectsTable();
-  return db.select().from(pageDomains).where(eq(pageDomains.pageId, pageId));
 }
 
 /**

@@ -8,7 +8,7 @@
 // profile memory by default; users may override per-component via
 // pageSettings.aiComponentDefaults (see schema.ts PageSettings).
 
-export type AIComponentType =
+type AIComponentType =
   | 'AskAgain'
   | 'AvailabilityChip'
   | 'BookCallSlot'
@@ -28,7 +28,7 @@ export type AIComponentType =
 // Visitor-driven sizing knob. Cards visitors most naturally ask to
 // resize (Project, Essay, Timeline, Metric) accept this. 'md' is the
 // rendered default when absent.
-export type ComponentSize = 'sm' | 'md' | 'lg';
+type ComponentSize = 'sm' | 'md' | 'lg';
 
 export interface AskAgainProps {
   suggestions: string[]; // 2-4 short follow-up questions
@@ -135,7 +135,7 @@ export type RenderableComponent =
 
 // Server response shape for the chat endpoint. Either text-only
 // (legacy / no components needed) or text + components array.
-export interface ChatResponse {
+interface ChatResponse {
   text: string;
   components?: RenderableComponent[];
   // Echoed back so the client can correlate suggestion chips with

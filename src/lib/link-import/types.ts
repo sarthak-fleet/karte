@@ -4,7 +4,7 @@ export type ImportedLink = {
   thumbnail?: string;
 };
 
-export type ParseContext = {
+type ParseContext = {
   /**
    * HTML body of `sourceUrl`. Some parsers ignore this and fetch their own
    * data (e.g. Linkin.bio hits a separate JSON API), in which case the

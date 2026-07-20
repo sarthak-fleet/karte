@@ -20,22 +20,22 @@ const httpUrl = z
 // 'md' is the default rendered size when absent.
 const sizeProp = z.enum(['sm', 'md', 'lg']).optional();
 
-export const askAgainSchema = z.object({
+const askAgainSchema = z.object({
   suggestions: z.array(z.string().min(1).max(120)).min(1).max(4),
 });
 
-export const availabilityChipSchema = z.object({
+const availabilityChipSchema = z.object({
   status: z.enum(['open', 'limited', 'closed']),
   label: z.string().max(120).optional(),
 });
 
-export const bookCallSlotSchema = z.object({
+const bookCallSlotSchema = z.object({
   url: httpUrl,
   label: z.string().max(80).optional(),
   duration: z.string().max(40).optional(),
 });
 
-export const essayLinkSchema = z.object({
+const essayLinkSchema = z.object({
   title: z.string().min(1).max(160),
   url: httpUrl,
   excerpt: z.string().max(400).optional(),
@@ -43,25 +43,25 @@ export const essayLinkSchema = z.object({
   size: sizeProp,
 });
 
-export const hiringStatusSchema = z.object({
+const hiringStatusSchema = z.object({
   status: z.enum(['open', 'fractional-only', 'advising-only', 'closed']),
   label: z.string().max(120).optional(),
 });
 
-export const locationCardSchema = z.object({
+const locationCardSchema = z.object({
   city: z.string().min(1).max(120),
   timezone: z.string().max(40).optional(),
   travelStatus: z.string().max(200).optional(),
 });
 
-export const metricCardSchema = z.object({
+const metricCardSchema = z.object({
   value: z.string().min(1).max(40),
   label: z.string().min(1).max(120),
   context: z.string().max(140).optional(),
   size: sizeProp,
 });
 
-export const projectMiniSchema = z.object({
+const projectMiniSchema = z.object({
   title: z.string().min(1).max(120),
   url: httpUrl.optional(),
   description: z.string().max(280).optional(),
@@ -69,12 +69,12 @@ export const projectMiniSchema = z.object({
   size: sizeProp,
 });
 
-export const quoteBlockSchema = z.object({
+const quoteBlockSchema = z.object({
   quote: z.string().min(1).max(400),
   attribution: z.string().max(120).optional(),
 });
 
-export const rateCardSchema = z.object({
+const rateCardSchema = z.object({
   tier: z.string().min(1).max(80),
   price: z.string().min(1).max(40),
   slots: z.string().max(160).optional(),
@@ -82,12 +82,12 @@ export const rateCardSchema = z.object({
   url: httpUrl.optional(),
 });
 
-export const stackListSchema = z.object({
+const stackListSchema = z.object({
   items: z.array(z.string().min(1).max(40)).min(1).max(20),
   label: z.string().max(60).optional(),
 });
 
-export const timelineSliceSchema = z.object({
+const timelineSliceSchema = z.object({
   events: z
     .array(
       z.object({
@@ -144,6 +144,4 @@ export const renderableComponentSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('TimelineSlice'), props: timelineSliceSchema }),
 ]);
 
-export type ValidatedRenderableComponent = z.infer<
-  typeof renderableComponentSchema
->;
+type ValidatedRenderableComponent = z.infer<typeof renderableComponentSchema>;

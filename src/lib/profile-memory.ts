@@ -16,7 +16,7 @@ type PageRecord = typeof pages.$inferSelect;
 
 export type ProfileMemoryMode = 'chat' | 'encyclopedia' | 'newspaper' | 'roast';
 
-export type ProfileMemorySource = {
+type ProfileMemorySource = {
   id: string;
   type:
     | 'identity'
@@ -34,7 +34,7 @@ export type ProfileMemorySource = {
   priority: number;
 };
 
-export type ProfileMemoryQuality = {
+type ProfileMemoryQuality = {
   hasEnoughForRichGeneration: boolean;
   sourceCount: number;
   missing: string[];

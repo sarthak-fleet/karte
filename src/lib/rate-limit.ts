@@ -31,7 +31,7 @@ type RateLimitOutcome = 'allowed' | 'limited' | 'observed';
  * evidence (fleet rule: no new limits without endpoint-specific evidence).
  * Note: wrangler observability samples at 10%, so treat counts as a sample.
  */
-export function logRateLimitEvent(
+function logRateLimitEvent(
   endpoint: string,
   outcome: RateLimitOutcome,
   detail: Record<string, string | number> = {},

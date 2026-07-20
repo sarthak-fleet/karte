@@ -42,5 +42,3 @@ export function generateAuthCode(): string {
   const n = randomValue % 1_000_000;
   return n.toString().padStart(6, '0');
 }
-
-export { API_KEY_PREFIX };

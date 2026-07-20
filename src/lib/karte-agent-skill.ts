@@ -1,6 +1,6 @@
 export const KARTE_AGENT_SKILL_VERSION = '0.2.0';
 
-export function getKarteAppUrl() {
+function getKarteAppUrl() {
   return process.env.NEXT_PUBLIC_APP_URL || 'https://karte.cc';
 }
 

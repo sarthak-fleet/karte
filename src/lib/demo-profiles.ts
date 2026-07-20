@@ -4,7 +4,7 @@
 //
 // Owned by the system demo@karte.cc user. Do not add real-user
 // slugs here.
-export const DEMO_SLUGS: ReadonlySet<string> = new Set([
+const DEMO_SLUGS: ReadonlySet<string> = new Set([
   'naval',
   'levelsio',
   'pg',

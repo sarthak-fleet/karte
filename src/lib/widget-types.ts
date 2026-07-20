@@ -8,7 +8,7 @@
 
 import type { ReactNode } from 'react';
 
-export type WidgetSize =
+type WidgetSize =
   /** 1-row, slim — title + maybe icon. Cheapest visual weight. */
   | 'line'
   /** 1×1 tile — title + thumbnail. Best for content with imagery. */
@@ -24,9 +24,9 @@ export type WidgetSize =
  * AI budgeting hint. The Revamp assistant uses this to keep a row visually
  * balanced — e.g. one `high` per row, or three `medium`s.
  */
-export type WidgetBudget = 'low' | 'medium' | 'high';
+type WidgetBudget = 'low' | 'medium' | 'high';
 
-export type WidgetResourceType = 'link' | 'project' | 'section' | 'info-block';
+type WidgetResourceType = 'link' | 'project' | 'section' | 'info-block';
 
 /**
  * Per-render context. Everything a variant might need that isn't on the
@@ -63,17 +63,17 @@ export interface WidgetVariant<TData> {
  * Stored layout. Lives on `pages.layoutPlan` (JSON, nullable).
  * `null` → use `buildDefaultPlan()` which mirrors the legacy rendering.
  */
-export interface LayoutPlan {
+interface LayoutPlan {
   version: 1;
   rows: LayoutRow[];
 }
 
-export interface LayoutRow {
+interface LayoutRow {
   /** Cells in this row. Total `cols` should sum to <=12. */
   cells: LayoutCell[];
 }
 
-export interface LayoutCell {
+interface LayoutCell {
   /** Matches WidgetVariant.id. */
   widgetVariantId: string;
   /** Foreign key into the resource type's table. */

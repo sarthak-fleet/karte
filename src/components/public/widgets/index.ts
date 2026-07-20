@@ -8,24 +8,14 @@ import type { ReactNode } from 'react';
 
 import type { WidgetRenderContext, WidgetVariant } from '@/lib/widget-types';
 
-import {
-  type LinkCardData,
-  linkCardVariants,
-  linkCardVariantsById,
-} from './link-card-variants';
+import { type LinkCardData, linkCardVariants } from './link-card-variants';
 import {
   type ProjectCardData,
   projectCardVariants,
-  projectCardVariantsById,
 } from './project-card-variants';
 
 export type { LinkCardData, ProjectCardData };
-export {
-  linkCardVariants,
-  linkCardVariantsById,
-  projectCardVariants,
-  projectCardVariantsById,
-};
+export { linkCardVariants, projectCardVariants };
 
 /**
  * Full catalog of every variant the renderer knows about, flattened
@@ -42,7 +32,7 @@ export type AnyWidgetVariant = Omit<
   render: (data: AnyWidgetData, ctx: WidgetRenderContext) => ReactNode;
 };
 
-export const allVariants: ReadonlyArray<AnyWidgetVariant> = [
+const allVariants: ReadonlyArray<AnyWidgetVariant> = [
   ...(linkCardVariants as unknown as ReadonlyArray<AnyWidgetVariant>),
   ...(projectCardVariants as unknown as ReadonlyArray<AnyWidgetVariant>),
   // future: ...sectionCardVariants, ...infoBlockVariants
@@ -50,21 +40,3 @@ export const allVariants: ReadonlyArray<AnyWidgetVariant> = [
 
 export const allVariantsById: Readonly<Record<string, AnyWidgetVariant>> =
   Object.freeze(Object.fromEntries(allVariants.map((v) => [v.id, v])));
-
-/**
- * Returns true if `variantId` is registered AND `data` satisfies the
- * variant's required fields. Useful before rendering a stored plan to
- * catch stale references gracefully (e.g. a plan references
- * 'link-hero' but the link's image was removed).
- */
-export function variantCanRender<TData extends Record<string, unknown>>(
-  variantId: string,
-  data: TData,
-): boolean {
-  const variant = allVariantsById[variantId];
-  if (!variant) return false;
-  return variant.requires.every((key) => {
-    const value = data[key as string];
-    return value !== undefined && value !== null && value !== '';
-  });
-}

@@ -79,7 +79,7 @@ export function createR2ImageObjectKey(args: {
   return `pages/${args.pageId}/${args.kind}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 }
 
-export function buildR2PublicUrl(objectKey: string): string {
+function buildR2PublicUrl(objectKey: string): string {
   const baseUrl = (getEnv('R2_PUBLIC_BASE_URL') ?? '').replace(/\/+$/, '');
   if (!baseUrl) {
     throw new Error(

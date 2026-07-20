@@ -1,5 +1,4 @@
 export type GeneratedPageType = 'encyclopedia' | 'roast' | 'newspaper';
-export type GeneratedPageStatus = 'pending' | 'generating' | 'ready' | 'error';
 
 export interface EncyclopediaContent {
   /** Full article body as HTML (from Novel/Tiptap editor) */

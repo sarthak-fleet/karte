@@ -1,9 +1,6 @@
 import type { pages } from '@/db/schema';
 
-export {
-  MAX_AGENT_CAPABILITIES,
-  normalizeAgentCapabilities,
-} from './agent-capabilities';
+export { normalizeAgentCapabilities } from './agent-capabilities';
 export const MAX_AGENT_PURPOSE_LENGTH = 500;
 export const MAX_AGENT_OPERATOR_LENGTH = 100;
 export const MAX_AGENT_DISCLOSURE_LENGTH = 1_000;

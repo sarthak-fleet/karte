@@ -9,13 +9,13 @@ type LinkRecord = typeof links.$inferSelect;
 type ProjectRecord = typeof projects.$inferSelect;
 type PageRecord = typeof pages.$inferSelect;
 
-export type ProfileEnrichmentProject = {
+type ProfileEnrichmentProject = {
   title: string;
   url: string;
   description: string;
 };
 
-export type ProfileEnrichmentMemoryBlock = {
+type ProfileEnrichmentMemoryBlock = {
   id: string;
   type: 'text' | 'faq' | 'current' | 'boundaries';
   title: string;
@@ -319,7 +319,7 @@ Prefer concrete projects and chat-useful memory. Keep wording concise and commer
   );
 }
 
-export async function buildProfileEnrichmentPlan(
+async function buildProfileEnrichmentPlan(
   pageId: string,
   options: AutoEnrichOptions = {},
 ): Promise<{
@@ -395,7 +395,7 @@ export async function buildProfileEnrichmentPlan(
   return { page, plan, sources: scraped };
 }
 
-export async function applyProfileEnrichmentPlan(
+async function applyProfileEnrichmentPlan(
   pageId: string,
   plan: ProfileEnrichmentPlan,
   options: Pick<AutoEnrichOptions, 'updateBio' | 'replaceExisting'> = {},

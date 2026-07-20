@@ -10,7 +10,7 @@ import { rateLimit } from './rate-limit';
 
 // Workers Paid includes 3,000 outbound emails/month. Keep agent-auth well under
 // that so other transactional mail still fits the quota.
-export const AGENT_AUTH_DAILY_EMAIL_CAP = Number(
+const AGENT_AUTH_DAILY_EMAIL_CAP = Number(
   process.env.AGENT_AUTH_DAILY_EMAIL_CAP ?? '80',
 );
 

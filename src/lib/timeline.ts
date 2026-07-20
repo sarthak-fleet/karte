@@ -1,8 +1,4 @@
-import type {
-  TimelineEventSource,
-  TimelineEventStatus,
-  TimelineEventType,
-} from '@/db/schema';
+import type { TimelineEventType } from '@/db/schema';
 
 // Display label for each event type, used in the dashboard chips +
 // public timeline badge.
@@ -99,27 +95,3 @@ export function parseWhenLabel(label: string): Date {
 
   return new Date();
 }
-
-// Render the canonical-looking whenLabel from a Date when we have a
-// timestamp but want to display a human form. Used in the GitHub
-// auto-import flow (v2) where we get ISO dates.
-export function formatWhenLabel(date: Date): string {
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-}
-
-// Re-export raw types for callers.
-export type { TimelineEventSource, TimelineEventStatus, TimelineEventType };
